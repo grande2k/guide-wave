@@ -1,0 +1,39 @@
+{
+    "start": {
+        "tourist": "For tourist",
+        "guide": "For guide"
+    },
+    "location": "Location",
+    "language": "Language",
+    "service": "Service",
+    "price": "Price",
+    "search": "Search",
+    "country": "Country",
+    "city": "City",
+    "email": "E-mail",
+    "password": "Password",
+    "confirm_password": "Confirm password",
+    "contact_admin": "Contact administrator",
+    "log_in": {
+        "title": "Log in",
+        "button": "Log in"
+    },
+    "sign_up": {
+        "title": "Sign up",
+        "button": "Sign up"
+    },
+    "placeholders": {
+        "email": "Your e-mail",
+        "password": "Your password"
+    },
+    "errors": {
+        "validation": "Fill required fields",
+        "default": "Error, please try again later",
+        "already_exists": "This account is already registered",
+        "login": "Invalid login or password"
+    },
+    "messages": {
+        "register_success": "You have successfully registered",
+        "login_success": "You have successfully logged in"
+    }
+}

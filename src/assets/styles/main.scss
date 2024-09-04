@@ -1,0 +1,158 @@
+@import "fonts";
+@import "libs";
+@import "base";
+@import "vars";
+@import "mixins";
+
+section.page {
+    max-width: 600px;
+    width: 100%;
+    padding: 0 1.25rem;
+    &--bg {
+        background-color: $primary;
+        border-radius: 1.5rem;
+        padding: 2rem 1.5rem;
+    }
+}
+
+body {
+    width: 100%;
+    height: 100%;
+    background-image: url('../images/paris-background.jpg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba($color: $black, $alpha: 0.25);
+        z-index: 1;
+    }
+}
+
+.form {
+    &-title {
+        text-align: center;
+        margin: 0 0 2.75rem 0;
+        color: $white;
+        font-weight: bold;
+        font-size: 2rem;
+    }
+    &-label {
+        @include flex-center;
+        text-align: center;
+        color: $white;
+        font-weight: 500;
+        margin: 0 0 0.625rem 0;
+        font-size: 1.25rem;
+        span {
+            @include flex-center;
+            margin-right: 0.5rem;
+            background-color: $white;
+            border-radius: 50%;
+            width: 1.5rem;
+            height: 1.5rem;
+            color: $black;
+            font-size: 0.875rem;
+            line-height: 1;
+        }
+    }
+    &-input-wrapper {
+        position: relative;
+        input {
+            position: relative;
+            z-index: 1;
+        }
+        img {
+            position: absolute;
+            top: 50%;
+            right: 0.75rem;
+            transform: translateY(-50%);
+            width: 1.5rem;
+            cursor: pointer;
+            z-index: 2;
+        }
+    }
+    &-input {
+        display: block;
+        width: 100%;
+        background-color: $white;
+        border-radius: 0.5rem;
+        padding: 1rem 0.75rem;
+        border: 2px solid $white;
+        color: $black;
+        outline: none;
+        transition: $transition;
+        line-height: 1.25;
+        &.error {
+            border-color: $error;
+            &::placeholder {
+                color: $error;
+            }
+        }
+        &::placeholder {
+            color: #aaa;
+        }
+    }
+    &-select {
+        display: block;
+        width: 100%;
+        border-radius: 0.5rem;
+        border: none;
+        padding: 1rem 0.75rem;
+        line-height: 1.25;
+        outline: none;
+        cursor: pointer;
+        color: #000;
+        background-color: $white;
+    }
+    &-submit {
+        @include flex-center;
+        width: 100%;
+        border-radius: 0.5rem;
+        margin-top: 1rem;
+        cursor: pointer;
+        border: none;
+        padding: 1rem;
+        background-color: $secondary;
+        color: $white;
+        font-weight: 500;
+        font-size: 1.25rem;
+        transition: $transition;
+        text-decoration: none;
+        img {
+            width: 1.5rem;
+            margin-right: 0.5rem;
+        }
+    }
+    &-links {
+        margin-top: 4rem;
+    }
+    &-link {
+        @include flex-center;
+        width: 100%;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        border: none;
+        padding: 1rem;
+        background-color: $dark;
+        color: $white;
+        font-weight: 500;
+        font-size: 1.25rem;
+        transition: $transition;
+        text-decoration: none;
+        &:not(:last-child) {
+            margin-bottom: 1rem;
+        }
+        img {
+            width: 1.5rem;
+            margin-right: 0.5rem;
+        }
+    }
+}
+
+@import "media";
