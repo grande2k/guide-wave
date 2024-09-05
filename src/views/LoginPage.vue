@@ -1,8 +1,8 @@
 <template>
     <section class="login page page--bg">
-        <form action="" class="login__form" @submit.prevent="submitForm">
-            <h2 class="login__title form-title" v-text="$t('log_in.title')"/>
+        <h2 class="login__title form-title" v-text="$t('log_in.title')"/>
 
+        <form action="" class="login__form" @submit.prevent="submitForm">
             <div class="login__form-field">
                 <label for="email" class="form-label" v-text="$t('email')"/>
 
@@ -17,6 +17,7 @@
 
             <div class="login__form-field">
                 <label for="password" class="form-label" v-text="$t('password')"/>
+
                 <div class="form-input-wrapper">
                     <input
                         :type="isPasswordVisible ? 'text' : 'password'"
@@ -29,29 +30,30 @@
                     <img v-if="!isPasswordVisible" src="@/assets/images/icons/eye-open.svg" @click="isPasswordVisible = true" alt="Show password">
                     <img v-else src="@/assets/images/icons/eye-close.svg" @click="isPasswordVisible = false" alt="Hide password">
                 </div>
+
+                <span v-if="v$.password.minLength.$invalid" class="form-error" v-text="$t('errors.password_length')"/>
             </div>
 
             <button type="submit" class="form-submit">
                 <img src="@/assets/images/icons/login.svg" alt="Log in">
                 {{ $t('log_in.button') }}
             </button>
-
-
-            <div class="form-links">
-                <router-link to="/signup" class="form-link" v-text="$t('sign_up.title')"/>
-                <a href="mailto:guides.to.go.2024@gmail.com" class="form-link">
-                    <img src="@/assets/images/icons/mail.svg" alt="Mail">
-                    {{ $t('contact_admin') }}
-                </a>
-            </div>
         </form>
+
+        <div class="form-links">
+            <router-link to="/signup" class="form-link" v-text="$t('sign_up.title')"/>
+            <a href="mailto:guides.to.go.2024@gmail.com" class="form-link">
+                <img src="@/assets/images/icons/mail.svg" alt="Mail">
+                {{ $t('contact_admin') }}
+            </a>
+        </div>
     </section>
 </template>
 
 <script setup>
     import { ref, computed, reactive } from 'vue';
     import { useVuelidate } from '@vuelidate/core';
-    import { required, email } from '@vuelidate/validators';
+    import { required, email, minLength } from '@vuelidate/validators';
     import { useToast } from 'vue-toastification';
     import { useI18n } from 'vue-i18n';
     import { useRouter } from 'vue-router';
@@ -70,7 +72,7 @@
     const rules = computed(() => {
         return {
             email: { required, email },
-            password: { required },
+            password: { required, minLength: minLength(6) },
         }
     });
 
@@ -79,13 +81,11 @@
     const login = async () => {
         try {
             const params = {
-                username: form_data.email,
+                email: form_data.email,
                 password: form_data.password
             };
 
-            const request_headers = {headers: {'Content-Type': 'application/x-www-form-urlencoded'}};
-
-            const response = await axios.post('https://guides-to-go.onrender.com/auth/jwt/login', params, request_headers);
+            const response = await axios.post('https://guides-to-go.onrender.com/auth/login', params);
 
             console.log(response);
 
@@ -95,7 +95,7 @@
             toast.success( t('messages.login_success') );
         } catch (error) {
             switch (error.response.status) {
-                case 400:
+                case 401:
                     toast.error( t('errors.login') );
                     break;
                 case 422:
@@ -126,6 +126,14 @@
 
 <style lang="scss" scoped>
     .login {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 650px;
+        @media screen and (max-width: 480px) {
+            min-height: unset;
+            display: block;
+        }
         &__form {
             &-field {
                 &:not(:last-child) {

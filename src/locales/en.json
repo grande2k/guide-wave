@@ -11,6 +11,7 @@
     "country": "Country",
     "city": "City",
     "email": "E-mail",
+    "tel": "Phone number",
     "password": "Password",
     "confirm_password": "Confirm password",
     "contact_admin": "Contact administrator",
@@ -24,13 +25,18 @@
     },
     "placeholders": {
         "email": "Your e-mail",
+        "tel": "Your phone number",
         "password": "Your password"
     },
     "errors": {
         "validation": "Fill required fields",
         "default": "Error, please try again later",
         "already_exists": "This account is already registered",
-        "login": "Invalid login or password"
+        "login": "Invalid login or password",
+        "password_length": "Password must be at least 6 characters",
+        "password_not_same": "Passwords do not match",
+        "phone_length": "Phone number must be at least 6 numbers",
+        "phone_integer": "Only numbers allowed"
     },
     "messages": {
         "register_success": "You have successfully registered",
