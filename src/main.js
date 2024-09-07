@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
 import Toast from 'vue-toastification'
+import VueCookies from 'vue-cookies'
 import App from '@/App.vue'
 import router from '@/router'
 
@@ -35,4 +36,5 @@ app.use(createPinia())
 app.use(i18n)
 app.use(router)
 app.use(Toast, toastOptions)
+app.use(VueCookies, { expires: '1m'})
 app.mount('#app')

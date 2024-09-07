@@ -9,33 +9,29 @@
 
                 <div class="row">
                     <autocomplete-field :items="countries" :placeholder="$t('country')" @select="handleCountrySelect"/>
-                    <autocomplete-field :items="cities" :placeholder="$t('city')" :disabled="!is_country_valid" @select="handleCitySelect"/>
+                    <autocomplete-field :items="cities" :placeholder="$t('city')" :disabled="!is_country_valid || !cities" @select="handleCitySelect"/>
                 </div>
             </div>
 
-            <div class="tourist__form-field" :class="{ 'active': form_data.country && form_data.city }">
+            <div class="tourist__form-field" :class="{ 'active': form_data.country_id && form_data.city_id }">
                 <p class="form-label">
                     <span>2</span>
                     {{ $t('language') }}
                 </p>
 
-                <select name="language" class="tourist__form-select form-select" v-model="lowercaseLanguage">
-                    <option v-for="(lang, index) in languages" :key="index" :value="lang" v-text="lang"/>
-                </select>
+                <form-select :options="['Русский', 'Английский', 'Испанский']" :placeholder="$t('placeholders.language')" @choose="e => form_data.language = e.toLowerCase()"/>
             </div>
 
-            <div class="tourist__form-field" :class="{ 'active': form_data.country && form_data.city && form_data.language }">
+            <div class="tourist__form-field" :class="{ 'active': form_data.country_id && form_data.city_id && form_data.language }">
                 <p class="form-label">
                     <span>3</span>
                     {{ $t('service') }}
                 </p>
                 
-                <select name="service" class="tourist__form-select form-select" v-model="lowercaseService">
-                    <option v-for="(service, index) in services" :key="index" :value="service" v-text="service"/>
-                </select>
+                <form-select :options="['Экскурсия', 'Катание на лодке', 'Прыжки с парашюта']" :placeholder="$t('placeholders.service_type')" @choose="e => form_data.service = e.toLowerCase()"/>
             </div>
 
-            <div class="tourist__form-field" :class="{ 'active': form_data.country && form_data.city && form_data.language && form_data.service }">
+            <div class="tourist__form-field" :class="{ 'active': form_data.country_id && form_data.city_id && form_data.language && form_data.service }">
                 <p class="form-label">
                     <span>4</span>
                     {{ $t('price') }}
@@ -52,7 +48,7 @@
                 </div>
             </div>
 
-            <button type="submit" class="tourist__form-submit form-submit" :class="{ 'active': form_data.country && form_data.city && form_data.language && form_data.service }">
+            <button type="submit" class="tourist__form-submit form-submit" :class="{ 'active': form_data.country_id && form_data.city_id && form_data.language && form_data.service }">
                 <img src="@/assets/images/icons/search.svg" alt="Find">
                 {{ $t('search') }}
             </button>
@@ -61,26 +57,32 @@
 </template>
 
 <script setup>
-    import { ref, reactive, computed } from 'vue';
+    import { ref, onMounted } from 'vue';
+    import { defaultLocale } from '@/locales';
+    import { useToast } from 'vue-toastification';
+    import { useI18n } from 'vue-i18n';
+    import axios from 'axios';
+    import FormSelect from '@/components/FormSelect.vue';
     import AutocompleteField from '@/components/AutocompleteField.vue';
 
     const is_country_valid = ref(false);
+    const { t } = useI18n();
+    const toast = useToast();
 
-    const form_data = reactive({
-        country: null,
-        city: null,
+    const form_data = ref({
+        country_id: null,
+        city_id: null,
         service: null,
         language: null,
         price_range: null,
     });
 
-    const countries = ["Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Anguilla", "Antigua &amp; Barbuda", "Argentina", "Armenia", "Aruba", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bermuda", "Bhutan", "Bolivia", "Bosnia &amp; Herzegovina", "Botswana", "Brazil", "British Virgin Islands", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cambodia", "Cameroon", "Cape Verde", "Cayman Islands", "Chad", "Chile", "China", "Colombia", "Congo", "Cook Islands", "Costa Rica", "Cote D Ivoire", "Croatia", "Cruise Ship", "Cuba", "Cyprus", "Czech Republic", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Estonia", "Ethiopia", "Falkland Islands", "Faroe Islands", "Fiji", "Finland", "France", "French Polynesia", "French West Indies", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Gibraltar", "Greece", "Greenland", "Grenada", "Guam", "Guatemala", "Guernsey", "Guinea", "Guinea Bissau", "Guyana", "Haiti", "Honduras", "Hong Kong", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Isle of Man", "Israel", "Italy", "Jamaica", "Japan", "Jersey", "Jordan", "Kazakhstan", "Kenya", "Kuwait", "Kyrgyz Republic", "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Macau", "Macedonia", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Mauritania", "Mauritius", "Mexico", "Moldova", "Monaco", "Mongolia", "Montenegro", "Montserrat", "Morocco", "Mozambique", "Namibia", "Nepal", "Netherlands", "Netherlands Antilles", "New Caledonia", "New Zealand", "Nicaragua", "Niger", "Nigeria", "Norway", "Oman", "Pakistan", "Palestine", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal", "Puerto Rico", "Qatar", "Reunion", "Romania", "Russia", "Rwanda", "Saint Pierre &amp; Miquelon", "Samoa", "San Marino", "Satellite", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "South Africa", "South Korea", "Spain", "Sri Lanka", "St Kitts &amp; Nevis", "St Lucia", "St Vincent", "St. Lucia", "Sudan", "Suriname", "Swaziland", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Timor L'Este", "Togo", "Tonga", "Trinidad &amp; Tobago", "Tunisia", "Turkey", "Turkmenistan", "Turks &amp; Caicos", "Uganda", "Ukraine", "USA", "United Arab Emirates", "United Kingdom", "Uruguay", "Uzbekistan", "Venezuela", "Vietnam", "Virgin Islands (US)", "Yemen", "Zambia", "Zimbabwe"];
+    const countries = ref(null);
+    const cities = ref(null);
 
-    const cities = ["Moscow", "New-York", "Ufa", "Kazan", "Saints-Peterburg", "Paris"];
-
-    const languages = ["Russian", "English", "Uzbek", "Poland"];
-
-    const services = ["Excursion", "Boat ride", "Museums", "Skydiving"];
+    onMounted(async () => {
+        await getCountry();
+    });
 
     const prices = ref([
         {
@@ -100,41 +102,80 @@
         }
     ]);
 
-    const lowercaseLanguage = computed({
-        get() {
-            return form_data.language;
-        },
-        set(value) {
-            form_data.language = value.toLowerCase();
-        }
-    });
+    const getCountry = async () => {
+        try {
+            const params = { language: defaultLocale };
+            const response = await axios.post('https://guides-to-go.onrender.com/search/get_country', params);
 
-    const lowercaseService = computed({
-        get() {
-            return form_data.service;
-        },
-        set(value) {
-            form_data.service = value.toLowerCase();
+            console.log(response.data);
+            countries.value = response.data.countries;
+        } catch (err) {
+            switch (err.response.status) {
+                default:
+                    toast.error(t('errors.default'));
+                    break;
+            }
         }
-    });
+    }
+
+    const getCity = async () => {
+        try {
+            const params = { language: defaultLocale, country_id: form_data.value.country_id };
+            const response = await axios.post('https://guides-to-go.onrender.com/search/get_city', params);
+
+            console.log(response.data);
+            cities.value = response.data.cities;
+        } catch (err) {
+            switch (err.response.status) {
+                default:
+                    toast.error(t('errors.default'));
+                    break;
+            }
+        }
+    }
 
     const handleCountrySelect = (country) => {
-        const isValidCountry = countries.some(item => item.toLowerCase() === country.toLowerCase());
-        if(isValidCountry) {
+        let country_found;
+        let isValidCountry;
+
+        if (typeof country === 'string') {
+            const string_country = countries.value.find(item => item.name.toLowerCase() === country.toLowerCase());
+            if (string_country) country_found = string_country;
+        } else if (typeof country === 'object') {
+            country_found = country;
+        }
+
+        if (country_found) isValidCountry = countries.value.some(item => item.name.toLowerCase() === country_found.name.toLowerCase());
+
+        if (isValidCountry) {
+            form_data.value.country_id = country_found.id;
             is_country_valid.value = true;
-            form_data.country = country.toLowerCase();
+            getCity();
         } else {
+            form_data.value.country_id = null;
+            form_data.value.city_id = null;
             is_country_valid.value = false;
-            form_data.country = null;
+            cities.value = null;
         }
     }
 
     const handleCitySelect = (city) => {
-        const isValidCity = cities.some(item => item.toLowerCase() === city.toLowerCase());
+        let city_found;
+        let isValidCity;
+
+        if (typeof city === 'string') {
+            const string_city = cities.value.find(item => item.name.toLowerCase() === city.toLowerCase());
+            if (string_city) city_found = string_city;
+        } else if (typeof city === 'object') {
+            city_found = city;
+        }
+
+        if (city_found) isValidCity = cities.value.some(item => item.name.toLowerCase() === city_found.name.toLowerCase());
+
         if (isValidCity) {
-            form_data.city = city.toLowerCase();
+            form_data.value.city_id = city_found.id;
         } else {
-            form_data.city = null;
+            form_data.value.city_id = null;
         }
     }
 

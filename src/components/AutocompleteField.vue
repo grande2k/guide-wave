@@ -10,20 +10,21 @@
             @keydown.up.prevent="onArrowUp"
             @keydown.enter.prevent="onEnter"
             @blur="closeDropDown"
+            @focus="onFocus"
             :placeholder="placeholder"
             :disabled="disabled"/>
 
         <ul v-if="filteredItems.length && isDropdownVisible" class="autocomplete-field__list">
             <li v-for="(item, index) in filteredItems" :key="index" @click="selectItem(item)"
                 :class="{ 'is-active': index === activeIndex }">
-                {{ item }}
+                {{ item.name }}
             </li>
         </ul>
     </div>
 </template>
 
 <script setup>
-    import { ref } from 'vue';
+    import { ref, watch } from 'vue';
 
     const props = defineProps({
         items: {
@@ -53,12 +54,18 @@
 
         if (query.value.trim()) {
             filteredItems.value = props.items.filter(item =>
-                item.toLowerCase().startsWith(query.value.toLowerCase())
+                item.name.toLowerCase().startsWith(query.value.toLowerCase())
             );
             isDropdownVisible.value = true;
         } else {
-            isDropdownVisible.value = false;
-            filteredItems.value = [];
+            filteredItems.value = props.items;
+        }
+    }
+
+    const onFocus = () => {
+        if(query.value === '') {
+            filteredItems.value = props.items;
+            isDropdownVisible.value = true;
         }
     }
 
@@ -81,11 +88,15 @@
     }
 
     const selectItem = (item) => {
-        query.value = item;
+        query.value = item.name;
         isDropdownVisible.value = false;
         activeIndex.value = -1;
         emit('select', item);
     }
+
+    watch(() => props.disabled, (newValue, oldValue) => {
+        if(!oldValue && newValue) query.value = '';
+    });
 
     const closeDropDown = () => {
         setTimeout(() => {

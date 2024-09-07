@@ -15,6 +15,7 @@
     "password": "Пароль",
     "confirm_password": "Подтвердите пароль",
     "contact_admin": "Написать администратору",
+    "save": "Сохранить",
     "log_in": {
         "title": "Вход",
         "button": "Войти"
@@ -26,7 +27,10 @@
     "placeholders": {
         "email": "Ваш e-mail",
         "tel": "Ваш номер телефона",
-        "password": "Ваш пароль"
+        "password": "Ваш пароль",
+        "name": "Ваше имя",
+        "language": "Выберите язык",
+        "service_type": "Выберите тип услуги"
     },
     "errors": {
         "validation": "Убедитесь что поля заполнены верно",
@@ -41,5 +45,17 @@
     "messages": {
         "register_success": "Вы успешно зарегистрировались",
         "login_success": "Вы успешно вошли в аккаунт"
+    },
+    "profile": {
+        "guide": {
+            "upload_photo": "Загрузить фото",
+            "status": {
+                "label": "Статус",
+                "on": "Вкл.",
+                "off": "Выкл."
+            },
+            "name": "Имя",
+            "services_and_prices": "Услуги и цены"
+        }
     }
 }

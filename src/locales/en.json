@@ -15,6 +15,7 @@
     "password": "Password",
     "confirm_password": "Confirm password",
     "contact_admin": "Contact administrator",
+    "save": "Save",
     "log_in": {
         "title": "Log in",
         "button": "Log in"
@@ -26,7 +27,10 @@
     "placeholders": {
         "email": "Your e-mail",
         "tel": "Your phone number",
-        "password": "Your password"
+        "password": "Your password",
+        "name": "Your name",
+        "language": "Choose language",
+        "service_type": "Choose service type"
     },
     "errors": {
         "validation": "Fill required fields",
@@ -41,5 +45,17 @@
     "messages": {
         "register_success": "You have successfully registered",
         "login_success": "You have successfully logged in"
+    },
+    "profile": {
+        "guide": {
+            "upload_photo": "Upload photo",
+            "status": {
+                "label": "Status",
+                "on": "On",
+                "off": "Off"
+            },
+            "name": "Name",
+            "services_and_prices": "Services and prices"
+        }
     }
 }

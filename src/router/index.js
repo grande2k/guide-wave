@@ -3,7 +3,7 @@ import StartPage from "@/views/StartPage.vue";
 import LoginPage from "@/views/LoginPage.vue";
 import SignupPage from "@/views/SignupPage.vue";
 import TouristPage from "@/views/TouristPage.vue";
-import GuideProfilePage from "@/views/GuideProfilePage.vue";
+import ProfilePage from "@/views/ProfilePage.vue";
 
 const routes = [
   {
@@ -27,9 +27,9 @@ const routes = [
     component: TouristPage
   },
   {
-    path: "/guide-profile",
-    name: "guide-profile",
-    component: GuideProfilePage
+    path: "/profile",
+    name: "profile",
+    component: ProfilePage
   },
 ];
 

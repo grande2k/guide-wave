@@ -51,7 +51,7 @@
 </template>
 
 <script setup>
-    import { ref, computed, reactive } from 'vue';
+    import { ref, computed, reactive, inject, onMounted } from 'vue';
     import { useVuelidate } from '@vuelidate/core';
     import { required, email, minLength } from '@vuelidate/validators';
     import { useToast } from 'vue-toastification';
@@ -59,10 +59,17 @@
     import { useRouter } from 'vue-router';
     import axios from 'axios';
 
+    const $cookies = inject('$cookies');
     const router = useRouter();
     const { t } = useI18n();
     const toast = useToast();
     const isPasswordVisible = ref(false);
+
+    onMounted(() => {
+        if ( $cookies.get("access_token") ) {
+            router.push('/profile');
+        }
+    });
 
     const form_data = reactive({
         email: "",
@@ -87,12 +94,11 @@
 
             const response = await axios.post('https://guides-to-go.onrender.com/auth/login', params);
 
-            console.log(response);
-
-            clearForm();
-
-            router.push('/guide-profile');
+            console.log(response.data);
+            $cookies.set("access_token", response.data.access_token, "1m");
+            router.push('/profile');
             toast.success( t('messages.login_success') );
+            clearForm();
         } catch (error) {
             switch (error.response.status) {
                 case 401:
