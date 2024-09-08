@@ -44,7 +44,8 @@
     },
     "messages": {
         "register_success": "You have successfully registered",
-        "login_success": "You have successfully logged in"
+        "login_success": "You have successfully logged in",
+        "save_success": "Profile saved"
     },
     "profile": {
         "guide": {

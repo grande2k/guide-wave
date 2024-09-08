@@ -44,7 +44,8 @@
     },
     "messages": {
         "register_success": "Вы успешно зарегистрировались",
-        "login_success": "Вы успешно вошли в аккаунт"
+        "login_success": "Вы успешно вошли в аккаунт",
+        "save_success": "Данные сохранены"
     },
     "profile": {
         "guide": {

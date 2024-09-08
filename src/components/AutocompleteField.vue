@@ -39,6 +39,10 @@
         disabled: {
             type: Boolean,
             default: false
+        },
+        value: {
+            type: Number,
+            default: null
         }
     });
 
@@ -97,6 +101,13 @@
     watch(() => props.disabled, (newValue, oldValue) => {
         if(!oldValue && newValue) query.value = '';
     });
+
+    watch(() => props.items, (newItems) => {
+        if (newItems && props.value !== '') {
+            const val = props.items.find(item => item.id === props.value);
+            if(val) query.value = val.name;
+        }
+    }, { immediate: true });
 
     const closeDropDown = () => {
         setTimeout(() => {
