@@ -1,12 +1,14 @@
 <template>
     <button type="submit" class="form-submit" :class="{'form-submit--loading': loading}">
-        <img v-if="!loading" :src="`/src/assets/images/icons/${icon}.svg`" :alt="icon">
+        <img v-if="!loading" :src="images[icon]" :alt="icon">
         <div v-else class="preloader"><span></span></div>
         {{ $t(text) }}
     </button>
 </template>
 
 <script setup>
+    import { filename } from 'pathe/utils';
+
     defineProps({
         text: {
             type: String,
@@ -19,7 +21,13 @@
             type: Boolean,
             default: false
         }
-    })
+    });
+
+    const glob = import.meta.glob('@/assets/images/icons/*.svg', { eager: true });
+
+    const images = Object.fromEntries(
+        Object.entries(glob).map(([key, value]) => [filename(key), value.default])
+    )
 </script>
 
 <style lang="scss" scoped>
