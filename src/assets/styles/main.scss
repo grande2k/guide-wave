@@ -12,6 +12,8 @@ section.page {
         background-color: $primary;
         border-radius: 1.5rem;
         padding: 2rem 1.5rem;
+        max-height: 85%;
+        overflow: hidden;
     }
 }
 
@@ -35,6 +37,8 @@ body {
 }
 
 .preloader {
+    @include flex-center;
+    height: 100%;
     text-align: center;
     span {
         width: 3rem;
@@ -45,6 +49,44 @@ body {
         box-sizing: border-box;
         animation: rotation 1s linear infinite;
         display: inline-block;
+    }
+}
+
+.scroll-parent {
+    overflow-y: auto;
+    height: 100%;
+    padding-right: 0.5rem;
+}
+
+.black-scroll {
+    &::-webkit-scrollbar {
+        width: 0.25rem;
+    }
+
+    &::-webkit-scrollbar-track {
+        border-radius: 10px;
+        background: rgba($color: $black, $alpha: 0.325);
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: $black;
+        border-radius: 10px;
+    }
+}
+
+.white-scroll {
+    &::-webkit-scrollbar {
+        width: 0.325rem;
+    }
+
+    &::-webkit-scrollbar-track {
+        border-radius: 10px;
+        background: rgba($color: $white, $alpha: 0.325);
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: $white;
+        border-radius: 10px;
     }
 }
 
@@ -171,6 +213,44 @@ body {
         color: $error;
         font-weight: 500;
         margin-top: 0.325rem;
+    }
+    &-add {
+        @include flex-center;
+        font-size: 1rem;
+        font-weight: normal;
+        width: 100%;
+        background-color: rgba($color: $white, $alpha: 0.25);
+        color: $white;
+        height: 3rem;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        line-height: 1;
+        margin-top: 0.5rem;
+        user-select: none;
+        span {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 2rem;
+            font-weight: 500;
+            margin-right: 0.5rem;
+            user-select: none;
+        }
+    }
+}
+
+.logout {
+    @include flex-center;
+    border-radius: 0.5rem;
+    background-color: $error;
+    color: $white;
+    width: 100%;
+    padding: 1rem;
+    font-weight: 500;
+    font-size: 1.25rem;
+    cursor: pointer;
+    img {
+        width: 1.5rem;
+        margin-right: 0.5rem;
+        transform: rotate(180deg);
     }
 }
 

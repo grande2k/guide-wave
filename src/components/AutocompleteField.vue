@@ -3,7 +3,7 @@
         <input
             type="text"
             class="autocomplete-field__input form-input"
-            :class="{ 'expanded': filteredItems.length && isDropdownVisible }"
+            :class="{ 'expanded': filteredItems.length && isDropdownVisible, 'error': error }"
             v-model="query"
             @input="onInput"
             @keydown.down.prevent="onArrowDown"
@@ -14,7 +14,7 @@
             :placeholder="placeholder"
             :disabled="disabled"/>
 
-        <ul v-if="filteredItems.length && isDropdownVisible" class="autocomplete-field__list">
+        <ul v-if="filteredItems.length && isDropdownVisible" class="autocomplete-field__list black-scroll">
             <li v-for="(item, index) in filteredItems" :key="index" @click="selectItem(item)"
                 :class="{ 'is-active': index === activeIndex }">
                 {{ item.name }}
@@ -30,7 +30,7 @@
         items: {
             type: Array,
             required: true,
-            default: () => [],
+            default: [],
         },
         placeholder: {
             type: String,
@@ -43,6 +43,10 @@
         value: {
             type: Number,
             default: null
+        },
+        error: {
+            type: Number,
+            default: 0
         }
     });
 
@@ -140,18 +144,6 @@
             max-height: 150px;
             overflow-y: auto;
             z-index: 10;
-            &::-webkit-scrollbar {
-                width: 0.25rem;
-            }
-            &::-webkit-scrollbar-track {
-                border-radius: 10px;
-                background: rgba($color: $black, $alpha: 0.325);
-            }
-            &::-webkit-scrollbar-thumb {
-                background: $black;
-                border-radius: 10px;
-            }
-
             li {
                 padding: 0.5rem;
                 cursor: pointer;

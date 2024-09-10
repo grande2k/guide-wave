@@ -1,6 +1,6 @@
 <template>
     <section class="guide-profile page page--bg">
-        <div class="guide-profile__content" v-if="guide_profile">
+        <div class="guide-profile__content scroll-parent white-scroll" v-if="guide_profile && countries.length && languages.length">
             <div class="guide-profile__info">
                 <guide-photo :photo_url="guide_profile.photo_url"/>
 
@@ -10,16 +10,21 @@
                 </div>
             </div>
 
-            <form action="" class="guide-profile__form" @submit.prevent="updateUserInfo">
+            <form action="" class="guide-profile__form" @submit.prevent="submitForm">
                 <div class="guide-profile__form-field">
                     <p class="form-label" v-text="$t('tel')"/>
 
                     <input
                         type="tel"
                         class="form-input"
+                        :class="{ error: v$.phone.$errors.length }"
                         name="tel"
+                        maxlength="15"
                         :placeholder="$t('placeholders.tel')"
-                        v-model="guide_profile.phone">
+                        v-model="guide_profile.phone"
+                        @input="guide_profile.phone = validatePhone($event.target.value)">
+
+                    <span v-if="v$.phone.$errors.length && v$.phone.minLength.$invalid" class="form-error" v-text="$t('errors.phone_length')"/>
                 </div>
 
                 <div class="guide-profile__form-field">
@@ -28,6 +33,7 @@
                     <input
                         type="text"
                         class="form-input"
+                        :class="{ error: v$.phone.$errors.length }"
                         name="name"
                         :placeholder="$t('placeholders.name')"
                         v-model="guide_profile.name">
@@ -41,6 +47,7 @@
                             :items="countries"
                             :value="guide_profile.country_id"
                             :placeholder="$t('country')"
+                            :error="v$.country_id.$errors.length"
                             @select="handleCountrySelect"/>
 
                         <autocomplete-field
@@ -48,6 +55,7 @@
                             :value="guide_profile.city_id"
                             :placeholder="$t('city')"
                             :disabled="!cities || !is_country_valid"
+                            :error="guide_profile.country_id && v$.city_id.$errors.length"
                             @select="handleCitySelect"/>
                     </div>
                 </div>
@@ -55,16 +63,54 @@
                 <div class="guide-profile__form-field full-column">
                     <p class="form-label" v-text="$t('language')"/>
 
-                    <form-select :options="['Русский', 'Английский', 'Испанский']" :placeholder="$t('placeholders.language')" @choose="e => console.log(e)"/>
+                    <div v-if="guide_profile.languages.length" class="guide-profile__languages">
+                        <form-language-select
+                            v-for="(language, index) in guide_profile.languages"
+                            :key="index"
+                            :options="languages"
+                            :all-selected-languages="guide_profile.languages"
+                            :selected="language"
+                            :error="language === '' && v$.languages.$errors.length ? true : false"
+                            @choose="(lang) => handleLanguageSelect(lang, index)"/>
+                    </div>
+
+                    <form-language-select
+                        v-else
+                        :options="languages"
+                        :all-selected-languages="guide_profile.languages"
+                        :error="v$.languages.$errors.length ? true : false"
+                        @choose="handleLanguageSelect"/>
+                    
+                    <div v-if="guide_profile.languages && guide_profile.languages.length < 5" class="form-add" @click="guide_profile.languages.push('');">
+                        <span>+</span>
+                        {{ $t('add') }}
+                    </div>
                 </div>
 
                 <div class="guide-profile__form-field full-column">
-                    <p class="form-label" v-text="$t('profile.guide.services_and_prices')"/>
+                    <p class="form-label" v-text="$t('profile.guide.services_and_prices')" />
 
-                    <form-select :options="['Экскурсия', 'Катание на лодке', 'Прыжки с парашюта']" :placeholder="$t('placeholders.service_type')" @choose="e => console.log(e)"/>
+                    <div v-if="services.length">
+                        <guide-service-field 
+                            v-for="(service, index) in services"
+                            :key="index"
+                            :value="service"
+                            :error="((service.service_name === '' || !service.price) && v1$.$errors.length) ? true : false"
+                            @update="handleServiceUpdate(service, index)"/>
+                    </div>
+
+                    <div v-if="services.length < 5" class="form-add" @click="addService">
+                        <span>+</span>
+                        {{ $t('add') }}
+                    </div>
                 </div>
 
-                <button type="sub" class="form-submit full-column" v-text="$t('save')"/>
+                <submit-button text="save" icon="check" :loading="response_loading" class="full-column"/>
+
+                <button type="button" class="logout full-column" @click="logout">
+                    <img src="@/assets/images/icons/login.svg" alt="log out">
+                    {{ $t('log_out') }}
+                </button>
             </form>
         </div>
 
@@ -75,99 +121,104 @@
 </template>
 
 <script setup>
-    import { ref, onMounted } from 'vue';
-    import { useRouter } from 'vue-router';
+    import { ref, onMounted, computed, watch } from 'vue';
     import { useToast } from 'vue-toastification';
     import { useI18n } from 'vue-i18n';
-    import { defaultLocale } from '@/locales';
+    import { useVuelidate } from '@vuelidate/core';
+    import { useRouter } from 'vue-router';
+    import { required, minLength, helpers } from '@vuelidate/validators';
+    import { validatePhone } from '@/utils/validatePhone';
+    import { getCountries, getCities, getLanguages, getProfile, getServices } from '@/api';
     import axios from 'axios';
     import AutocompleteField from './AutocompleteField.vue';
-    import FormSelect from './FormSelect.vue';
+    import FormLanguageSelect from './FormLanguageSelect.vue';
+    import GuideServiceField from './GuideServiceField.vue';
     import GuideStatusToggler from './GuideStatusToggler.vue';
     import GuidePhoto from './GuidePhoto.vue';
+    import SubmitButton from './SubmitButton.vue';
 
-    const router = useRouter();
     const { t } = useI18n();
     const toast = useToast();
+    const router = useRouter();
 
     const guide_profile = ref(null);
-    const countries = ref(null);
-    const cities = ref(null);
+    const countries = ref([]);
+    const cities = ref([]);
+    const languages = ref([]);
+    const services = ref([]);
     const is_country_valid = ref(false);
+    const response_loading = ref(false);
 
     onMounted(async () => {
-        await getProfile();
-        await getCountry();
+        guide_profile.value = await getProfile(t);
+        if (guide_profile.value.country_id) { cities.value = await getCities(guide_profile.value.country_id, t); is_country_valid.value = true; }
+    
+        countries.value = await getCountries(t);
+        languages.value = await getLanguages(t);
+        services.value  = await getServices('guide', t);
+
+        if (!services.value.length) services.value.push({ service_name: "", price: null, status: false });
     });
 
-    const getProfile = async () => {
-        try {
-            const request_headers = { headers: { 'Authorization': `Bearer ${$cookies.get("access_token")}` } };
-            const response = await axios.get('https://guides-to-go.onrender.com/user_info', request_headers);
+    const languagesValidator = helpers.withMessage(
+        'Language must be selected',
+        (languages) => languages.length > 0 && languages.every(lang => lang !== '')
+    );
 
-            guide_profile.value = response.data.info_about_user;
-            guide_profile.value.languages = ['ru'];
-            console.log(guide_profile.value);
+    const serviceNameValidator = helpers.withMessage(
+        'name',
+        (value) => value.every(service => service.service_name !== '')
+    );
 
-            if(guide_profile.value.country_id) {
-                await getCity();
-                is_country_valid.value = true;
-            }
-        } catch (err) {
-            switch (err.response.status) {
-                case 401:
-                    $cookies.remove("access_token");
-                    router.push('/login');
-                    break;
-                default:
-                    toast.error(t('errors.default'));
-                    break;
-            }
+    const servicePriceValidator = helpers.withMessage(
+        'price',
+        (value) => value.every(service => service.price)
+    );
+
+    const rules = computed(() => {
+        return {
+            phone: { required, minLength: minLength(7) },
+            name: { required },
+            country_id: { required },
+            city_id: { required },
+            languages: { required, languagesValidator }
         }
-    }
+    });
 
-    const getCountry = async () => {
-        try {
-            const params = { language: defaultLocale };
-            const response = await axios.post('https://guides-to-go.onrender.com/search/get_country', params);
-
-            console.log(response.data);
-            countries.value = response.data.countries;
-        } catch (err) {
-            switch (err.response.status) {
-                default:
-                    toast.error(t('errors.default'));
-                    break;
-            }
+    const services_rules = computed(() => {
+        return {
+            services: { required, serviceNameValidator, servicePriceValidator }
         }
-    }
+    });
 
-    const getCity = async () => {
-        try {
-            const params = { language: defaultLocale, country_id: guide_profile.value.country_id };
-            const response = await axios.post('https://guides-to-go.onrender.com/search/get_city', params);
+    const services_state = ref({ services: services.value });
 
-            console.log(response.data);
-            cities.value = response.data.cities;
-        } catch (err) {
-            switch (err.response.status) {
-                default:
-                    toast.error(t('errors.default'));
-                    break;
-            }
-        }
-    }
+    watch(services, (newValue) => {
+        if(newValue) services_state.value.services = newValue;
+    }, { deep: true, immediate: true });
+
+    const v$ = useVuelidate(rules, guide_profile);
+    const v1$ = useVuelidate(services_rules, services_state);
 
     const updateUserInfo = async () => {
         try {
             const params = guide_profile.value;
+            const services_params = { services: services.value };
             const request_headers = { headers: { 'Authorization': `Bearer ${$cookies.get("access_token")}` } };
-            const response = await axios.post('https://guides-to-go.onrender.com/user_info/', params, request_headers);
 
-            console.log(response.data);
-            await getProfile();
+            response_loading.value = true;
+
+            const response = await axios.post('https://guides-to-go.onrender.com/user_info/', params, request_headers);
+            const services_response = await axios.post('https://guides-to-go.onrender.com/service/add_service', services_params, request_headers);
+
+            response_loading.value = false;
             toast.success(t('messages.save_success'));
+
+            await getProfile(t);
+            await getServices('guide', t);
         } catch (err) {
+            response_loading.value = false;
+
             switch (err.response.status) {
                 default:
                     toast.error(t('errors.default'));
@@ -176,7 +227,17 @@
         }
     }
 
-    const handleCountrySelect = (country) => {
+    const submitForm = async () => {
+        const result = await v$.value.$validate() && await v1$.value.$validate();
+
+        if (result) {
+            updateUserInfo();
+        } else {
+            toast.error(t('errors.validation'));
+        }
+    }
+
+    const handleCountrySelect = async (country) => {
         let country_found;
         let isValidCountry;
 
@@ -192,12 +253,12 @@
         if(isValidCountry) {
             guide_profile.value.country_id = country_found.id;
             is_country_valid.value = true;
-            getCity();
+            cities.value = await getCities(guide_profile.value.country_id, t);
         } else {
             guide_profile.value.country_id = null;
             guide_profile.value.city_id = null;
             is_country_valid.value = false;
-            cities.value = null;
+            cities.value = [];
         }
     }
 
@@ -220,10 +281,51 @@
             guide_profile.value.city_id = null;
         }
     }
+
+    const handleLanguageSelect = (lang, index) => {
+        if(lang) {
+            if(typeof index === 'number') {
+                guide_profile.value.languages[index] = lang;
+            } else {
+                guide_profile.value.languages.push(lang);
+            }
+        }
+    }
+
+    const handleServiceUpdate = (service, index) => {
+        if (service && service.service_name !== '' && service.price) {
+            if(typeof index === 'number') {
+                services.value[index] = service;
+            } else {
+                services.value.push(service);
+            }
+
+            v1$.value.$touch();
+            v1$.value.$reset();
+        }
+    }
+
+    const addService = () => {
+        if (services.value.length < 5) {
+            services.value.push({
+                service_name: "",
+                price: null,
+                status: false
+            });
+        }
+    }
+
+    const logout = () => {
+        $cookies.remove("access_token");
+        router.push('/login');
+    }
 </script>
 
 <style lang="scss" scoped>
     .guide-profile {
+        min-height: 500px;
+        overflow: hidden;
+        padding-right: 1rem;
         &__label {
             margin: 0;
             color: $white;
@@ -234,13 +336,13 @@
                 display: block;
                 .row {
                     @include flex-center;
-
                 }
             }
         }
         &__form {
             @include grid(2, 0.5rem);
             margin-left: 2rem;
+            flex: auto;
             @media screen and (max-width: 480px) {
                 margin-left: 0;
                 margin-top: 0.75rem; 
@@ -259,6 +361,9 @@
                     @include grid(2, 0.5rem);
                 }
             }
+        }
+        .logout {
+            margin-top: 0.5rem;
         }
     }
 </style>

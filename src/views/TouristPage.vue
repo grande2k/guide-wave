@@ -1,6 +1,6 @@
 <template>
     <section class="tourist page page--bg">
-        <form class="tourist__form">
+        <form v-if="!results" action="#" class="tourist__form scroll-parent" @submit.prevent="submitForm">
             <div class="tourist__form-field active">
                 <p class="form-label">
                     <span>1</span>
@@ -8,8 +8,16 @@
                 </p>
 
                 <div class="row">
-                    <autocomplete-field :items="countries" :placeholder="$t('country')" @select="handleCountrySelect"/>
-                    <autocomplete-field :items="cities" :placeholder="$t('city')" :disabled="!is_country_valid || !cities" @select="handleCitySelect"/>
+                    <autocomplete-field
+                        :items="countries"
+                        :placeholder="$t('country')"
+                        @select="handleCountrySelect"/>
+
+                    <autocomplete-field
+                        :items="cities"
+                        :placeholder="$t('city')"
+                        :disabled="!cities || !is_country_valid"
+                        @select="handleCitySelect"/>
                 </div>
             </div>
 
@@ -19,19 +27,22 @@
                     {{ $t('language') }}
                 </p>
 
-                <form-select :options="['Русский', 'Английский', 'Испанский']" :placeholder="$t('placeholders.language')" @choose="e => form_data.language = e.toLowerCase()"/>
+                <form-language-select
+                    :options="languages"
+                    :all-selected-languages="[form_data.language]"
+                    @choose="handleLanguageSelect"/>
             </div>
 
-            <div class="tourist__form-field" :class="{ 'active': form_data.country_id && form_data.city_id && form_data.language }">
+            <div class="tourist__form-field" :class="{ 'active': form_data.country_id && form_data.city_id && form_data.language_code }">
                 <p class="form-label">
                     <span>3</span>
                     {{ $t('service') }}
                 </p>
                 
-                <form-select :options="['Экскурсия', 'Катание на лодке', 'Прыжки с парашюта']" :placeholder="$t('placeholders.service_type')" @choose="e => form_data.service = e.toLowerCase()"/>
+                <services-select :options="services" :all-selected-languages="[form_data.service_name]" @choose="handleServiceSelect"/>
             </div>
 
-            <div class="tourist__form-field" :class="{ 'active': form_data.country_id && form_data.city_id && form_data.language && form_data.service }">
+            <div class="tourist__form-field" :class="{ 'active': form_data.country_id && form_data.city_id && form_data.language_code && form_data.service_name }">
                 <p class="form-label">
                     <span>4</span>
                     {{ $t('price') }}
@@ -48,41 +59,78 @@
                 </div>
             </div>
 
-            <button type="submit" class="tourist__form-submit form-submit" :class="{ 'active': form_data.country_id && form_data.city_id && form_data.language && form_data.service }">
-                <img src="@/assets/images/icons/search.svg" alt="Find">
-                {{ $t('search') }}
-            </button>
+            <submit-button
+                text="search"
+                icon="search"
+                class="tourist__form-submit form-submit"
+                :class="{ 'active': form_data.country_id && form_data.city_id && form_data.language_code && form_data.service_name }"
+                :loading="response_loading"/>
         </form>
+
+        <div v-if="results && results.length" class="tourist__results scroll-parent white-scroll">
+            <p v-text="$t('search_results')"/>
+
+            <guide v-for="(guide, index) in results" :key="index" :guide="guide"/>
+
+            <button class="form-submit" v-text="$t('go_back_search')" @click="resetSearch"/>
+        </div>
+
+        <div v-if="results && !results.length" class="tourist__results">
+            <p v-text="$t('errors.search_not_found')"/>
+
+            <button class="form-submit" v-text="$t('go_back_search')" @click="resetSearch"/>
+        </div>
     </section>
 </template>
 
 <script setup>
-    import { ref, onMounted } from 'vue';
-    import { defaultLocale } from '@/locales';
+    import { ref, onMounted, computed} from 'vue';
+    import { getCountries, getCities, getLanguages, getServices, search } from '@/api';
+    import { useVuelidate } from '@vuelidate/core';
+    import { required } from '@vuelidate/validators';
     import { useToast } from 'vue-toastification';
     import { useI18n } from 'vue-i18n';
-    import axios from 'axios';
-    import FormSelect from '@/components/FormSelect.vue';
+    import FormLanguageSelect from '@/components/FormLanguageSelect.vue';
     import AutocompleteField from '@/components/AutocompleteField.vue';
+    import ServicesSelect from '@/components/ServicesSelect.vue';
+    import SubmitButton from '@/components/SubmitButton.vue';
+    import Guide from '@/components/Guide.vue';
 
-    const is_country_valid = ref(false);
     const { t } = useI18n();
+    const is_country_valid = ref(false);
+    const response_loading = ref(false);
     const toast = useToast();
 
     const form_data = ref({
         country_id: null,
         city_id: null,
-        service: null,
-        language: null,
-        price_range: null,
+        service_name: null,
+        language_code: null,
+        price: null,
     });
 
-    const countries = ref(null);
-    const cities = ref(null);
+    const countries = ref([]);
+    const cities = ref([]);
+    const languages = ref([]);
+    const services = ref([]);
+    const results = ref(null);
 
     onMounted(async () => {
-        await getCountry();
+        countries.value = await getCountries(t);
+        languages.value = await getLanguages(t);
+        services.value  = await getServices('tourist', t);
     });
+
+    const rules = computed(() => {
+        return {
+            country_id: { required },
+            city_id: { required},
+            service_name: { required },
+            language_code: { required }
+        }
+    });
+
+    const v$ = useVuelidate(rules, form_data);
 
     const prices = ref([
         {
@@ -102,39 +150,19 @@
         }
     ]);
 
-    const getCountry = async () => {
-        try {
-            const params = { language: defaultLocale };
-            const response = await axios.post('https://guides-to-go.onrender.com/search/get_country', params);
+    const submitForm = async () => {
+        const result = await v$.value.$validate();
 
-            console.log(response.data);
-            countries.value = response.data.countries;
-        } catch (err) {
-            switch (err.response.status) {
-                default:
-                    toast.error(t('errors.default'));
-                    break;
-            }
+        if (result) {
+            response_loading.value = true;
+            results.value = await search(form_data.value, t);
+            response_loading.value = false;
+        } else {
+            toast.error(t('errors.validation'));
         }
     }
 
-    const getCity = async () => {
-        try {
-            const params = { language: defaultLocale, country_id: form_data.value.country_id };
-            const response = await axios.post('https://guides-to-go.onrender.com/search/get_city', params);
-
-            console.log(response.data);
-            cities.value = response.data.cities;
-        } catch (err) {
-            switch (err.response.status) {
-                default:
-                    toast.error(t('errors.default'));
-                    break;
-            }
-        }
-    }
-
-    const handleCountrySelect = (country) => {
+    const handleCountrySelect = async (country) => {
         let country_found;
         let isValidCountry;
 
@@ -150,12 +178,12 @@
         if (isValidCountry) {
             form_data.value.country_id = country_found.id;
             is_country_valid.value = true;
-            getCity();
+            cities.value = await getCities(form_data.value.country_id, t);
         } else {
             form_data.value.country_id = null;
             form_data.value.city_id = null;
             is_country_valid.value = false;
-            cities.value = null;
+            cities.value = [];
         }
     }
 
@@ -179,19 +207,42 @@
         }
     }
 
+    const handleLanguageSelect = (lang) => {
+        if (lang) form_data.value.language_code = lang;
+    }
+
+    const handleServiceSelect = (service) => {
+        if (service) form_data.value.service_name = service;
+    }
+
     const handleTabClick = (tabIndex) => {
         prices.value.forEach((tab, index) => {
             index === tabIndex ? tab.is_active = !tab.is_active : '';
         });
 
         const selectedPrice = prices.value.filter(price => price.is_active).map(price => price.range);
-        selectedPrice ? form_data.price_range = selectedPrice : form_data.price_range = null;
-        if(selectedPrice.length === 0) form_data.price_range = null;
+        selectedPrice ? form_data.price = selectedPrice : form_data.price = null;
+        if(selectedPrice.length === 0) form_data.price = null;
+    }
+
+    const resetSearch = () => {
+        results.value = null;
+        is_country_valid.value = false;
+        form_data.value = {
+            country_id: null,
+            city_id: null,
+            service_name: null,
+            language_code: null,
+            price: null,
+        }
     }
 </script>
 
 <style lang="scss" scoped>
     .tourist {
+        &__form {
+            overflow: hidden;
+        }
         &__form {
             &-field {
                 margin-bottom: 2rem;
@@ -238,6 +289,17 @@
                 &.active {
                     opacity: 1;
                     pointer-events: auto;
+                }
+            }
+        }
+        &__results {
+            & > p {
+                color: $white;
+                text-align: center;
+                font-size: 1.5rem;
+                margin: 0 0 2rem 0;
+                @media screen and (max-width: 480px) {
+                    font-size: 1.25rem;
                 }
             }
         }

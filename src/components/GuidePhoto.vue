@@ -1,5 +1,5 @@
 <template>
-    <label for="guide-photo" class="guide-profile__photo" :class="{ 'disabled': photo_url }">
+    <label for="guide-photo" class="guide-profile__photo">
         <div v-if="photo_url" class="guide-profile__photo-avatar">
             <img :src="`https://guides-to-go.onrender.com${photo_url}`" alt="User photo" />
         </div>
@@ -64,9 +64,6 @@
         cursor: pointer;
         background-color: $secondary;
         border: 1px solid $white;
-        &.disabled {
-            pointer-events: none;
-        }
         &-preview,
         &-avatar {
             position: absolute;
@@ -82,6 +79,43 @@
                 height: 100%;
                 object-fit: cover;
                 border-radius: inherit;
+                position: relative;
+                z-index: 1;
+            }
+            &::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba($color: $black, $alpha: 0.325);
+                z-index: 2;
+                opacity: 0;
+                transition: $transition;
+                border-radius: 50%;
+            }
+            &::after {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 2rem;
+                height: 2rem;
+                background-image: url('../assets/images/icons/edit.svg');
+                background-repeat: no-repeat;
+                background-size: contain;
+                background-position: center;
+                z-index: 3;
+                opacity: 0;
+                transition: $transition;
+            }
+            &:hover {
+                &::before,
+                &::after {
+                    opacity: 1;
+                }
             }
         }
         &-add {

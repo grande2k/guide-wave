@@ -31,13 +31,10 @@
                     <img v-else src="@/assets/images/icons/eye-close.svg" @click="isPasswordVisible = false" alt="Hide password">
                 </div>
 
-                <span v-if="v$.password.minLength.$invalid" class="form-error" v-text="$t('errors.password_length')"/>
+                <span v-if="v$.password.$errors.length && v$.password.minLength.$invalid" class="form-error" v-text="$t('errors.password_length')"/>
             </div>
 
-            <button type="submit" class="form-submit">
-                <img src="@/assets/images/icons/login.svg" alt="Log in">
-                {{ $t('log_in.button') }}
-            </button>
+            <submit-button text="log_in.button" icon="login" :loading="response_loading"/>
         </form>
 
         <div class="form-links">
@@ -58,12 +55,15 @@
     import { useI18n } from 'vue-i18n';
     import { useRouter } from 'vue-router';
     import axios from 'axios';
+    import SubmitButton from '@/components/SubmitButton.vue';
 
     const $cookies = inject('$cookies');
     const router = useRouter();
     const { t } = useI18n();
     const toast = useToast();
     const isPasswordVisible = ref(false);
+
+    const response_loading = ref(false);
 
     onMounted(() => {
         if ( $cookies.get("access_token") ) {
@@ -92,7 +92,11 @@
                 password: form_data.password
             };
 
+            response_loading.value = true;
+
             const response = await axios.post('https://guides-to-go.onrender.com/auth/login', params);
+
+            response_loading.value = false;
 
             console.log(response.data);
             $cookies.set("access_token", response.data.access_token, "1m");
@@ -100,6 +104,8 @@
             toast.success( t('messages.login_success') );
             clearForm();
         } catch (error) {
+            response_loading.value = false;
+
             switch (error.response.status) {
                 case 401:
                     toast.error( t('errors.login') );

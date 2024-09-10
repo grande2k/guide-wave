@@ -53,6 +53,7 @@
         background-color: $secondary;
         position: relative;
         transition: all 0.5s ease;
+        user-select: none;
         span {
             position: absolute;
             display: block;

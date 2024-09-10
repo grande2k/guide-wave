@@ -1,11 +1,11 @@
 <template>
-    <div class="form-select" :class="{ 'form-select--active': isSelectActive }">
+    <div class="form-select" :class="{ 'form-select--active': isSelectActive, 'error': error }" ref="target">
         <div class="form-select__top" @click="isSelectActive = !isSelectActive">
-            <span class="form-select__current" :class="{ 'placeholder': !currentOption }" v-text="currentOption ?? placeholder"/>
+            <span class="form-select__current" :class="{ 'placeholder': !currentOption }" v-text="currentOption?.name ?? select_placeholder"/>
         </div>
 
-        <ul class="form-select__options">
-            <li v-for="(option, index) in options" :key="index" class="form-select__option" @click="chooseOption(index)" v-text="option"/>
+        <ul class="form-select__options black-scroll">
+            <li v-for="option in filteredOptions" :key="option.lang_code" class="form-select__option" @click="chooseOption(option.lang_code)" v-text="option.name"/>
         </ul>
 
         <img src="@/assets/images/icons/arrow-down.svg" class="form-select__arrow" alt="arrow" @click="isSelectActive = !isSelectActive">
@@ -13,10 +13,17 @@
 </template>
 
 <script setup>
-    import { ref } from 'vue';
+    import { ref, watch, computed } from 'vue';
+    import { onClickOutside } from '@vueuse/core';
+    import { useI18n } from 'vue-i18n';
 
+    const { t } = useI18n();
     const isSelectActive = ref(false);
     const currentOption = ref(null);
+    const target = ref(null);
+    const select_placeholder = t('placeholders.language');
+
+    onClickOutside(target, () => isSelectActive.value = false);
 
     const emit = defineEmits(['choose']);
 
@@ -24,17 +31,35 @@
         options: {
             type: Array,
             required: true,
-            default: () => [],
+            default: [],
         },
-        placeholder: {
+        allSelectedLanguages: {
+            type: Array,
+            required: true,
+        },
+        selected: {
             type: String,
-            default: 'Select from the list'
+        },
+        error: {
+            type: Boolean,
+            default: false
         }
     });
 
-    const chooseOption = (index) => {
-        currentOption.value = props.options[index];
-        emit('choose', currentOption.value);
+    watch(() => props.options, (newVal) => {
+        if(newVal) {
+            const selectedOption = props.options.find(option => option.lang_code === props.selected);
+            if(selectedOption) currentOption.value = selectedOption;
+        }
+    }, { immediate: true });
+
+    const filteredOptions = computed(() => {
+        return props.options.filter(option => !props.allSelectedLanguages.includes(option.lang_code));
+    });
+
+    const chooseOption = (lang_code) => {
+        currentOption.value = props.options.find(option => option.lang_code === lang_code);
+        emit('choose', currentOption.value.lang_code);
         isSelectActive.value = false;
     }
 </script>
@@ -50,6 +75,14 @@
         user-select: none;
         color: $white;
         line-height: 1.25;
+        &.error {
+            .form-select__top {
+                border-color: $error;
+            }
+        }
+        &:not(:last-child) {
+            margin-bottom: 0.5rem;
+        }
         &__arrow {
             position: absolute;
             top: 50%;
@@ -57,6 +90,10 @@
             right: 0.5rem;
             transition: $transition;
             z-index: 2;
+        }
+        &__top {
+            border: 2px solid transparent;
+            border-radius: inherit
         }
         &__option,
         &__current {
@@ -89,7 +126,7 @@
         &__options {
             visibility: hidden;
             opacity: 0;
-            margin-top: 2.25rem;
+            margin-top: 2.75rem;
             transition: opacity 0.3s ease;
             position: absolute;
             left: 0;
@@ -100,6 +137,9 @@
             border-bottom-left-radius: 0.5rem;
             border-bottom-right-radius: 0.5rem;
             z-index: 3;
+            max-height: 200px;
+            overflow: auto;
+            border-top: 1px solid $black;
             @media screen and (max-width: 480px) {
                 margin-top: 2rem;
             }
