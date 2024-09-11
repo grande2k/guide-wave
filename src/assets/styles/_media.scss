@@ -24,13 +24,6 @@
                     font-size: 16px;
                     padding: 0.75rem 0.5rem;
                 }
-                &-submit {
-                    padding: 0.875rem;
-                    font-size: 1rem;
-                    img {
-                        width: 1.125rem;
-                    }
-                }
                 &-link {
                     padding: 0.875rem;
                     font-size: 0.875rem;
@@ -40,6 +33,16 @@
                     img {
                         width: 1.25rem;
                     }
+                }
+            }
+
+            .logout,
+            .form-submit {
+                padding: 0.875rem;
+                font-size: 1rem;
+                height: 3rem;
+                img {
+                    width: 1.125rem;
                 }
             }
         }

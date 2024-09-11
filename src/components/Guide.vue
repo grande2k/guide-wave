@@ -1,27 +1,33 @@
 <template>
     <div class="guide" v-if="guide">
-        <div class="guide__photo">
-            <div v-if="guide.photo_url" class="guide__photo-avatar">
-                <img :src="`https://guides-to-go.onrender.com${guide.photo_url}`" alt="User photo" />
+        <div class="guide__flex">
+            <div class="guide__photo">
+                <div v-if="guide.photo_url" class="guide__photo-avatar">
+                    <img :src="`https://guides-to-go.onrender.com${guide.photo_url}`" alt="User photo" />
+                </div>
+
+                <div v-else class="guide__photo-empty">
+                    <img src="@/assets/images/icons/user.svg" alt="User photo" />
+                </div>
             </div>
 
-            <div v-else class="guide__photo-empty">
-                <img src="@/assets/images/icons/user.svg" alt="User photo" />
+            <div class="guide__info">
+                <p class="guide__name" v-text="guide.name"/>
+
+                <a :href="`https://wa.me/${guide.phone.slice(1)}`" class="guide__call">
+                    <img src="@/assets/images/icons/whatsapp.svg" alt="whatsapp icon" />
+                    {{ $t('call') }}
+                </a>
             </div>
         </div>
 
-        <div class="guide__info">
-            <p class="guide__name" v-text="guide.name"/>
-
-            <a :href="`https://wa.me/${guide.phone.slice(1)}`" class="guide__call">
-                <img src="@/assets/images/icons/whatsapp.svg" alt="whatsapp icon" />
-                {{ $t('call') }}
-            </a>
-        </div>
+        <calendar v-if="guide.calendar && guide.calendar.length" :dates="guide.calendar"/>
     </div>
 </template>
 
 <script setup>
+    import Calendar from '@/components/Calendar.vue';
+
     const props = defineProps({
         guide: {
             type: Object,
@@ -32,7 +38,9 @@
 
 <style lang="scss" scoped>
     .guide {
-        @include flex-center-vert;
+        &__flex {
+            display: flex;
+        }
         &:not(:last-child) {
             margin-bottom: 1.5rem;
             padding-bottom: 1.5rem;
@@ -45,14 +53,16 @@
         &__photo {
             position: relative;
             width: 8rem;
+            min-width: 8rem;
             height: 8rem;
             border-radius: 50%;
             border: 2px solid $white;
             margin-right: 2rem;
             @media screen and (max-width: 480px) {
+                min-width: 6rem;
                 width: 6rem;
                 height: 6rem;
-                margin-right: 1.5rem;
+                margin-right: 1.25rem;
             }
             &-avatar {
                 width: 100%;

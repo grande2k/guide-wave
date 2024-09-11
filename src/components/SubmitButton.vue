@@ -1,5 +1,5 @@
 <template>
-    <button type="submit" class="form-submit" :class="{'form-submit--loading': loading}">
+    <button type="submit" class="form-submit" :class="{'form-submit--loading': loading, 'form-submit--blue': blue}">
         <img v-if="!loading" :src="images[icon]" :alt="icon">
         <div v-else class="preloader"><span></span></div>
         {{ $t(text) }}
@@ -20,6 +20,10 @@
         loading: {
             type: Boolean,
             default: false
+        },
+        blue: {
+            type: Boolean,
+            default: false
         }
     });
 
@@ -33,6 +37,10 @@
 <style lang="scss" scoped>
     .form-submit {
         position: relative;
+        height: 3.5rem;
+        &--blue {
+            background-color: $primary;
+        }
         .preloader {
             margin-right: 0.5rem;
             span {

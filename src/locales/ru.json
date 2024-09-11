@@ -21,6 +21,9 @@
     "search_results": "Результаты поиска:",
     "log_out": "Выйти",
     "go_back_search": "Вернуться к поиску",
+    "calendar": "Календарь",
+    "occupancy_calendar": "Календарь занятости",
+    "free_time": "Свободное время:",
     "log_in": {
         "title": "Вход",
         "button": "Войти"

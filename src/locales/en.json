@@ -21,6 +21,9 @@
     "search_results": "Search results:",
     "log_out": "Log out",
     "go_back_search": "Go back",
+    "calendar": "Calendar",
+    "occupancy_calendar": "Occupancy calendar",
+    "free_time": "Free time:",
     "log_in": {
         "title": "Log in",
         "button": "Log in"

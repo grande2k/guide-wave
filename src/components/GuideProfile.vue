@@ -8,6 +8,17 @@
                     <p class="guide-profile__label" v-text="`${$t('profile.guide.status.label')}:`"/>
                     <guide-status-toggler :status="guide_profile.status"/>
                 </div>
+
+                <button class="calendar-button" @click="isCalendarModalOpen = true">
+                    <img src="@/assets/images/icons/calendar.svg" alt="calendar">
+                    {{ $t('calendar') }}
+                </button>
+
+                <calendar-modal
+                    v-if="isCalendarModalOpen"
+                    :dates="guide_profile.calendar"
+                    @close="isCalendarModalOpen = false"
+                    @updated="async () => guide_profile = await getProfile($t)"/>
             </div>
 
             <form action="" class="guide-profile__form" @submit.prevent="submitForm">
@@ -130,12 +141,13 @@
     import { validatePhone } from '@/utils/validatePhone';
     import { getCountries, getCities, getLanguages, getProfile, getServices } from '@/api';
     import axios from 'axios';
-    import AutocompleteField from './AutocompleteField.vue';
-    import FormLanguageSelect from './FormLanguageSelect.vue';
-    import GuideServiceField from './GuideServiceField.vue';
-    import GuideStatusToggler from './GuideStatusToggler.vue';
-    import GuidePhoto from './GuidePhoto.vue';
-    import SubmitButton from './SubmitButton.vue';
+    import AutocompleteField from '@/components/AutocompleteField.vue';
+    import FormLanguageSelect from '@/components/FormLanguageSelect.vue';
+    import GuideServiceField from '@/components/GuideServiceField.vue';
+    import GuideStatusToggler from '@/components/GuideStatusToggler.vue';
+    import GuidePhoto from '@/components/GuidePhoto.vue';
+    import SubmitButton from '@/components/SubmitButton.vue';
+    import CalendarModal from '@/components/modals/CalendarModal.vue'
 
     const { t } = useI18n();
     const toast = useToast();
@@ -148,6 +160,7 @@
     const services = ref([]);
     const is_country_valid = ref(false);
     const response_loading = ref(false);
+    const isCalendarModalOpen = ref(false);
 
     onMounted(async () => {
         guide_profile.value = await getProfile(t);
@@ -339,9 +352,38 @@
                 }
             }
         }
+        &__info {
+            .calendar-button {
+                @include flex-center-column;
+                width: 100%;
+                aspect-ratio: 1;
+                border-radius: 0.5rem;
+                background-color: transparent;
+                border: 2px solid $white;
+                cursor: pointer;
+                margin-top: 2rem;
+                color: $white;
+                font-weight: 500;
+                padding: 0.5rem;
+                img {
+                    width: 2.25rem;
+                    margin-bottom: 0.5rem;
+                }
+                @media screen and (max-width: 480px) {
+                    flex-direction: row;
+                    aspect-ratio: unset;
+                    margin: 1rem 0;
+                    padding: 1rem;
+                    img {
+                        width: 1.5rem;
+                        margin: 0 0.5rem 0 0;
+                    }
+                }
+            }
+        }
         &__form {
             @include grid(2, 0.5rem);
-            margin-left: 2rem;
+            margin-left: 1.25rem;
             flex: auto;
             @media screen and (max-width: 480px) {
                 margin-left: 0;

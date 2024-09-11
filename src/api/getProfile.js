@@ -10,6 +10,8 @@ export const getProfile = async (t) => {
         const request_headers = { headers: { 'Authorization': `Bearer ${$cookies.get("access_token")}` } };
         const response = await axios.get('https://guides-to-go.onrender.com/user_info', request_headers);
 
+        console.log(response.data.info_about_user);
+
         return response.data.info_about_user;
     } catch (err) {
         switch (err.response.status) {

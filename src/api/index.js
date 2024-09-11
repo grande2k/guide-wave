@@ -4,3 +4,4 @@ export * from './getLanguages';
 export * from './getProfile';
 export * from './getServices';
 export * from './search';
+export * from './addCalendar';
