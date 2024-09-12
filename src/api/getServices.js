@@ -1,12 +1,16 @@
 import axios from "axios";
 import { useToast } from "vue-toastification";
+import { defaultLocale } from "@/locales";
 
 const toast = useToast();
 
 export const getServices = async (source, t) => {
     if(source === 'tourist') {
         try {
-            const response = await axios.get('https://guides-to-go.onrender.com/search/services');
+            const params = { language: defaultLocale };
+            const response = await axios.post('https://guides-to-go.onrender.com/search/services', params);
+
+            console.log(response.data.services);
 
             return response.data.services;
         } catch (err) {
@@ -22,6 +26,8 @@ export const getServices = async (source, t) => {
         try {
             const request_headers = { headers: { 'Authorization': `Bearer ${$cookies.get("access_token")}` } };
             const response = await axios.get('https://guides-to-go.onrender.com/service/get_service', request_headers);
+            
+            console.log(response.data.services);
 
             return response.data.services;
         } catch (err) {

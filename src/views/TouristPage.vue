@@ -39,10 +39,10 @@
                     {{ $t('service') }}
                 </p>
                 
-                <services-select :options="services" :all-selected-languages="[form_data.service_name]" @choose="handleServiceSelect"/>
+                <services-select :options="services" :all_selected_services="[]" @choose="handleServiceSelect"/>
             </div>
 
-            <div class="tourist__form-field" :class="{ 'active': form_data.country_id && form_data.city_id && form_data.language_code && form_data.service_name }">
+            <div class="tourist__form-field" :class="{ 'active': form_data.country_id && form_data.city_id && form_data.language_code && form_data.service_id }">
                 <p class="form-label">
                     <span>4</span>
                     {{ $t('price') }}
@@ -63,7 +63,7 @@
                 text="search"
                 icon="search"
                 class="tourist__form-submit form-submit"
-                :class="{ 'active': form_data.country_id && form_data.city_id && form_data.language_code && form_data.service_name }"
+                :class="{ 'active': form_data.country_id && form_data.city_id && form_data.language_code && form_data.service_id }"
                 :loading="response_loading"/>
         </form>
 
@@ -104,7 +104,7 @@
     const form_data = ref({
         country_id: null,
         city_id: null,
-        service_name: null,
+        service_id: null,
         language_code: null,
         price: null,
     });
@@ -125,7 +125,7 @@
         return {
             country_id: { required },
             city_id: { required},
-            service_name: { required },
+            service_id: { required },
             language_code: { required }
         }
     });
@@ -212,7 +212,7 @@
     }
 
     const handleServiceSelect = (service) => {
-        if (service) form_data.value.service_name = service;
+        if (service) form_data.value.service_id = service.id;
     }
 
     const handleTabClick = (tabIndex) => {
@@ -231,7 +231,7 @@
         form_data.value = {
             country_id: null,
             city_id: null,
-            service_name: null,
+            service_id: null,
             language_code: null,
             price: null,
         }

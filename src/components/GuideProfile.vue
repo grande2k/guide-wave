@@ -18,7 +18,7 @@
                     v-if="isCalendarModalOpen"
                     :dates="guide_profile.calendar"
                     @close="isCalendarModalOpen = false"
-                    @updated="async () => guide_profile = await getProfile($t)"/>
+                    @updated="async () => guide_profile = await getProfile(router, $t)"/>
             </div>
 
             <form action="" class="guide-profile__form" @submit.prevent="submitForm">
@@ -106,7 +106,8 @@
                             v-for="(service, index) in services"
                             :key="index"
                             :value="service"
-                            :error="((service.service_name === '' || !service.price) && v1$.$errors.length) ? true : false"
+                            :all_selected_services="services"
+                            :error="((!service.service_id || !service.price) && v1$.$errors.length) ? true : false"
                             @update="handleServiceUpdate(service, index)"/>
                     </div>
 
@@ -163,14 +164,14 @@
     const isCalendarModalOpen = ref(false);
 
     onMounted(async () => {
-        guide_profile.value = await getProfile(t);
+        guide_profile.value = await getProfile(router, t);
         if (guide_profile.value.country_id) { cities.value = await getCities(guide_profile.value.country_id, t); is_country_valid.value = true; }
     
         countries.value = await getCountries(t);
         languages.value = await getLanguages(t);
         services.value  = await getServices('guide', t);
 
-        if (!services.value.length) services.value.push({ service_name: "", price: null, status: false });
+        if (!services.value.length) services.value.push({ service_id: null, price: null });
     });
 
     const languagesValidator = helpers.withMessage(
@@ -178,9 +179,9 @@
         (languages) => languages.length > 0 && languages.every(lang => lang !== '')
     );
 
-    const serviceNameValidator = helpers.withMessage(
+    const serviceIdValidator = helpers.withMessage(
         'name',
-        (value) => value.every(service => service.service_name !== '')
+        (value) => value.every(service => service.service_id)
     );
 
     const servicePriceValidator = helpers.withMessage(
@@ -200,7 +201,7 @@
 
     const services_rules = computed(() => {
         return {
-            services: { required, serviceNameValidator, servicePriceValidator }
+            services: { required, serviceIdValidator, servicePriceValidator }
         }
     });
 
@@ -221,13 +222,13 @@
 
             response_loading.value = true;
 
-            const response = await axios.post('https://guides-to-go.onrender.com/user_info/', params, request_headers);
-            const services_response = await axios.post('https://guides-to-go.onrender.com/service/add_service', services_params, request_headers);
+            await axios.post('https://guides-to-go.onrender.com/user_info/', params, request_headers);
+            await axios.post('https://guides-to-go.onrender.com/service/update_services', services_params, request_headers);
 
             response_loading.value = false;
             toast.success(t('messages.save_success'));
 
-            await getProfile(t);
+            guide_profile.value = await getProfile(router, t);
             await getServices('guide', t);
         } catch (err) {
             response_loading.value = false;
@@ -306,7 +307,7 @@
     }
 
     const handleServiceUpdate = (service, index) => {
-        if (service && service.service_name !== '' && service.price) {
+        if (service && service.service_id && service.price) {
             if(typeof index === 'number') {
                 services.value[index] = service;
             } else {
@@ -321,9 +322,8 @@
     const addService = () => {
         if (services.value.length < 5) {
             services.value.push({
-                service_name: "",
+                service_id: null,
                 price: null,
-                status: false
             });
         }
     }
@@ -363,7 +363,7 @@
                 cursor: pointer;
                 margin-top: 2rem;
                 color: $white;
-                font-weight: 500;
+                font-weight: bold;
                 padding: 0.5rem;
                 img {
                     width: 2.25rem;

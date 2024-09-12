@@ -1,13 +1,10 @@
 <template>
     <div class="guide-profile__service">
-        <input
-            type="text"
-            class="form-input"
-            :class="{ error: error }"
-            :placeholder="$t('profile.guide.service_type')"
-            maxlength="30"
-            v-model="local_service.service_name"
-            @input="emitUpdate">
+        <services-select
+            :value="value"
+            :error="error"
+            :all_selected_services="all_selected_services"
+            @choose="handleServiceSelect"/>
 
         <input
             type="text"
@@ -23,6 +20,7 @@
 <script setup>
     import { ref, watch } from 'vue';
     import { validatePrice } from '@/utils/validatePrice';
+    import ServicesSelect from './ServicesSelect.vue';
 
     const emit = defineEmits(['update']);
 
@@ -30,15 +28,18 @@
         value: {
             type: Object,
         },
+        all_selected_services: {
+            type: Array,
+            required: true,
+        },
         error: {
             type: Boolean
         }
     });
 
     const local_service = ref({
-        service_name: '',
+        service_id: null,
         price: null,
-        status: false
     });
 
     watch(() => props.value, (newVal) => {
@@ -51,6 +52,11 @@
         emit('update', local_service.value);
     }
 
+    const handleServiceSelect = (service) => {
+        local_service.value.service_id = service.id;
+        console.log(local_service.value);
+    }
+
     const handlePriceInput = (event) => {
         local_service.value.price = +validatePrice(event.target.value);
         emitUpdate();
@@ -61,14 +67,15 @@
     .guide-profile__service {
         display: flex;
         margin-bottom: 0.5rem;
-        input:first-child {
+        & > *:first-child {
             width: 70%;
             margin-right: 0.5rem;
             text-transform: capitalize;
+            height: 3.5rem;
         }
         input:last-child {
+            height: 3.5rem;
             width: 30%;
-            appearance: none;
         }
     }
 </style>

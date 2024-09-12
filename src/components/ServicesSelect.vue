@@ -2,12 +2,12 @@
     <div class="form-select" :class="{ 'form-select--active': isSelectActive, 'error': error }" ref="target">
         <div class="form-select__top" @click="isSelectActive = !isSelectActive">
             <span class="form-select__current" :class="{ 'placeholder': !currentOption }"
-                v-text="currentOption ?? select_placeholder" />
+                v-text="currentOption?.name ?? select_placeholder" />
         </div>
 
         <ul class="form-select__options black-scroll">
             <li v-for="(option, index) in filteredOptions" :key="index" class="form-select__option"
-                @click="chooseOption(option)" v-text="option" />
+                @click="chooseOption(option)" v-text="option?.name ?? option" />
         </ul>
 
         <img src="@/assets/images/icons/arrow-down.svg" class="form-select__arrow" alt="arrow"
@@ -16,29 +16,39 @@
 </template>
 
 <script setup>
-    import { ref, watch, computed } from 'vue';
+    import { ref, computed, onMounted, watch } from 'vue';
     import { onClickOutside } from '@vueuse/core';
+    import { getServices } from '@/api';
     import { useI18n } from 'vue-i18n';
 
     const { t } = useI18n();
+    const services = ref([]);
     const isSelectActive = ref(false);
     const currentOption = ref(null);
     const target = ref(null);
     const select_placeholder = t('placeholders.service_type');
+
+    onMounted(async () => {
+        services.value = await getServices('tourist');
+        if(props.value && props.value.service_id && props.value.price) {
+            currentOption.value = {
+                name: services.value.find(s => s.id === props.value.service_id).name,
+                id: props.value.service_id
+            }
+        }
+    });
 
     onClickOutside(target, () => isSelectActive.value = false);
 
     const emit = defineEmits(['choose']);
 
     const props = defineProps({
-        options: {
-            type: Array,
-            required: true,
-            default: [],
+        value: {
+            type: Object,
         },
-        allSelectedLanguages: {
+        all_selected_services: {
             type: Array,
-            required: true,
+            required: true
         },
         error: {
             type: Boolean,
@@ -47,12 +57,14 @@
     });
 
     const filteredOptions = computed(() => {
-        return props.options.filter(option => !props.allSelectedLanguages.includes(option));
+        return services.value.filter(service => {
+            return !props.all_selected_services.some(selected => selected.service_id === service.id);
+        });
     });
 
     const chooseOption = (option) => {
         currentOption.value = option;
-        emit('choose', currentOption);
+        emit('choose', currentOption.value);
         isSelectActive.value = false;
     }
 </script>
