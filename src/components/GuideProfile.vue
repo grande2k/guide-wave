@@ -330,6 +330,7 @@
 
     const logout = () => {
         $cookies.remove("access_token");
+        $cookies.remove("user_role");
         router.push('/login');
     }
 </script>

@@ -3,6 +3,8 @@
         "tourist": "For tourist",
         "guide": "For guide"
     },
+    "admin": "Administrator",
+    "go_home": "Home page",
     "location": "Location",
     "language": "Language",
     "service": "Service",

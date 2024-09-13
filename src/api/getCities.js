@@ -4,9 +4,9 @@ import { useToast } from "vue-toastification";
 
 const toast = useToast();
 
-export const getCities = async (country_id, t) => {
+export const getCities = async (country_id, t, lang) => {
     try {
-        const params = { language: defaultLocale, country_id: country_id };
+        const params = { language: lang ?? defaultLocale, country_id: country_id };
         const response = await axios.post('https://guides-to-go.onrender.com/search/get_city', params);
         
         return response.data.cities;

@@ -100,6 +100,7 @@
 
             console.log(response.data);
             $cookies.set("access_token", response.data.access_token, "1m");
+            $cookies.set("user_role", response.data.user_info[0].role_id, "1m");
             router.push('/profile');
             toast.success( t('messages.login_success') );
             clearForm();
