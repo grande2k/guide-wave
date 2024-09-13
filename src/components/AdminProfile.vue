@@ -42,7 +42,8 @@
                         v-for="lang in admin_profile.languages"
                         :key="lang.lang_code"
                         class="admin-profile__language" 
-                        v-text="lang.languages_names.ru"/>
+                        v-text="lang.languages_names.ru"
+                        @click="handleLanguageClick(lang)"/>
                 </div>
 
                 <p v-else class="admin-profile__message">Пусто</p>
@@ -69,7 +70,8 @@
                         v-for="service in admin_profile.services"
                         :key="service.services_name.ru"
                         class="admin-profile__language" 
-                        v-text="service.services_name.ru"/>
+                        v-text="service.services_name.ru"
+                        @click="handleServiceClick(service)"/>
                 </div>
 
                 <p v-else class="admin-profile__message">Пусто</p>
@@ -94,21 +96,35 @@
 
     <admin-create-modal
         v-if="is_create_modal_open"
-        :type="modal_props.type"
-        :title="modal_props.title"
+        :content="modal_props.create"
         @submitted="handleCreateModalSubmit"
         @close="is_create_modal_open = false"/>
+
+    <admin-dialog-modal
+        v-if="is_dialog_modal_open"
+        :content="modal_props.dialog"
+        @edit="openEditModal"
+        @delete="deleteContent"
+        @close="is_dialog_modal_open = false; editing_language = null; editing_service = null;"/>
+
+    <admin-edit-modal
+        v-if="is_edit_modal_open"
+        :content="modal_props.edit"
+        @submitted="handleEditModalSubmit"
+        @close="is_edit_modal_open = false; editing_language = null; editing_service = null;"/>
 </template>
 
 <script setup>
     import { ref, reactive, onMounted } from 'vue';
     import { useRouter } from 'vue-router';
     import { useI18n } from 'vue-i18n';
-    import { getGuides, getAdminLanguages, getAdminServices, getCountries, addLanguages, addServices } from '@/api';
+    import { getGuides, getAdminLanguages, getAdminServices, getCountries, addLanguages, addServices, updateLanguage, deleteLanguage, updateService, deleteService } from '@/api';
     import { useToast } from 'vue-toastification';
     import AdminSplit from './AdminSplit.vue';
     import AdminGuideRequest from './AdminGuideRequest.vue';
     import AdminCreateModal from './modals/AdminCreateModal.vue';
+    import AdminDialogModal from './modals/AdminDialogModal.vue';
+    import AdminEditModal from './modals/AdminEditModal.vue';
 
     const router = useRouter();
     const toast = useToast();
@@ -122,14 +138,29 @@
     });
 
     const modal_props = reactive({
-        title: '',
-        type: ''
+        create: {
+            title: '',
+            type: ''
+        },
+        dialog: {
+            title: '',
+            type: ''
+        },
+        edit: {
+            title: '',
+            type: ''
+        }
     })
     
     const is_create_modal_open = ref(false);
+    const is_dialog_modal_open = ref(false);
+    const is_edit_modal_open = ref(false);
     const is_guides_open = ref(false);
     const is_languages_open = ref(false);
     const is_services_open = ref(false);
+
+    const editing_language = ref(null);
+    const editing_service = ref(null);
 
     onMounted(async () => {
         admin_profile.value.guides = await getGuides(router, t);
@@ -182,20 +213,138 @@
                 break;
         }
 
-        modal_props.title = "",
-        modal_props.type = ""
+        modal_props.create.title = "",
+        modal_props.create.type = ""
+    }
+
+    const handleEditModalSubmit = async (result) => {
+        switch (result.type.toLowerCase()) {
+            case 'languages':
+                const lang_params = {
+                    old_lang_code: result.data.old_lang_code,
+                    update_lang_code: result.data.lang_code,
+                    languages_names: {
+                        ru: result.data.ru,
+                        en: result.data.en
+                    }
+                };
+
+                const lang_response_result = await updateLanguage(lang_params, t);
+
+                if (lang_response_result) {
+                    toast.success('Язык успешно добавлен');
+                    admin_profile.value.languages = await getAdminLanguages(t);
+                }
+
+                break;
+            case 'services':
+                const services_params = {
+                    old_services: result.data.old_services,
+                    update_services: {
+                        en: result.data.en,
+                        ru: result.data.ru
+                    }
+                };
+
+                const service_response_result = await updateService(services_params, t);
+
+                if (service_response_result) {
+                    toast.success('Услуга успешно добавлена');
+                    admin_profile.value.services = await getAdminServices(t);
+                }
+
+                break;
+            default:
+                toast.error('Произошла ошибка');
+                break;
+        }
     }
 
     const openLanguageCreateModal = () => {
         is_create_modal_open.value = true;
-        modal_props.title = "Добавление нового языка",
-        modal_props.type = "languages"
+        modal_props.create.title = "Добавление нового языка",
+        modal_props.create.type = "languages"
     }
 
     const openServicesCreateModal = () => {
         is_create_modal_open.value = true;
-        modal_props.title = "Добавление новой услуги",
-        modal_props.type = "services"
+        modal_props.create.title = "Добавление новой услуги",
+        modal_props.create.type = "services"
+    }
+
+    const handleLanguageClick = (lang) => {
+        is_dialog_modal_open.value = true;
+        modal_props.dialog.title = "Что вы хотите сделать?",
+        modal_props.dialog.type = "languages";
+        editing_language.value = lang;
+    }
+
+    const handleServiceClick = (service) => {
+        is_dialog_modal_open.value = true;
+        modal_props.dialog.title = "Что вы хотите сделать?",
+        modal_props.dialog.type = "services";
+        editing_service.value = service;
+    }
+
+    const openEditModal = (type) => {
+        switch (type) {
+            case 'languages':
+                is_dialog_modal_open.value = false;
+                is_edit_modal_open.value = true;
+                modal_props.edit.title = "Введите новые значения";
+                modal_props.edit.type = "languages";
+                modal_props.edit.value = editing_language.value;
+                break;
+            case 'services':
+                is_dialog_modal_open.value = false;
+                is_edit_modal_open.value = true;
+                modal_props.edit.title = "Введите новые значения";
+                modal_props.edit.type = "services";
+                modal_props.edit.value = editing_service.value;
+                break;
+            default:
+                break;
+        }
+    }
+
+    const deleteContent = async (type) => {
+        switch (type) {
+            case 'languages':
+                const lang_params = {
+                    lang_code: editing_language.value.lang_code,
+                    languages_names: {
+                        en: editing_language.value.languages_names.en,
+                        ru: editing_language.value.languages_names.ru,
+                    }
+                };
+
+                const lang_response_result = await deleteLanguage(lang_params, t);
+
+                if (lang_response_result) {
+                    toast.success('Язык успешно удален');
+                    admin_profile.value.languages = await getAdminLanguages(t);
+                }
+
+                break;
+            case 'services':
+                const services_params = {
+                    services_name: editing_service.value.services_name
+                };
+
+                const services_response_result = await deleteService(services_params, t);
+
+                if (services_response_result) {
+                    toast.success('Услуга успешно удалена');
+                    admin_profile.value.services = await getAdminServices(t);
+                }
+
+                break;
+        
+            default:
+                break;
+        }
+
+        is_dialog_modal_open.value = false;
     }
 
     const logout = () => {

@@ -14,3 +14,7 @@ export * from './admin/addLanguages';
 export * from './admin/addServices';
 export * from './admin/getSplit';
 export * from './admin/updateSplit';
+export * from './admin/updateLanguage';
+export * from './admin/deleteLanguage';
+export * from './admin/updateService';
+export * from './admin/deleteService';

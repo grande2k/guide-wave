@@ -106,7 +106,7 @@
         city_id: null,
         service_id: null,
         language_code: null,
-        price: null,
+        price: [],
     });
 
     const countries = ref([]);
@@ -220,9 +220,9 @@
             index === tabIndex ? tab.is_active = !tab.is_active : '';
         });
 
-        // const selectedPrice = prices.value.filter(price => price.is_active).map(price => price.range);
-        // selectedPrice ? form_data.value.price = selectedPrice : form_data.value.price = null;
-        // if(selectedPrice.length === 0) form_data.value.price = null;
+        const selectedPrice = prices.value.filter(price => price.is_active).map(price => price.range);
+        selectedPrice ? form_data.value.price = selectedPrice : form_data.value.price = [];
+        if(selectedPrice.length === 0) form_data.value.price = [];
     }
 
     const resetSearch = () => {
@@ -233,7 +233,7 @@
             city_id: null,
             service_id: null,
             language_code: null,
-            price: null,
+            price: [],
         }
     }
 </script>
