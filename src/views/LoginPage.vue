@@ -66,7 +66,7 @@
     const response_loading = ref(false);
 
     onMounted(() => {
-        if ( $cookies.get("access_token") ) {
+        if ( $cookies.get("access_token") && $cookies.get("user_role") ) {
             router.push('/profile');
         }
     });
