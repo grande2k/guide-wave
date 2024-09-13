@@ -220,9 +220,9 @@
             index === tabIndex ? tab.is_active = !tab.is_active : '';
         });
 
-        const selectedPrice = prices.value.filter(price => price.is_active).map(price => price.range);
-        selectedPrice ? form_data.price = selectedPrice : form_data.price = null;
-        if(selectedPrice.length === 0) form_data.price = null;
+        // const selectedPrice = prices.value.filter(price => price.is_active).map(price => price.range);
+        // selectedPrice ? form_data.value.price = selectedPrice : form_data.value.price = null;
+        // if(selectedPrice.length === 0) form_data.value.price = null;
     }
 
     const resetSearch = () => {

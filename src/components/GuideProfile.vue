@@ -6,7 +6,9 @@
 
                 <div class="row">
                     <p class="guide-profile__label" v-text="`${$t('profile.guide.status.label')}:`"/>
-                    <guide-status-toggler :status="guide_profile.status"/>
+                    <guide-status-toggler
+                        :approved_status="approved_status"
+                        :status="guide_profile.status"/>
                 </div>
 
                 <button class="calendar-button" @click="isCalendarModalOpen = true">
@@ -174,6 +176,23 @@
         if (!services.value.length) services.value.push({ service_id: null, price: null });
     });
 
+    const approved_status = computed(() => {
+        switch (guide_profile.value.approved) {
+            case null:
+                return 'not_checked';
+                break;
+            case false:
+                return 'declined';
+                break;
+            case true:
+                return 'approved';
+                break;
+            default:
+                return ''
+                break;
+        }
+    });
+
     const languagesValidator = helpers.withMessage(
         'Language must be selected',
         (languages) => languages.length > 0 && languages.every(lang => lang !== '')
@@ -229,7 +248,7 @@
             toast.success(t('messages.save_success'));
 
             guide_profile.value = await getProfile(router, t);
-            await getServices('guide', t);
+            services.value = await getServices('guide', t);
         } catch (err) {
             response_loading.value = false;
 

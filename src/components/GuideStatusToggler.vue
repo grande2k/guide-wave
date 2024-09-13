@@ -1,5 +1,5 @@
 <template>
-    <button class="guide-profile__status" :class="{ 'guide-profile__status--off': !status_value }" @click="updateStatus()">
+    <button class="guide-profile__status" :class="{ 'guide-profile__status--off': !status_value }" @click="handleStatusUpdate">
         <span/>
 
         <p>
@@ -11,11 +11,19 @@
 <script setup>
     import { watch } from 'vue';
     import { useToggle } from '@vueuse/core';
-    import axios from 'axios';
+    import { updateStatus } from '@/api';
+    import { useI18n } from 'vue-i18n';
+    import { useToast } from 'vue-toastification';
 
+    const { t } = useI18n();
+    const toast = useToast();
     const [status_value, toggleStatus] = useToggle();
 
     const props = defineProps({
+        approved_status: {
+            type: String,
+            required: true,
+        },
         status: {
             type: Boolean,
             required: true,
@@ -26,18 +34,23 @@
         status_value.value = newStatus;
     }, { immediate: true });
 
-    const updateStatus = async () => {
-        toggleStatus();
-
-        try {
-            const params = { status: status_value.value };
-            const request_headers = { headers: { 'Authorization': `Bearer ${$cookies.get("access_token")}` } };
-            const response = await axios.post('https://guides-to-go.onrender.com/user_info/status', params, request_headers);
-            console.log(response.data);
-        } catch(err) {
-            console.log(err);
+    const handleStatusUpdate = async () => {
+        switch (props.approved_status) {
+            case 'approved':
+                const params = { status: status_value.value };
+                await updateStatus(params, t);
+                toggleStatus();
+                break;
+            case 'not_checked':
+                toast(t('messages.not_approved_yet'));
+                break;
+            case 'not_checked':
+                toast.error(t('messages.declined'));
+                break;
+            default:
+                toast.error(t('errors.default'));
+                break;
         }
-
     }
 </script>
 

@@ -20,11 +20,21 @@
         </div>
 
         <div class="guide__details">
-            <div class="guide__languages">
+            <div class="guide__languages" v-if="guide.languages.length">
                 <p class="guide__detail">Языки:</p>
 
-                <div v-for="(lang, index) in guide.languages" :key="index" class="guide__language" v-text="getLanguageName(lang)"/>
+                <div v-for="(lang, index) in guide.languages" :key="index" class="guide__language" v-text="getLanguageName(lang, index)"/>
             </div>
+
+            <p v-else class="guide__details-empty">Нет языков</p>
+
+            <div class="guide__services" v-if="guide.services.length">
+                <p class="guide__detail">Услуги:</p>
+
+                <div v-for="(service, index) in guide.services" :key="index" class="guide__language" v-text="getServiceName(service, index)"/>
+            </div>
+
+            <p v-else class="guide__details-empty">Нет услуг</p>
         </div>
 
         <div class="guide__controls">
@@ -88,12 +98,24 @@
         }
     });
 
-    const getLanguageName = (lang) => {
+    const getLanguageName = (lang, index) => {
         if(props.languages) {
-            let found_lang = props.languages.find(l => l.lang_code === lang).languages_names.ru;
-            if(found_lang) return `${found_lang},`;
+            const found_lang = props.languages.find(l => l.lang_code === lang).languages_names.ru;
+            if((index + 1) < props.guide.languages.length) {
+                if (found_lang) return `${found_lang},`;
+            } else {
+                if (found_lang) return found_lang;
+            }
         } else {
             return '';
+        }
+    }
+
+    const getServiceName = (service, index) => {
+        if ((index + 1) < props.guide.services.length) {
+            return `${service.service_name.ru},`;
+        } else {
+            return service.service_name.ru;
         }
     }
 
@@ -109,7 +131,7 @@
 
         const approve_response = await approveGuide(params, t);
 
-        if(approve_response.status === "succees") {
+        if(approve_response.status === "success") {
             toast.success('Гид был успешно одобрен');
             emit('update');
         } 
@@ -127,7 +149,7 @@
 
         const approve_response = await approveGuide(params, t);
 
-        if (approve_response.status === "succees") {
+        if (approve_response.status === "success") {
             toast.success('Гид был успешно отклонен');
             emit('update');
         }
@@ -205,6 +227,11 @@
                 margin-bottom: 0.75rem;
             }
         }
+        &__details-empty {
+            color: $white;
+            margin: 0;
+            font-weight: bold;
+        }
         &__detail {
             color: $white;
             margin: 0;
@@ -212,8 +239,12 @@
                 margin-bottom: 0.75rem;
             }
         }
-        &__languages {
+        &__languages,
+        &__services {
             display: flex;
+            flex-wrap: wrap;
+            row-gap: 0.5rem;
+            margin-bottom: 1rem;
             & > *:first-child {
                 margin: 0;
                 margin-right: 0.5rem;

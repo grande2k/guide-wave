@@ -33,10 +33,13 @@
             border-radius: 0.5rem;
             color: $black;
             @media screen and (max-width: 480px) {
+                @include flex-center;
                 top: 1rem;
                 left: 1rem;
                 font-size: 0.75rem;
                 padding: 0.75rem;
+                width: 5.75rem;
+                height: 2.5rem;
             }
         }
         .logo {

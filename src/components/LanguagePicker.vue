@@ -83,7 +83,7 @@
     .language-picker {
         position: fixed;
         top: 2rem;
-        right: 3rem;
+        right: 2rem;
         background-color: $white;
         border-radius: 0.5rem;
         padding: 0.5rem 1.625rem 0.5rem 0.5rem;
@@ -92,13 +92,19 @@
         cursor: pointer;
         user-select: none;
         @media screen and (max-width: 480px) {
-            right: 1.25rem;
+            @include flex-center;
+            top: 1rem;
+            right: 1rem;
+            height: 2.5rem;
         }
         &__arrow {
             position: absolute;
             top: 1rem;
             right: 0.5rem;
             transition: $transition;
+            @media screen and (max-width: 480px) {
+                top: 1.05rem;
+            }
         }
         &__language {
             @include flex-center-vert;

@@ -56,7 +56,9 @@
     "messages": {
         "register_success": "Вы успешно зарегистрировались",
         "login_success": "Вы успешно вошли в аккаунт",
-        "save_success": "Данные сохранены"
+        "save_success": "Данные сохранены",
+        "not_approved_yet": "Аккаунт еще не подтвержден, ожидайте",
+        "declined": "Ваш Аккаунт был заблокирован"
     },
     "profile": {
         "guide": {

@@ -1,6 +1,8 @@
 <template>
     <section class="admin-profile page page--bg" :class="{ opened: is_guides_open || is_languages_open || is_services_open }">
         <div class="admin-profile__content scroll-parent white-scroll" v-if="admin_profile">
+            <admin-split/>
+            
             <div class="admin-profile__menu white-scroll" v-if="is_guides_open">
                 <div class="topbar">
                     <button class="admin-profile__button" @click="is_guides_open = false">
@@ -104,6 +106,7 @@
     import { useI18n } from 'vue-i18n';
     import { getGuides, getAdminLanguages, getAdminServices, getCountries, addLanguages, addServices } from '@/api';
     import { useToast } from 'vue-toastification';
+    import AdminSplit from './AdminSplit.vue';
     import AdminGuideRequest from './AdminGuideRequest.vue';
     import AdminCreateModal from './modals/AdminCreateModal.vue';
 
