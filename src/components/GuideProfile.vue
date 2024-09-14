@@ -84,7 +84,9 @@
                             :all-selected-languages="guide_profile.languages"
                             :selected="language"
                             :error="language === '' && v$.languages.$errors.length ? true : false"
-                            @choose="(lang) => handleLanguageSelect(lang, index)"/>
+                            able_delete
+                            @choose="(lang) => handleLanguageSelect(lang, index)"
+                            @delete="handleLanguageDelete(index)"/>
                     </div>
 
                     <form-language-select
@@ -110,7 +112,8 @@
                             :value="service"
                             :all_selected_services="services"
                             :error="((!service.service_id || !service.price) && v1$.$errors.length) ? true : false"
-                            @update="handleServiceUpdate(service, index)"/>
+                            @update="s => handleServiceUpdate(s, index)"
+                            @delete="handleServiceDelete(index)"/>
                     </div>
 
                     <div v-if="services.length < 5" class="form-add" @click="addService">
@@ -337,6 +340,15 @@
             v1$.value.$reset();
         }
     }
+
+    const handleServiceDelete = (index) => {
+        if(services.value.length > 1) services.value.splice(index, 1);
+    }
+
+    const handleLanguageDelete = (index) => {
+        if(guide_profile.value.languages.length > 1) guide_profile.value.languages.splice(index, 1);
+    }
+
 
     const addService = () => {
         if (services.value.length < 5) {

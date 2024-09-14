@@ -28,20 +28,6 @@
     const target = ref(null);
     const select_placeholder = t('placeholders.service_type');
 
-    onMounted(async () => {
-        services.value = await getServices('tourist');
-        if(props.value && props.value.service_id && props.value.price) {
-            currentOption.value = {
-                name: services.value.find(s => s.id === props.value.service_id).name,
-                id: props.value.service_id
-            }
-        }
-    });
-
-    onClickOutside(target, () => isSelectActive.value = false);
-
-    const emit = defineEmits(['choose']);
-
     const props = defineProps({
         value: {
             type: Object,
@@ -56,6 +42,32 @@
         }
     });
 
+    onMounted(async () => {
+        services.value = await getServices('tourist');
+        if (props.value && props.value.service_id && props.value.price) {
+            currentOption.value = {
+                name: services.value.find(s => s.id === props.value.service_id).name,
+                id: props.value.service_id
+            }
+        }
+    });
+
+    watch(() => props.value, (newValue, oldValue) => {
+        if(newValue !== oldValue) {
+            const name = services.value.find(s => s.id === props.value.service_id).name;
+            if(name) {
+                currentOption.value = {
+                    name: services.value.find(s => s.id === props.value.service_id).name,
+                    id: props.value.service_id
+                }
+            }
+        }
+    }, { deep: true });
+
+    onClickOutside(target, () => isSelectActive.value = false);
+
+    const emit = defineEmits(['choose']);
+
     const filteredOptions = computed(() => {
         return services.value.filter(service => {
             return !props.all_selected_services.some(selected => selected.service_id === service.id);
@@ -64,13 +76,14 @@
 
     const chooseOption = (option) => {
         currentOption.value = option;
-        emit('choose', currentOption.value);
+        emit('choose', currentOption.value.id);
         isSelectActive.value = false;
     }
 </script>
 
 <style lang="scss" scoped>
     .form-select {
+
         &__option,
         &__current {
             text-transform: capitalize;

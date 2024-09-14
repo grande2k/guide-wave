@@ -212,7 +212,7 @@
     }
 
     const handleServiceSelect = (service) => {
-        if (service) form_data.value.service_id = service.id;
+        if (service) form_data.value.service_id = service;
     }
 
     const handleTabClick = (tabIndex) => {

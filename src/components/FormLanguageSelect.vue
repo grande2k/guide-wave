@@ -1,14 +1,20 @@
 <template>
-    <div class="form-select" :class="{ 'form-select--active': isSelectActive, 'error': error }" ref="target">
-        <div class="form-select__top" @click="isSelectActive = !isSelectActive">
-            <span class="form-select__current" :class="{ 'placeholder': !currentOption }" v-text="currentOption?.name ?? select_placeholder"/>
+    <div class="form-row" :class="{ 'able_delete': able_delete }">
+        <div class="form-select" :class="{ 'form-select--active': isSelectActive, 'error': error }" ref="target">
+            <div class="form-select__top" @click="isSelectActive = !isSelectActive">
+                <span class="form-select__current" :class="{ 'placeholder': !currentOption }" v-text="currentOption?.name ?? select_placeholder"/>
+            </div>
+
+            <ul class="form-select__options black-scroll">
+                <li v-for="option in filteredOptions" :key="option.lang_code" class="form-select__option" @click="chooseOption(option.lang_code)" v-text="option.name"/>
+            </ul>
+
+            <img src="@/assets/images/icons/arrow-down.svg" class="form-select__arrow" alt="arrow" @click="isSelectActive = !isSelectActive">
         </div>
 
-        <ul class="form-select__options black-scroll">
-            <li v-for="option in filteredOptions" :key="option.lang_code" class="form-select__option" @click="chooseOption(option.lang_code)" v-text="option.name"/>
-        </ul>
-
-        <img src="@/assets/images/icons/arrow-down.svg" class="form-select__arrow" alt="arrow" @click="isSelectActive = !isSelectActive">
+        <button v-if="able_delete" type="button" class="delete-btn" @click="emit('delete')">
+            <img src="@/assets/images/icons/delete.svg" alt="delete">
+        </button>
     </div>
 </template>
 
@@ -25,7 +31,7 @@
 
     onClickOutside(target, () => isSelectActive.value = false);
 
-    const emit = defineEmits(['choose']);
+    const emit = defineEmits(['choose', 'delete']);
 
     const props = defineProps({
         options: {
@@ -40,6 +46,10 @@
         selected: {
             type: String,
         },
+        able_delete: {
+            type: Boolean,
+            default: false
+        },
         error: {
             type: Boolean,
             default: false
@@ -53,6 +63,13 @@
         }
     }, { immediate: true });
 
+    watch(() => props.selected, (newVal) => {
+        if (newVal) {
+            const selectedOption = props.options.find(option => option.lang_code === props.selected);
+            if (selectedOption) currentOption.value = selectedOption;
+        }
+    }, { deep: true });
+
     const filteredOptions = computed(() => {
         return props.options.filter(option => !props.allSelectedLanguages.includes(option.lang_code));
     });
@@ -65,6 +82,31 @@
 </script>
 
 <style lang="scss">
+    .form-row {
+        &.able_delete {
+            display: flex;
+            &:not(:last-child) {
+                margin-bottom: 0.5rem;
+            }
+            .form-select {
+                flex: 0 1 85%;
+                margin-bottom: 0 !important;
+            }
+        }
+        .delete-btn {
+            @include flex-center;
+            background-color: $white;
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            cursor: pointer;
+            margin-left: 0.5rem;
+            width: 3.5rem;
+            img {
+                width: 1.5rem;
+                filter: invert(1);
+            }
+        }
+    }
     .form-select {
         display: block;
         position: relative;
