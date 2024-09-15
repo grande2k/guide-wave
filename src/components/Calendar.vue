@@ -73,9 +73,8 @@
         & > p {
             color: $white;
             font-weight: bold;
-            text-align: center;
             font-size: 1rem;
-            margin: 0 0 0.5rem 0;
+            margin: 0 0 0.75rem 0;
         }
         &__day {
             @include flex-center-vert;

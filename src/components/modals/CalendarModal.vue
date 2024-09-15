@@ -2,11 +2,21 @@
     <teleport to="body">
         <div class="calendar modal">
             <div class="modal__content calendar__content" ref="target">
-                <div class="modal__close" @click="emit('close')">
+                <div class="modal__close" @click="submitCalendar(); emit('close', isCalendarChanged())">
                     <img src="@/assets/images/icons/close.svg" alt="close">
                 </div>
 
-                <p v-text="$t('occupancy_calendar')"/>
+                <p v-text="$t('calendar_modal_title')"/>
+
+                <div class="calendar__nav">
+                    <button @click="goBack" :disabled="isBackDisabled">
+                        <img src="@/assets/images/icons/arrow-left.svg" alt="prev">
+                    </button>
+
+                    <button @click="goForward">
+                        <img src="@/assets/images/icons/arrow-left.svg" alt="next">
+                    </button>
+                </div>
 
                 <div class="calendar__days-column">
                     <div v-for="(day, index) in days" :key="index" class="calendar__day">
@@ -17,26 +27,17 @@
                         </div>
                     </div>
                 </div>
-
-                <submit-button
-                    blue
-                    text="save"
-                    icon="check"
-                    :loading="response_loading"
-                    class="full-column"
-                    @click="submitCalendar"/>
             </div>
         </div>
     </teleport>
 </template>
 
 <script setup>
-    import { ref, watch } from 'vue';
+    import { ref, watch, computed } from 'vue';
     import { onClickOutside } from '@vueuse/core';
     import { addCalendar } from '@/api';
     import { useI18n } from 'vue-i18n';
     import { useToast } from 'vue-toastification';
-    import SubmitButton from '../SubmitButton.vue';
 
     const { t } = useI18n();
     const toast = useToast();
@@ -45,8 +46,6 @@
     const calendar = ref([]);
     const response_loading = ref(false);
 
-    onClickOutside(target, () => emit('close'));
-
     const props = defineProps({
         dates: {
             type: Array,
@@ -54,20 +53,50 @@
         }
     });
 
+    const initialCalendar = ref([]);
+
+    onClickOutside(target, () => {
+        submitCalendar();
+        emit('close', isCalendarChanged());
+    });
+
     watch(() => props.dates, (newDates) => {
-        newDates ? calendar.value = newDates : calendar.value = [];
+        if (newDates) {
+            // Создаем независимую копию props.dates с помощью метода JSON
+            calendar.value = JSON.parse(JSON.stringify(newDates));
+            initialCalendar.value = JSON.parse(JSON.stringify(newDates));
+        } else {
+            calendar.value = [];
+        }
     }, { immediate: true, deep: true });
 
-    const generateNextDays = (count) => {
-        const today = new Date();
+    const deepEqual = (arr1, arr2) => {
+        if (arr1.length !== arr2.length) return false;
+
+        return arr1.every((item1, index) => {
+            const item2 = arr2[index];
+            return (
+                item1.data_time === item2.data_time &&
+                JSON.stringify(item1.hours.sort()) === JSON.stringify(item2.hours.sort())
+            );
+        });
+    };
+
+    const isCalendarChanged = () => {
+        return !deepEqual(calendar.value, initialCalendar.value);
+    };
+
+    const startDate = ref(new Date());
+
+    const generateNextDays = (start, count) => {
         const daysArray = [];
         for (let i = 0; i < count; i++) {
-            const nextDay = new Date(today);
-            nextDay.setDate(today.getDate() + i);
+            const nextDay = new Date(start);
+            nextDay.setDate(start.getDate() + i);
             daysArray.push(nextDay);
         }
         return daysArray;
-    }
+    };
 
     const generateTimeSlots = (startHour, endHour) => {
         const timeArray = [];
@@ -75,37 +104,34 @@
             timeArray.push(hour);
         }
         return timeArray;
-    }
+    };
 
     const formatDate = (date) => {
         const day = String(date.getDate()).padStart(2, '0');
         const month = String(date.getMonth() + 1).padStart(2, '0');
         const year = date.getFullYear();
         return `${day}.${month}.${year}`;
-    }
+    };
 
     const toDate = (dateString) => {
         const [year, month, day] = dateString.split('-');
         return new Date(year, month - 1, day);
-    }
+    };
 
     const isBusy = (day, time) => {
-        const busyDay = props.dates.find(d => toDate(d.data_time).toDateString() === day.toDateString());
-
+        const busyDay = calendar.value.find(d => toDate(d.data_time).toDateString() === day.toDateString());
         return busyDay ? busyDay.hours.includes(time) : false;
-    }
+    };
 
     const formatDateWithTimezone = (date) => {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
         const day = String(date.getDate()).padStart(2, '0');
         return `${year}-${month}-${day}`;
-    }
-
+    };
 
     const pickTime = (day, time) => {
         const dayStr = formatDateWithTimezone(day);
-
         const existingEntry = calendar.value.find(d => d.data_time === dayStr);
 
         if (existingEntry) {
@@ -120,25 +146,49 @@
                 hours: [time]
             });
         }
-    }
+    };
 
     const submitCalendar = async () => {
-        if(calendar.value.length) {
-            response_loading.value = true;
-            const params = { data: calendar.value };
-            console.log(params.data);
-            await addCalendar(params, t);
+        if (isCalendarChanged()) {
+            if (calendar.value.length) {
+                response_loading.value = true;
+                const params = { data: calendar.value };
+                console.log(params.data);
+                await addCalendar(params, t);
 
-            response_loading.value = false;
-            emit('updated');
+                response_loading.value = false;
+                emit('updated');
+            }
+
+            toast.success(t('messages.save_success'));
         }
+    };
 
-        toast.success(t('messages.save_success'));
-    }
-
-    const days = ref(generateNextDays(5));
+    const days = ref(generateNextDays(startDate.value, 5));
     const timeSlots = ref(generateTimeSlots(9, 21));
+
+    const goBack = () => {
+        const newStartDate = new Date(startDate.value);
+        newStartDate.setDate(newStartDate.getDate() - 5);
+
+        if (newStartDate >= new Date().setHours(0, 0, 0, 0)) {
+            startDate.value = newStartDate;
+            days.value = generateNextDays(startDate.value, 5);
+        }
+    };
+
+    const goForward = () => {
+        const newStartDate = new Date(startDate.value);
+        newStartDate.setDate(newStartDate.getDate() + 5);
+        startDate.value = newStartDate;
+        days.value = generateNextDays(startDate.value, 5);
+    };
+
+    const isBackDisabled = computed(() => {
+        return startDate.value <= new Date().setHours(0, 0, 0, 0);
+    });
 </script>
+
 
 <style lang="scss" scoped>
     .calendar {
@@ -149,10 +199,38 @@
                 font-weight: bold;
                 text-align: center;
                 font-size: 1.5rem;
-                margin: 0 0 2rem 0;
+                margin: 0 0 1.5rem 0;
                 @media screen and (max-width: 480px) {
                     font-size: 1rem;
                     margin-bottom: 1.25rem;
+                }
+            }
+        }
+        &__nav {
+            @include flex-center;
+            margin-bottom: 1.5rem;
+            button {
+                @include flex-center;
+                width: 3rem;
+                height: 3rem;
+                background-color: $primary;
+                border-radius: 50%;
+                cursor: pointer;
+                img {
+                    width: 1.5rem;
+                    @media screen and (max-width: 480px) {
+                        width: 1rem;
+                    }
+                }
+                &:last-child {
+                    margin-left: 1rem;
+                    img {
+                        transform: rotate(180deg);
+                    }
+                }
+                @media screen and (max-width: 480px) {
+                    width: 2.5rem;
+                    height: 2.5rem;
                 }
             }
         }

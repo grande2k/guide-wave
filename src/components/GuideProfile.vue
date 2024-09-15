@@ -19,7 +19,7 @@
                 <calendar-modal
                     v-if="isCalendarModalOpen"
                     :dates="guide_profile.calendar"
-                    @close="isCalendarModalOpen = false"
+                    @close="closeCalendar"
                     @updated="async () => guide_profile = await getProfile(router, $t)"/>
             </div>
 
@@ -357,6 +357,11 @@
                 price: null,
             });
         }
+    }
+
+    const closeCalendar = async (isCalendarChanged) => {
+        isCalendarModalOpen.value = false;
+        if(isCalendarChanged) guide_profile.value = await getProfile(router, t);
     }
 
     const logout = () => {

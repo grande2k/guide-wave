@@ -21,7 +21,7 @@
             </div>
         </div>
 
-        <calendar v-if="guide.calendar && guide.calendar.length" :dates="guide.calendar"/>
+        <calendar v-if="guide.calendar" :dates="guide.calendar"/>
     </div>
 </template>
 
