@@ -44,25 +44,43 @@
 
     onMounted(async () => {
         services.value = await getServices('tourist');
-        if (props.value && props.value.service_id && props.value.price) {
-            currentOption.value = {
-                name: services.value.find(s => s.id === props.value.service_id).name,
-                id: props.value.service_id
+        console.log(props.value);
+        if (props.value && props.value.service_id) {
+            const service = services.value.find(s => s.id === props.value.service_id);
+            if (service) {
+                currentOption.value = {
+                    name: service.name,
+                    id: props.value.service_id
+                };
+            } else {
+                currentOption.value = null;
             }
         }
     });
 
-    watch(() => props.value, (newValue, oldValue) => {
-        if(newValue !== oldValue) {
-            const name = services.value.find(s => s.id === props.value.service_id).name;
-            if(name) {
+    watch(() => props.value, (newValue) => {
+        if (newValue && newValue.service_id) {
+            const service = services.value.find(s => s.id === newValue.service_id);
+            if (service) {
                 currentOption.value = {
-                    name: services.value.find(s => s.id === props.value.service_id).name,
-                    id: props.value.service_id
-                }
+                    name: service.name,
+                    id: newValue.service_id
+                };
+            } else {
+                currentOption.value = null;
             }
+        } else {
+            currentOption.value = null;
         }
     }, { deep: true });
+
+    watch(() => props.all_selected_services, (newSelectedServices) => {
+        if (currentOption.value && !newSelectedServices.some(service => service.service_id === currentOption.value.id)) {
+            currentOption.value = null;
+        }
+    });
+
+
 
     onClickOutside(target, () => isSelectActive.value = false);
 
@@ -76,7 +94,7 @@
 
     const chooseOption = (option) => {
         currentOption.value = option;
-        emit('choose', currentOption.value.id);
+        emit('choose', option.id);
         isSelectActive.value = false;
     }
 </script>
