@@ -7,6 +7,8 @@ export const search = async (params, t) => {
     try {
         const response = await axios.post('https://guides-to-go.onrender.com/search', params);
 
+        console.log(response.data);
+
         return response.data.users;
     } catch(err) {
         switch (err.response.status) {

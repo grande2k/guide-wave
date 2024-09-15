@@ -18,6 +18,7 @@
                 <p class="guide__detail" v-text="`Город: ${guide_city}`"/>
                 <p class="guide__detail" v-text="`Телефон: ${guide.phone ?? ''}`"/>
                 <p class="guide__detail" v-text="`Дата регистрации: ${formatDate(guide.date_registered)}`"/>
+                <p class="guide__detail" v-text="`Количество звонков: ${guide.count}`"/>
             </div>
         </div>
 

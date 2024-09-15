@@ -14,10 +14,15 @@
             <div class="guide__info">
                 <p class="guide__name" v-text="guide.name"/>
 
-                <a :href="`https://wa.me/${guide.phone.slice(1)}`" class="guide__call">
+                <button
+                    type="button"
+                    class="guide__call"
+                    :class="{ disabled: isDisabled }"
+                    @click="handleCall"
+                    :disabled="isDisabled">
                     <img src="@/assets/images/icons/whatsapp.svg" alt="whatsapp icon" />
                     {{ $t('call') }}
-                </a>
+                </button>
             </div>
         </div>
 
@@ -26,14 +31,30 @@
 </template>
 
 <script setup>
+    import { ref } from 'vue';
+    import { addCallsCount } from '@/api';
+    import { useI18n } from 'vue-i18n';
     import Calendar from '@/components/Calendar.vue';
+
+    const { t } = useI18n();
 
     const props = defineProps({
         guide: {
             type: Object,
             required: true
         }
-    })
+    });
+
+    const isDisabled = ref(false);
+
+    const handleCall = async () => {
+        if (isDisabled.value) return;
+
+        const params = { user_id: props.guide.user_id };
+        await addCallsCount(params, t);
+        window.open(`https://wa.me/${props.guide.phone.slice(1)}`, '_blank').focus();
+        isDisabled.value = true;
+    }
 </script>
 
 <style lang="scss" scoped>
@@ -116,6 +137,13 @@
             font-weight: 500;
             max-width: 200px;
             font-size: 1.125rem;
+            cursor: pointer;
+            user-select: none;
+            &.disabled  {
+                background-color: #ccc;
+                pointer-events: none;
+                cursor: not-allowed;
+            }
             @media screen and (max-width: 480px) {
                 font-size: 1rem;
                 padding: 0.75rem;

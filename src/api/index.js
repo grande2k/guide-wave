@@ -18,3 +18,4 @@ export * from './admin/updateLanguage';
 export * from './admin/deleteLanguage';
 export * from './admin/updateService';
 export * from './admin/deleteService';
+export * from './admin/addCallsCount';
