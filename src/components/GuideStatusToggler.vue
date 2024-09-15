@@ -27,6 +27,10 @@
         status: {
             type: Boolean,
             required: true,
+        },
+        profile_valid: {
+            type: Boolean,
+            required: true,
         }
     });
 
@@ -37,14 +41,18 @@
     const handleStatusUpdate = async () => {
         switch (props.approved_status) {
             case 'approved':
-                const params = { status: status_value.value };
-                await updateStatus(params, t);
-                toggleStatus();
+                if(props.profile_valid) {
+                    toggleStatus();
+                    const params = { status: status_value.value };
+                    await updateStatus(params, t);
+                } else {
+                    toast(t('messages.fill_profile'));
+                }
                 break;
             case 'not_checked':
                 toast(t('messages.not_approved_yet'));
                 break;
-            case 'not_checked':
+            case 'declined':
                 toast.error(t('messages.declined'));
                 break;
             default:

@@ -59,7 +59,8 @@
         "login_success": "You have successfully logged in",
         "save_success": "Profile saved",
         "not_approved_yet": "Account is not approved yet",
-        "declined": "Your account was blocked"
+        "declined": "Your account was blocked",
+        "fill_profile": "First, fill out your profile"
     },
     "profile": {
         "guide": {

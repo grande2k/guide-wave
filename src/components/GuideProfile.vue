@@ -8,10 +8,11 @@
                     <p class="guide-profile__label" v-text="`${$t('profile.guide.status.label')}:`"/>
                     <guide-status-toggler
                         :approved_status="approved_status"
+                        :profile_valid="!v$.$invalid && !v1$.$invalid"
                         :status="guide_profile.status"/>
                 </div>
 
-                <button class="calendar-button" @click="isCalendarModalOpen = true">
+                <button class="calendar-button" @click="openCalendar">
                     <img src="@/assets/images/icons/calendar.svg" alt="calendar">
                     {{ $t('calendar') }}
                 </button>
@@ -185,16 +186,12 @@
         switch (guide_profile.value.approved) {
             case null:
                 return 'not_checked';
-                break;
             case false:
                 return 'declined';
-                break;
             case true:
                 return 'approved';
-                break;
             default:
-                return ''
-                break;
+                return '';
         }
     });
 
@@ -358,6 +355,16 @@
                 service_id: null,
                 price: null,
             });
+        }
+    }
+
+    const openCalendar = async () => {
+        const result = !v$.value.$invalid && !v1$.value.$invalid;
+
+        if(result) {
+            isCalendarModalOpen.value = true
+        } else {
+            toast(t('messages.fill_profile'));
         }
     }
 
