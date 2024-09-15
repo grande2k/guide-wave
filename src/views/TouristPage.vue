@@ -67,12 +67,22 @@
                 :loading="response_loading"/>
         </form>
 
-        <div v-if="results && results.length" class="tourist__results scroll-parent white-scroll">
-            <p v-text="$t('search_results')"/>
+        <div v-if="paginatedResults && paginatedResults.length" class="tourist__results scroll-parent white-scroll">
+            <p v-text="$t('search_results')" />
 
-            <guide v-for="(guide, index) in results" :key="index" :guide="guide"/>
+            <guide
+                v-for="(guide, index) in paginatedResults[currentPage]"
+                :key="guide.user_id"
+                :guide="guide"
+                @callMade="handleCallMade(index)"/>
 
-            <button class="form-submit" v-text="$t('go_back_search')" @click="resetSearch"/>
+            <button
+                v-if="canShowNextGroup"
+                class="tourist__results-next"
+                v-text="$t('show_next')"
+                @click="showNextGroup"/>
+
+            <button class="form-submit" v-text="$t('go_back_search')" @click="resetResults" />
         </div>
 
         <div v-if="results && !results.length" class="tourist__results">
@@ -101,6 +111,9 @@
     const response_loading = ref(false);
     const toast = useToast();
 
+    const currentPage = ref(0);
+    const callsMade = ref([]);
+
     const form_data = ref({
         country_id: null,
         city_id: null,
@@ -114,6 +127,7 @@
     const languages = ref([]);
     const services = ref([]);
     const results = ref(null);
+    const split_by = ref(null);
 
     onMounted(async () => {
         countries.value = await getCountries(t);
@@ -155,7 +169,10 @@
 
         if (result) {
             response_loading.value = true;
-            results.value = await search(form_data.value, t);
+            let response = await search(form_data.value, t);
+            console.log(response);
+            results.value = response.users;
+            split_by.value = response.split_by;
             response_loading.value = false;
         } else {
             toast.error(t('errors.validation'));
@@ -236,6 +253,39 @@
             price: [],
         }
     }
+
+    const paginatedResults = computed(() => {
+        if(results.value) {
+            const paginated = [];
+            for (let i = 0; i < results.value.length; i += split_by.value) {
+                paginated.push(results.value.slice(i, i + split_by.value));
+            }
+            return paginated;
+        }
+    });
+
+    const canShowNextGroup = computed(() => {
+        return callsMade.value.length === paginatedResults.value[currentPage.value].length
+            && currentPage.value < paginatedResults.value.length - 1;
+    });
+
+    const handleCallMade = (index) => {
+        if (!callsMade.value.includes(index)) {
+            callsMade.value.push(index);
+        }
+    }
+
+    const showNextGroup = () => {
+        if (canShowNextGroup.value && currentPage.value < paginatedResults.value.length - 1) {
+            currentPage.value++;
+            callsMade.value = []; // Обнуляем отслеживание звонков для новой группы
+        }
+    }
+
+    const resetResults = () => {
+        currentPage.value = 0;
+        callsMade.value = [];
+    }
 </script>
 
 <style lang="scss" scoped>
@@ -301,6 +351,21 @@
                 @media screen and (max-width: 480px) {
                     font-size: 1.25rem;
                 }
+            }
+            &-next {
+                @include flex-center;
+                width: 100%;
+                border-radius: 0.5rem;
+                margin-top: 1rem;
+                cursor: pointer;
+                border: none;
+                padding: 1rem;
+                background-color: $white;
+                color: $black;
+                font-weight: 500;
+                font-size: 1.25rem;
+                transition: all 0.3s ease;
+                text-decoration: none;
             }
         }
     }

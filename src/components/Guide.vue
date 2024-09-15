@@ -38,6 +38,8 @@
 
     const { t } = useI18n();
 
+    const emit = defineEmits(['callMade']);
+
     const props = defineProps({
         guide: {
             type: Object,
@@ -47,13 +49,14 @@
 
     const isDisabled = ref(false);
 
-    const handleCall = async () => {
+    const handleCall = async (index) => {
         if (isDisabled.value) return;
 
         const params = { user_id: props.guide.user_id };
         await addCallsCount(params, t);
         window.open(`https://wa.me/${props.guide.phone.slice(1)}`, '_blank').focus();
         isDisabled.value = true;
+        emit('callMade');
     }
 </script>
 

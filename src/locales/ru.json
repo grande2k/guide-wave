@@ -27,6 +27,7 @@
     "occupancy_calendar": "Календарь занятости",
     "calendar_modal_title": "Выберите нерабочие или занятые часы",
     "free_time": "Свободное время:",
+    "show_next": "Показать следующих",
     "log_in": {
         "title": "Вход",
         "button": "Войти"

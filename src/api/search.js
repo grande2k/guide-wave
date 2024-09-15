@@ -9,7 +9,7 @@ export const search = async (params, t) => {
 
         console.log(response.data);
 
-        return response.data.users;
+        return response.data;
     } catch(err) {
         switch (err.response.status) {
             default:
