@@ -8,9 +8,9 @@ export const getGuides = async (router, t) => {
         const request_headers = { headers: { 'Authorization': `Bearer ${$cookies.get("access_token")}` } };
         const response = await axios.get('https://guides-to-go.onrender.com/admin/guides', request_headers);
 
-        console.log(response.data.guides_not_accepted);
+        console.log(response.data.guides);
 
-        return response.data.guides_not_accepted;
+        return response.data.guides;
     } catch (err) {
         switch (err.response.status) {
             case 401:

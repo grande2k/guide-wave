@@ -12,15 +12,17 @@
             </div>
 
             <div class="guide__info">
-                <h3 class="guide__name" v-text="guide.name"/>
+                <h3 class="guide__name" v-text="guide.name ?? 'Имя не указано'"/>
+                <p class="guide__detail guide__status">Статус: <span :class="{ 'on': guide.is_active, 'off': !guide.is_active }"/></p>
                 <p class="guide__detail" v-text="`Страна: ${guide_country}`"/>
                 <p class="guide__detail" v-text="`Город: ${guide_city}`"/>
-                <p class="guide__detail" v-text="`Телефон: ${guide.phone}`"/>
+                <p class="guide__detail" v-text="`Телефон: ${guide.phone ?? ''}`"/>
+                <p class="guide__detail" v-text="`Дата регистрации: ${formatDate(guide.date_registered)}`"/>
             </div>
         </div>
 
         <div class="guide__details">
-            <div class="guide__languages" v-if="guide.languages.length">
+            <div class="guide__languages" v-if="guide.languages && guide.languages.length">
                 <p class="guide__detail">Языки:</p>
 
                 <div v-for="(lang, index) in guide.languages" :key="index" class="guide__language" v-text="getLanguageName(lang, index)"/>
@@ -28,7 +30,7 @@
 
             <p v-else class="guide__details-empty">Нет языков</p>
 
-            <div class="guide__services" v-if="guide.services.length">
+            <div class="guide__services" v-if="guide.services && guide.services.length">
                 <p class="guide__detail">Услуги:</p>
 
                 <div v-for="(service, index) in guide.services" :key="index" class="guide__language" v-text="getServiceName(service, index)"/>
@@ -64,7 +66,7 @@
     const emit = defineEmits(['update']);
 
     onMounted(async () => {
-       cities.value = await getCities(props.guide.country_id, t, 'ru'); 
+       if(props.guide.city_id !== null) cities.value = await getCities(props.guide.country_id, t, 'ru'); 
     });
 
     const props = defineProps({
@@ -87,12 +89,20 @@
     });
 
     const guide_country = computed(() => {
-        return props.countries.find(country => country.id === props.guide.country_id).name;
+        if(props.guide.country_id !== null) {
+            return props.countries.find(country => country.id === props.guide.country_id).name;
+        } else {
+            return '';
+        }
     });
 
     const guide_city = computed(() => {
         if(cities.value.length) {
-            return cities.value.find(city => city.id === props.guide.city_id).name;
+            if(props.guide.city_id !== null) {
+                return cities.value.find(city => city.id === props.guide.city_id).name;
+            } else {
+                return '';
+            }
         } else {
             return '';
         }
@@ -153,6 +163,15 @@
             toast.success('Гид был успешно отклонен');
             emit('update');
         }
+    }
+
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+
+        return `${day}.${month}.${year}`;
     }
 </script>
 
@@ -225,6 +244,23 @@
             @media screen and (max-width: 480px) {
                 font-size: 1.325rem;
                 margin-bottom: 0.75rem;
+            }
+        }
+        &__status {
+            @include flex-center-vert;
+            margin-bottom: 1rem;
+            span {
+                display: block;
+                width: 1.25rem;
+                height: 1.25rem;
+                border-radius: 50%;
+                margin-left: 0.5rem;
+                &.on {
+                    background-color: #15ff15;
+                }
+                &.off {
+                    background-color: #ff1515;
+                }
             }
         }
         &__details-empty {
