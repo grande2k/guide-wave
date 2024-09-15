@@ -83,7 +83,7 @@
                 v-text="$t('show_next')"
                 @click="showNextGroup"/>
 
-            <button class="form-submit" v-text="$t('go_back_search')" @click="resetResults" />
+            <button class="form-submit" v-text="$t('go_back_search')" @click="resetSearch" />
         </div>
 
         <div v-if="results && !results.length" class="tourist__results">
@@ -246,6 +246,8 @@
     const resetSearch = () => {
         results.value = null;
         is_country_valid.value = false;
+        currentPage.value = 0;
+        callsMade.value = [];
         form_data.value = {
             country_id: null,
             city_id: null,
@@ -281,11 +283,6 @@
             currentPage.value++;
             callsMade.value = [];
         }
-    }
-
-    const resetResults = () => {
-        currentPage.value = 0;
-        callsMade.value = [];
     }
 </script>
 
