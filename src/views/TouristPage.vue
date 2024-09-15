@@ -1,6 +1,6 @@
 <template>
     <section class="tourist page page--bg">
-        <form v-if="!results" action="#" class="tourist__form scroll-parent" @submit.prevent="submitForm">
+        <form v-if="!results" action="#" class="tourist__form scroll-parent white-scroll" @submit.prevent="submitForm">
             <div class="tourist__form-field active">
                 <p class="form-label">
                     <span>1</span>
@@ -11,12 +11,13 @@
                     <autocomplete-field
                         :items="countries"
                         :placeholder="$t('country')"
+                        :disabled="!countries || !countries.length"
                         @select="handleCountrySelect"/>
 
                     <autocomplete-field
                         :items="cities"
                         :placeholder="$t('city')"
-                        :disabled="!cities || !is_country_valid"
+                        :disabled="!cities || !cities.length || !is_country_valid"
                         @select="handleCitySelect"/>
                 </div>
             </div>
@@ -278,7 +279,7 @@
     const showNextGroup = () => {
         if (canShowNextGroup.value && currentPage.value < paginatedResults.value.length - 1) {
             currentPage.value++;
-            callsMade.value = []; // Обнуляем отслеживание звонков для новой группы
+            callsMade.value = [];
         }
     }
 
@@ -290,9 +291,6 @@
 
 <style lang="scss" scoped>
     .tourist {
-        &__form {
-            overflow: hidden;
-        }
         &__form {
             &-field {
                 margin-bottom: 2rem;

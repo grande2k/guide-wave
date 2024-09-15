@@ -49,12 +49,14 @@
 
     const isDisabled = ref(false);
 
-    const handleCall = async (index) => {
+    const handleCall = async () => {
         if (isDisabled.value) return;
+
+        window.open(`https://wa.me/${props.guide.phone.slice(1)}`, '_blank');
 
         const params = { user_id: props.guide.user_id };
         await addCallsCount(params, t);
-        window.open(`https://wa.me/${props.guide.phone.slice(1)}`, '_blank').focus();
+
         isDisabled.value = true;
         emit('callMade');
     }

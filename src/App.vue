@@ -4,8 +4,8 @@
 
         <h1 class="logo">
             Guides to go
-            <br v-if="$cookies.get('user_role') === '2'">
-            <span v-if="$cookies.get('user_role') === '2'" v-text="$t('admin')"/>
+            <br v-if="$cookies.get('user_role') === '2' && $route.name === 'profile'">
+            <span v-if="$cookies.get('user_role') === '2' && $route.name === 'profile'" v-text="$t('admin')"/>
         </h1>
 
         <router-view/>
