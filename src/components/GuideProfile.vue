@@ -82,7 +82,6 @@
                             v-for="(language, index) in guide_profile.languages"
                             :key="index"
                             :options="languages"
-                            :index="index"
                             :all-selected-languages="guide_profile.languages"
                             :selected="language"
                             :error="language === '' && v$.languages.$errors.length ? true : false"
@@ -90,13 +89,6 @@
                             @choose="(lang) => handleLanguageSelect(lang, index)"
                             @delete="handleLanguageDelete(index)"/>
                     </div>
-
-                    <form-language-select
-                        v-else
-                        :options="languages"
-                        :all-selected-languages="guide_profile.languages"
-                        :error="v$.languages.$errors.length ? true : false"
-                        @choose="handleLanguageSelect"/>
                     
                     <div v-if="guide_profile.languages && guide_profile.languages.length < 5" class="form-add" @click="guide_profile.languages.push('');">
                         <span>+</span>
@@ -112,7 +104,6 @@
                             v-for="(service, index) in services"
                             :key="index"
                             :value="service"
-                            :index="index"
                             :all_selected_services="services"
                             :error="((!service.service_id || !service.price) && v1$.$errors.length) ? true : false"
                             @update="s => handleServiceUpdate(s, index)"
@@ -184,7 +175,7 @@
         languages.value = await getLanguages(t);
         services.value  = await getServices('guide', t);
 
-        if (!services.value.length) services.value.push({ service_id: null, price: null });
+        // if (!services.value.length) services.value.push({ service_id: null, price: null });
     });
 
     const approved_status = computed(() => {
@@ -216,18 +207,33 @@
     );
 
     const rules = computed(() => {
-        return {
-            phone: { required, minLength: minLength(7) },
-            name: { required },
-            country_id: { required },
-            city_id: { required },
-            languages: { required, languagesValidator }
+        if(guide_profile.value) {
+            if (guide_profile.value.languages.length > 0) {
+                return {
+                    phone: { required, minLength: minLength(7) },
+                    name: { required },
+                    country_id: { required },
+                    city_id: { required },
+                    languages: { required, languagesValidator }
+                }
+            } else {
+                return {
+                    phone: { required, minLength: minLength(7) },
+                    name: { required },
+                    country_id: { required },
+                    city_id: { required }
+                }
+            }
         }
     });
 
     const services_rules = computed(() => {
-        return {
-            services: { required, serviceIdValidator, servicePriceValidator }
+        if(services.value) {
+            if(services.value.length > 0) {
+                return {
+                    services: { required, serviceIdValidator, servicePriceValidator }
+                }
+            }
         }
     });
 
@@ -346,11 +352,11 @@
     }
 
     const handleServiceDelete = (index) => {
-        if(services.value.length > 1) services.value.splice(index, 1);
+        services.value.splice(index, 1);
     }
 
     const handleLanguageDelete = (index) => {
-        if(guide_profile.value.languages.length > 1) guide_profile.value.languages.splice(index, 1);
+        guide_profile.value.languages.splice(index, 1);
     }
 
 

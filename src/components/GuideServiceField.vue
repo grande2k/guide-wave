@@ -1,5 +1,5 @@
 <template>
-    <div class="guide-profile__service" :class="{ 'delete': all_selected_services.length > 1 && index }">
+    <div class="guide-profile__service delete">
         <services-select
             :value="local_service"
             :error="error"
@@ -9,7 +9,7 @@
         <input type="text" class="form-input service-price" :class="{ error: error }" :placeholder="$t('price')"
             maxlength="5" v-model="local_service.price" @input="handlePriceInput" />
 
-        <button v-if="all_selected_services.length > 1 && index" type="button" class="delete-btn" @click="emit('delete')">
+        <button type="button" class="delete-btn" @click="emit('delete')">
             <img src="@/assets/images/icons/delete.svg" alt="delete">
         </button>
     </div>
@@ -27,7 +27,6 @@
             type: Object,
             default: { service_id: null, price: null },
         },
-        index: Number,
         error: Boolean,
         all_selected_services: Array,
     });

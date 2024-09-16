@@ -1,5 +1,5 @@
 <template>
-    <div class="form-row" :class="{ 'able_delete': able_delete && index }">
+    <div class="form-row" :class="{ 'able_delete': able_delete }">
         <div class="form-select" :class="{ 'form-select--active': isSelectActive, 'error': error }" ref="target">
             <div class="form-select__top" @click="isSelectActive = !isSelectActive">
                 <span class="form-select__current" :class="{ 'placeholder': !currentOption }" v-text="currentOption?.name ?? select_placeholder"/>
@@ -12,7 +12,7 @@
             <img src="@/assets/images/icons/arrow-down.svg" class="form-select__arrow" alt="arrow" @click="isSelectActive = !isSelectActive">
         </div>
 
-        <button v-if="able_delete && index" type="button" class="delete-btn" @click="emit('delete')">
+        <button v-if="able_delete" type="button" class="delete-btn" @click="emit('delete')">
             <img src="@/assets/images/icons/delete.svg" alt="delete">
         </button>
     </div>
@@ -51,8 +51,9 @@
             type: Boolean,
             default: false
         },
-        index: Number,
-        selected: String
+        selected: {
+            type: String,
+        }
     });
 
     watch(() => props.options, (newVal) => {
