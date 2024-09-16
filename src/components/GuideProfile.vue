@@ -118,7 +118,7 @@
 
                 <submit-button text="save" icon="check" :loading="response_loading" class="full-column"/>
 
-                <a href="mailto:guides.to.go.2024@gmail.com" class="form-link full-column">
+                <a :href="`mailto:${appStore.admin_email}`" class="form-link full-column">
                     <img src="@/assets/images/icons/mail.svg" alt="Mail">
                     {{ $t('contact_admin') }}
                 </a>
@@ -142,6 +142,7 @@
     import { useI18n } from 'vue-i18n';
     import { useVuelidate } from '@vuelidate/core';
     import { useRouter } from 'vue-router';
+    import { useAppStore } from '@/stores/app';
     import { required, minLength, helpers } from '@vuelidate/validators';
     import { validatePhone } from '@/utils/validatePhone';
     import { getCountries, getCities, getLanguages, getProfile, getServices } from '@/api';
@@ -157,6 +158,7 @@
     const { t } = useI18n();
     const toast = useToast();
     const router = useRouter();
+    const appStore = useAppStore();
 
     const guide_profile = ref(null);
     const countries = ref([]);
@@ -174,8 +176,6 @@
         countries.value = await getCountries(t);
         languages.value = await getLanguages(t);
         services.value  = await getServices('guide', t);
-
-        // if (!services.value.length) services.value.push({ service_id: null, price: null });
     });
 
     const approved_status = computed(() => {
@@ -451,6 +451,12 @@
             }
             .form-link {
                 margin: 0.25rem 0;
+                @media screen and (max-width: 480px) {
+                    padding: 0.875rem;
+                    font-size: 1rem;
+                    height: 3rem;
+                    margin: 0.25rem 0 !important;
+                }
             }
             &-field {
                 &.full-column {

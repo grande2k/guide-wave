@@ -81,7 +81,7 @@
 
             <div class="form-links">
                 <router-link to="/login" class="form-link" v-text="$t('log_in.title')"/>
-                <a href="mailto:guides.to.go.2024@gmail.com" class="form-link">
+                <a :href="`mailto:${appStore.admin_email}`" class="form-link">
                     <img src="@/assets/images/icons/mail.svg" alt="Mail">
                     {{ $t('contact_admin') }}
                 </a>
@@ -97,12 +97,14 @@
     import { useToast } from 'vue-toastification';
     import { useI18n } from 'vue-i18n';
     import { useRouter } from 'vue-router';
+    import { useAppStore } from '@/stores/app';
     import { validatePhone } from '@/utils/validatePhone';
     import axios from 'axios';
     import SubmitButton from '@/components/SubmitButton.vue';
 
     const router = useRouter();
     const { t } = useI18n();
+    const appStore = useAppStore();
     const toast = useToast();
     const isPasswordVisible = ref(false);
     const isRepeatPasswordVisible = ref(false);

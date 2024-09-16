@@ -246,6 +246,7 @@
             overflow: auto;
             @media screen and (max-width: 480px) {
                 overflow-x: scroll;
+                scrollbar-gutter: stable both-edges;
                 padding-bottom: 0.75rem;
                 &::-webkit-scrollbar {
                     -webkit-appearance: none;

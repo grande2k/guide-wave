@@ -87,6 +87,19 @@
             <button class="admin-profile__button" @click="is_languages_open = true">Языки</button>
             <button class="admin-profile__button">Надписи</button>
 
+            <form action="" class="admin-profile__email" @submit.prevent="submitEmail">
+                <input
+                    type="email"
+                    class="form-input"
+                    :class="{ error: v$.$errors.length }"
+                    id="email"
+                    name="email"
+                    placeholder="Почта администратора"
+                    v-model="admin_email">
+
+                <submit-button v-if="shouldShowEmailSaveButton" text="save" icon="check"/>
+            </form>
+
             <button type="button" class="logout full-column" @click="logout">
                 <img src="@/assets/images/icons/login.svg" alt="log out">
                 {{ $t('log_out') }}
@@ -115,19 +128,24 @@
 </template>
 
 <script setup>
-    import { ref, reactive, onMounted } from 'vue';
+    import { ref, reactive, onMounted, watch, computed } from 'vue';
     import { useRouter } from 'vue-router';
     import { useI18n } from 'vue-i18n';
-    import { getGuides, getAdminLanguages, getAdminServices, getCountries, addLanguages, addServices, updateLanguage, deleteLanguage, updateService, deleteService } from '@/api';
+    import { useAppStore } from '@/stores/app';
+    import { getGuides, getAdminLanguages, getAdminServices, getCountries, addLanguages, addServices, updateLanguage, deleteLanguage, updateService, deleteService, getAdminMail, updateEmail } from '@/api';
     import { useToast } from 'vue-toastification';
+    import { useVuelidate } from '@vuelidate/core';
+    import { required, email } from '@vuelidate/validators';
     import AdminSplit from './AdminSplit.vue';
     import AdminGuideRequest from './AdminGuideRequest.vue';
     import AdminCreateModal from './modals/AdminCreateModal.vue';
     import AdminDialogModal from './modals/AdminDialogModal.vue';
     import AdminEditModal from './modals/AdminEditModal.vue';
+    import SubmitButton from './SubmitButton.vue';
 
     const router = useRouter();
     const toast = useToast();
+    const appStore = useAppStore();
     const { t } = useI18n();
 
     const admin_profile = ref({
@@ -167,6 +185,46 @@
         admin_profile.value.languages = await getAdminLanguages(t);
         admin_profile.value.services = await getAdminServices(t);
         admin_profile.value.countries = await getCountries(t);
+    });
+
+    const admin_email = ref('');
+    const email_state = ref({ email: admin_email.value });
+
+    watch(() => appStore.admin_email, (newValue) => {
+        if(newValue) {
+            admin_email.value = newValue;
+            email_state.value.email = newValue;
+        }
+    }, { immediate: true });
+
+    const rules = computed(() => {
+        return {
+            email: { required, email },
+        }
+    });
+
+    const v$ = useVuelidate(rules, email_state);
+
+    const submitEmail = async () => {
+        const result = await v$.value.$validate();
+
+        console.log(result);
+
+        if(result) {
+            const params = { email: admin_email.value };
+            try {
+                await updateEmail(params, t);
+                appStore.setAdminEmail(await getAdminMail(t));
+            } catch(error) {
+                toast.error('Произошла ошибка');
+            }
+        } else {
+            toast.error('Убедитесь что почта введена правильно');
+        }
+    }
+
+    const shouldShowEmailSaveButton = computed(() => {
+        return admin_email.value && appStore.admin_email && admin_email.value !== appStore.admin_email;
     });
 
     const handleGuidesUpdate = async () => {
@@ -440,6 +498,12 @@
                 filter: invert(1);
                 width: 1.5rem;
                 margin-right: 0.5rem;
+            }
+        }
+        &__email {
+            margin: 3rem 0;
+            @media screen and (max-width: 480px) {
+                margin: 1.5rem 0;
             }
         }
     }

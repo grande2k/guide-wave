@@ -16,7 +16,17 @@
 </template>
 
 <script setup>
-    
+    import { onMounted } from 'vue';
+    import { getAdminMail } from '@/api';
+    import { useAppStore } from '@/stores/app';
+    import { useI18n } from 'vue-i18n';
+
+    const appStore = useAppStore();
+    const { t } = useI18n();
+
+    onMounted(async () => {
+        appStore.setAdminEmail(await getAdminMail(t));
+    });
 </script>
 
 <style lang="scss" scoped>

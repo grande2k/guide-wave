@@ -80,10 +80,16 @@
             text-transform: capitalize;
             height: 3.5rem;
             margin-bottom: 0 !important;
+            @media screen and (max-width: 480px) {
+                height: auto;
+            }
         }
         input.service-price {
             width: 17.5%;
             height: 3.5rem;
+            @media screen and (max-width: 480px) {
+                height: auto;
+            }
         }
     }
 </style>
