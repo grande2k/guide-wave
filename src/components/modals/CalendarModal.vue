@@ -13,6 +13,10 @@
                         <img src="@/assets/images/icons/arrow-left.svg" alt="prev">
                     </button>
 
+                    <p class="calendar__nav-current">
+                        {{ formatDate(days[0]) }} - {{ formatDate(days[days.length - 1]) }}
+                    </p>
+
                     <button @click="goForward">
                         <img src="@/assets/images/icons/arrow-left.svg" alt="next">
                     </button>
@@ -62,7 +66,6 @@
 
     watch(() => props.dates, (newDates) => {
         if (newDates) {
-            // Создаем независимую копию props.dates с помощью метода JSON
             calendar.value = JSON.parse(JSON.stringify(newDates));
             initialCalendar.value = JSON.parse(JSON.stringify(newDates));
         } else {
@@ -209,6 +212,12 @@
         &__nav {
             @include flex-center;
             margin-bottom: 1.5rem;
+            &-current {
+                margin: 0 1rem;
+                @media screen and (max-width: 480px) {
+                    font-size: 0.875rem;
+                }
+            }
             button {
                 @include flex-center;
                 width: 3rem;
@@ -223,7 +232,6 @@
                     }
                 }
                 &:last-child {
-                    margin-left: 1rem;
                     img {
                         transform: rotate(180deg);
                     }
@@ -235,10 +243,24 @@
             }
         }
         &__days-column {
-            margin-bottom: 2rem;
             overflow: auto;
             @media screen and (max-width: 480px) {
-                margin-bottom: 1rem;
+                overflow-x: scroll;
+                padding-bottom: 0.75rem;
+                &::-webkit-scrollbar {
+                    width: 0.25rem;
+                    height: 0.25rem;
+                }
+
+                &::-webkit-scrollbar-track {
+                    border-radius: 10px;
+                    background: rgba($color: $black, $alpha: 0.25);
+                }
+
+                &::-webkit-scrollbar-thumb {
+                    background: #222;
+                    border-radius: 10px;
+                }
             }
         }
         &__day {
