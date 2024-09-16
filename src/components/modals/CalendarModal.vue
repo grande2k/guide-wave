@@ -248,6 +248,7 @@
                 overflow-x: scroll;
                 padding-bottom: 0.75rem;
                 &::-webkit-scrollbar {
+                    -webkit-appearance: none;
                     width: 0.25rem;
                     height: 0.25rem;
                 }

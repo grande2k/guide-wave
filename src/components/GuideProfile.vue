@@ -127,6 +127,11 @@
 
                 <submit-button text="save" icon="check" :loading="response_loading" class="full-column"/>
 
+                <a href="mailto:guides.to.go.2024@gmail.com" class="form-link full-column">
+                    <img src="@/assets/images/icons/mail.svg" alt="Mail">
+                    {{ $t('contact_admin') }}
+                </a>
+
                 <button type="button" class="logout full-column" @click="logout">
                     <img src="@/assets/images/icons/login.svg" alt="log out">
                     {{ $t('log_out') }}
@@ -438,6 +443,9 @@
             .full-column {
                 grid-column: 1/3;
             }
+            .form-link {
+                margin: 0.25rem 0;
+            }
             &-field {
                 &.full-column {
                     .form-label {
@@ -451,7 +459,7 @@
             }
         }
         .logout {
-            margin-top: 0.5rem;
+            margin: 0;
         }
     }
 </style>

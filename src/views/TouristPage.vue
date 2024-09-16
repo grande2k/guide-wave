@@ -1,6 +1,6 @@
 <template>
     <section class="tourist page page--bg">
-        <form v-if="!results" action="#" class="tourist__form scroll-parent white-scroll" @submit.prevent="submitForm">
+        <form v-show="!results" action="#" class="tourist__form scroll-parent white-scroll" @submit.prevent="submitForm">
             <div class="tourist__form-field active">
                 <p class="form-label">
                     <span>1</span>
@@ -245,16 +245,8 @@
 
     const resetSearch = () => {
         results.value = null;
-        is_country_valid.value = false;
         currentPage.value = 0;
         callsMade.value = [];
-        form_data.value = {
-            country_id: null,
-            city_id: null,
-            service_id: null,
-            language_code: null,
-            price: [],
-        }
     }
 
     const paginatedResults = computed(() => {

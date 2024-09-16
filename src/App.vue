@@ -1,6 +1,9 @@
 <template>
     <div class="layout">
-        <router-link to="/" class="go-home" v-text="$t('go_home')"/>
+        <router-link to="/" class="go-home">
+            <img src="@/assets/images/icons/home.svg" alt="home">
+            {{ $t('go_home') }}
+        </router-link>
 
         <h1 class="logo">
             Guides to go
@@ -32,30 +35,39 @@
             text-decoration: none;
             border-radius: 0.5rem;
             color: $black;
+            img {
+                display: none;
+            }
             @media screen and (max-width: 480px) {
                 @include flex-center;
                 top: 1rem;
                 left: 1rem;
-                font-size: 0.75rem;
+                font-size: 0;
                 padding: 0.75rem;
-                width: 5.75rem;
-                height: 2.5rem;
+                img {
+                    display: block;
+                    width: 1.5rem;
+                }
             }
         }
         .logo {
             text-align: center;
-            color: $white;
-            font-size: 2rem;
+            color: $primary;
+            font-size: 2.75rem;
             font-weight: bold;
             margin: 0 0 2rem 0;
             line-height: 1;
             span {
+                display: block;
                 font-weight: normal;
-                font-size: 1.25rem;
+                font-size: 1.5rem;
+                font-weight: 500;
+                line-height: 1;
+                margin-top: 0.5rem;
             }
             @media screen and (max-width: 480px) {
                 margin-bottom: 1rem;
-                font-size: 1.5rem;
+                font-size: 2.5rem;
             }
         }
     }
