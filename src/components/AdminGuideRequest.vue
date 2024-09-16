@@ -41,14 +41,12 @@
         </div>
 
         <div class="guide__controls">
-            <button class="guide__decline" @click="decline">
-                <img src="@/assets/images/icons/close.svg" alt="decline">
-                Отклонить
+            <button v-if="guide.approved" class="guide__decline" @click="decline">
+                Заблокировать
             </button>
 
-            <button class="guide__approve" @click="approve">
-                <img src="@/assets/images/icons/check.svg" alt="approve">
-                Одобрить
+            <button v-else class="guide__approve" @click="approve">
+                Разблокировать
             </button>
         </div>
     </div>
@@ -143,7 +141,7 @@
         const approve_response = await approveGuide(params, t);
 
         if(approve_response.status === "success") {
-            toast.success('Гид был успешно одобрен');
+            toast.success('Успешно');
             emit('update');
         } 
     }
@@ -161,7 +159,7 @@
         const approve_response = await approveGuide(params, t);
 
         if (approve_response.status === "success") {
-            toast.success('Гид был успешно отклонен');
+            toast.success('Успешно');
             emit('update');
         }
     }
@@ -294,7 +292,6 @@
             }
         }
         &__controls {
-            @include grid(2, 0.5rem);
             margin-top: 1rem;
             button {
                 @include flex-center;
@@ -307,16 +304,13 @@
                     width: 1.25rem;
                     margin-right: 0.25rem;
                 }
-                &:first-child {
-                    background-color: $error;
-                    img {
-                        filter: invert(1);
-                    }
-                }
-                &:last-child {
-                    background-color: $success;
-                }
             }
+        }
+        &__approve {
+            background-color: $success;
+        }
+        &__decline {
+            background-color: $error;
         }
     }
 </style>
