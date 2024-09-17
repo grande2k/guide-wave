@@ -36,13 +36,13 @@
             id: 0,
             name: "ru",
             caption: "Русский",
-            is_current_language: true,
+            is_current_language: false,
         },
         {
             id: 1,
             name: "en",
             caption: "English",
-            is_current_language: false,
+            is_current_language: true,
         },
     ];
 

@@ -21,3 +21,5 @@ export * from './admin/updateService';
 export * from './admin/deleteService';
 export * from './admin/addCallsCount';
 export * from './admin/updateEmail';
+export * from './admin/getInterface';
+export * from './admin/updateInterface';

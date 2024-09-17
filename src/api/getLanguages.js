@@ -1,12 +1,12 @@
 import axios from "axios";
-import { defaultLocale } from "@/locales";
 import { useToast } from "vue-toastification";
 
 const toast = useToast();
+const locale = localStorage.getItem('language') || 'en';
 
 export const getLanguages = async (t) => {
     try {
-        const params = { language: defaultLocale };
+        const params = { language: locale };
         const response = await axios.post('https://guides-to-go.onrender.com/search/language', params);
 
         return response.data.language;

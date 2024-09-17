@@ -82,10 +82,22 @@
                 </button>
             </div>
 
+            <div class="admin-profile__menu white-scroll" v-if="is_translations_open">
+                <div class="topbar">
+                    <button class="admin-profile__button" @click="is_translations_open = false">
+                        <img src="@/assets/images/icons/arrow-left.svg" alt="back">
+                    </button>
+
+                    <h2 class="admin-profile__title">Надписи</h2>
+                </div>
+
+                <translation-editor/>
+            </div>
+
             <button class="admin-profile__button" @click="is_services_open = true">Услуги</button>
             <button class="admin-profile__button" @click="is_guides_open = true">Исполнители</button>
             <button class="admin-profile__button" @click="is_languages_open = true">Языки</button>
-            <button class="admin-profile__button">Надписи</button>
+            <button class="admin-profile__button" @click="is_translations_open = true">Надписи</button>
 
             <form action="" class="admin-profile__email" @submit.prevent="submitEmail">
                 <input
@@ -141,6 +153,7 @@
     import AdminCreateModal from './modals/AdminCreateModal.vue';
     import AdminDialogModal from './modals/AdminDialogModal.vue';
     import AdminEditModal from './modals/AdminEditModal.vue';
+    import TranslationEditor from './TranslationEditor.vue';
     import SubmitButton from './SubmitButton.vue';
 
     const router = useRouter();
@@ -176,6 +189,7 @@
     const is_guides_open = ref(false);
     const is_languages_open = ref(false);
     const is_services_open = ref(false);
+    const is_translations_open = ref(false);
 
     const editing_language = ref(null);
     const editing_service = ref(null);
