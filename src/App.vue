@@ -1,6 +1,6 @@
 <template>
     <div class="layout">
-        <router-link to="/" class="go-home">
+        <router-link v-if="$route.name !== 'start'" to="/" class="go-home">
             <img src="@/assets/images/icons/home.svg" alt="home">
             {{ $t('go_home') }}
         </router-link>

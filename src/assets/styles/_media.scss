@@ -1,4 +1,7 @@
 @media screen and (max-width: 480px) {
+    html > body {
+        background-position: 75% 50%;
+    }
     .layout {
         .page {
             &--bg {
