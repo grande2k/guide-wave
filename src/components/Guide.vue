@@ -14,15 +14,27 @@
             <div class="guide__info">
                 <p class="guide__name" v-text="guide.name"/>
 
-                <button
-                    type="button"
-                    class="guide__call"
-                    :class="{ disabled: isDisabled }"
-                    @click="handleCall"
-                    :disabled="isDisabled">
-                    <img src="@/assets/images/icons/whatsapp.svg" alt="whatsapp icon" />
-                    {{ $t('call') }}
-                </button>
+                <div class="grid-half">
+                    <button
+                        type="button"
+                        class="guide__btn whatsapp"
+                        :class="{ disabled: isDisabled }"
+                        @click="handleCall"
+                        :disabled="isDisabled">
+                        <img src="@/assets/images/icons/whatsapp.svg" alt="whatsapp icon" />
+                        Whatsapp
+                    </button>
+
+                    <a
+                        :href="`tel:${guide.phone}`"
+                        class="guide__btn call"
+                        :class="{ disabled: isDisabled }"
+                        @click="handleCall"
+                        :disabled="isDisabled">
+                        <img src="@/assets/images/icons/call.svg" alt="call" />
+                        {{ $t('call') }}
+                    </a>
+                </div>
             </div>
         </div>
 
@@ -131,23 +143,37 @@
                 margin-bottom: 0.75rem;
             }
         }
-        &__call {
+        .grid-half {
+            @include grid(2, 0.5rem);
+            @media screen and (max-width: 480px) {
+                grid-template-columns: 1fr;
+                grid-gap: 0.75rem;
+            }
+        }
+        &__btn {
             @include flex-center;
             text-decoration: none;
             border-radius: 1rem;
             padding: 1rem;
-            background-color: #25d366;
-            color: $white;
             width: 100%;
             font-weight: 500;
             max-width: 200px;
             font-size: 1.125rem;
             cursor: pointer;
             user-select: none;
+            text-decoration: none;
             &.disabled  {
                 background-color: #ccc;
                 pointer-events: none;
                 cursor: not-allowed;
+            }
+            &.whatsapp {
+                background-color: #25d366;
+                color: $white;
+            }
+            &.call {
+                background-color: $white;
+                color: $black;
             }
             @media screen and (max-width: 480px) {
                 font-size: 1rem;

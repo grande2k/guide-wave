@@ -71,16 +71,42 @@
     const onFileChange = (event) => {
         const file = event.target.files[0];
 
+        // Максимальный размер файла в байтах (20 МБ)
         const maxFileSize = 20 * 1024 * 1024;
 
+        // Проверка размера файла
         if (file.size > maxFileSize) {
-            toast.error( t('errors.video_size') );
+            toast.error(t('errors.video_size'));
             selected_video.value = null;
             event.target.value = '';
-        } else {
+            return;
+        }
+
+        // Создаем объект URL для видео
+        const videoElement = document.createElement('video');
+        const videoURL = URL.createObjectURL(file);
+
+        // Когда метаданные загружены, проверяем длительность
+        videoElement.addEventListener('loadedmetadata', () => {
+            const videoDuration = Math.floor(videoElement.duration);
+
+            // Максимальная длительность в секундах
+            const maxDuration = 15;
+
+            if (videoDuration > maxDuration) {
+                toast.error(t('errors.video_duration')); // Сообщение об ошибке длительности
+                selected_video.value = null;
+                event.target.value = '';
+                return;
+            }
+
+            // Если проверка прошла успешно, сохраняем файл
             selected_video.value = file;
             console.log(selected_video.value);
-        }
+        });
+
+        // Устанавливаем источник видео
+        videoElement.src = videoURL;
     }
 
     const uploadVideo = async () => {
