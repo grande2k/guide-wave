@@ -92,6 +92,14 @@
             <button class="form-submit" v-text="$t('go_back_search')" @click="resetSearch"/>
         </div>
     </section>
+
+    <video-modal 
+        v-if="is_video_shown" 
+        close_disabled
+        :guide_name="paginatedResults[currentPage][video_index].name"
+        :video_url="current_video_url"
+        @close="is_video_shown  = false"
+        @ended="showNextVideo"/>
 </template>
 
 <script setup>
@@ -106,6 +114,7 @@
     import ServicesSelect from '@/components/ServicesSelect.vue';
     import SubmitButton from '@/components/SubmitButton.vue';
     import Guide from '@/components/Guide.vue';
+    import VideoModal from '@/components/modals/VideoModal.vue';
 
     const { t } = useI18n();
     const is_country_valid = ref(false);
@@ -165,6 +174,28 @@
         }
     ]);
 
+    const video_index = ref(0);
+    const is_video_shown  = ref(false);
+    const current_video_url = ref(null);
+
+    const showVideos = () => {
+        const currentGroup = paginatedResults.value && paginatedResults.value[currentPage.value];
+        if (currentGroup && currentGroup.length > 0) {
+            video_index.value = 0;
+            current_video_url.value = currentGroup[video_index.value].video_url;
+            is_video_shown.value = true;
+        }
+    }
+
+    const showNextVideo = () => {
+        video_index.value++;
+        if (video_index.value < paginatedResults.value[currentPage.value].length && paginatedResults.value[currentPage.value][video_index.value].video_url) {
+            current_video_url.value = paginatedResults.value[currentPage.value][video_index.value].video_url;
+        } else {
+            is_video_shown.value = false;
+        }
+    }
+
     const submitForm = async () => {
         const result = await v$.value.$validate();
 
@@ -175,6 +206,7 @@
             results.value = response.users;
             split_by.value = response.split_by;
             response_loading.value = false;
+            if (results.value && results.value.length > 0) showVideos();
         } else {
             toast.error(t('errors.validation'));
         }
@@ -273,7 +305,9 @@
     const showNextGroup = () => {
         if (canShowNextGroup.value && currentPage.value < paginatedResults.value.length - 1) {
             currentPage.value++;
+            video_index.value = 0;
             callsMade.value = [];
+            showVideos();
         }
     }
 </script>

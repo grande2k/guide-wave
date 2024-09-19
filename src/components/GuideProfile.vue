@@ -116,6 +116,12 @@
                     </div>
                 </div>
 
+                <guide-video-upload
+                    :video_url="guide_profile.video_url ?? ''"
+                    @change="guide_profile.video_url = null"
+                    @deleted="async () => guide_profile = await getProfile(router, $t)"
+                    @updated="async () => guide_profile = await getProfile(router, $t)"/>
+
                 <submit-button text="save" icon="check" :loading="response_loading" class="full-column"/>
 
                 <a :href="`mailto:${appStore.admin_email}`" class="form-link full-column">
@@ -153,7 +159,8 @@
     import GuideStatusToggler from '@/components/GuideStatusToggler.vue';
     import GuidePhoto from '@/components/GuidePhoto.vue';
     import SubmitButton from '@/components/SubmitButton.vue';
-    import CalendarModal from '@/components/modals/CalendarModal.vue'
+    import CalendarModal from '@/components/modals/CalendarModal.vue';
+    import GuideVideoUpload from './GuideVideoUpload.vue';
 
     const { t } = useI18n();
     const toast = useToast();
