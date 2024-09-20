@@ -118,7 +118,7 @@
 
                 <guide-video-upload
                     :video_url="guide_profile.video_url ?? ''"
-                    @change="guide_profile.video_url = null"
+                    :max_video_duration="guide_profile.max_video_duration"
                     @deleted="async () => guide_profile = await getProfile(router, $t)"
                     @updated="async () => guide_profile = await getProfile(router, $t)"/>
 

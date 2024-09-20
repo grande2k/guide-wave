@@ -2,7 +2,7 @@
     <div class="guide-profile__video full-column">
         <h2 class="form-label" v-text="$t('profile.guide.video.title')"/>
 
-        <div class="upload-element" v-if="!video_url">
+        <div class="upload-element" v-if="is_changing || !video_url">
             <div class="flex">
                 <label class="upload-btn" for="upload-video">
                     <img src="@/assets/images/icons/upload.svg" alt="Upload">
@@ -12,7 +12,12 @@
                 <p v-if="selected_video" class="video-title" v-text="selected_video.name"/>
             </div>
 
-            <span class="video-size-tip" v-text="$t('profile.guide.video.size_tip')"/>
+            <span class="video-tip">
+                {{ `${ $t('profile.guide.video.size_tip') } ${maxVideoSize} ${$t('profile.guide.video.mb')}` }}
+                <br>
+                {{ `${$t('profile.guide.video.duration_tip')} ${max_video_duration} ${$t('profile.guide.video.seconds')}` }}
+                <br>
+            </span>
 
             <button v-if="selected_video" type="button" class="video-save" :class="{ 'loading': is_uploading }" @click="uploadVideo">
                 <div v-if="is_uploading" class="preloader"><span></span></div>
@@ -46,7 +51,7 @@
 </template>
 
 <script setup>
-    import { ref } from 'vue';
+    import { ref, computed } from 'vue';
     import { useToast } from 'vue-toastification';
     import { useI18n } from 'vue-i18n';
     import axios from 'axios';
@@ -59,83 +64,84 @@
         video_url: {
             type: String,
             required: true
+        },
+        max_video_duration: {
+            type: Number,
+            required: true
         }
     });
 
-    const emit = defineEmits(['change', 'deleted', 'updated']);
+    const emit = defineEmits(['deleted', 'updated']);
 
     const selected_video = ref(null);
     const is_watch_open = ref(false);
     const is_uploading = ref(false);
+    const is_changing = ref(false);
+
+    const maxVideoSize = computed(() => props.max_video_duration * 1.5);
     
     const onFileChange = (event) => {
         const file = event.target.files[0];
+        const maxFileSize = maxVideoSize.value * 1024 * 1024;
 
-        // Максимальный размер файла в байтах (20 МБ)
-        const maxFileSize = 20 * 1024 * 1024;
-
-        // Проверка размера файла
         if (file.size > maxFileSize) {
-            toast.error(t('errors.video_size'));
+            toast.error(`${t('errors.video_size')} ${maxFileSize.value} ${t('profile.guide.video.mb')}`);
             selected_video.value = null;
             event.target.value = '';
             return;
         }
 
-        // Создаем объект URL для видео
         const videoElement = document.createElement('video');
         const videoURL = URL.createObjectURL(file);
 
-        // Когда метаданные загружены, проверяем длительность
         videoElement.addEventListener('loadedmetadata', () => {
             const videoDuration = Math.floor(videoElement.duration);
-
-            // Максимальная длительность в секундах
             const maxDuration = 15;
 
             if (videoDuration > maxDuration) {
-                toast.error(t('errors.video_duration')); // Сообщение об ошибке длительности
+                toast.error(`${t('errors.video_duration')} ${props.max_video_duration} ${t('profile.guide.video.seconds')}`);
                 selected_video.value = null;
                 event.target.value = '';
                 return;
             }
 
-            // Если проверка прошла успешно, сохраняем файл
             selected_video.value = file;
             console.log(selected_video.value);
         });
 
-        // Устанавливаем источник видео
         videoElement.src = videoURL;
     }
 
     const uploadVideo = async () => {
         const fd = new FormData();
-        fd.append('file', selected_video.value, selected_video.value.name);
         console.log(selected_video.value);
         try {
-            const request_headers = { headers: { 'Authorization': `Bearer ${$cookies.get("access_token")}` } };
             let response;
             is_uploading.value = true;
             if(!props.video_url || props.video_url === '') {
-                response = await axios.post('https://guides-to-go.onrender.com/user_info/add_video', fd, request_headers);
-            } else {
-                const params = { old_video_url: props.video_url };
-                response = await axios.put('https://guides-to-go.onrender.com/user_info/update_video', params, fd, request_headers);
+                const add_request_headers = { headers: { 'Authorization': `Bearer ${$cookies.get("access_token")}` } };
+                fd.append('file', selected_video.value, selected_video.value.name);
+                response = await axios.post('https://guides-to-go.onrender.com/user_info/add_video', fd, add_request_headers);
+            } else if(props.video_url && is_changing.value) {
+                const update_request_headers = { params: { old_video_url: props.video_url }, headers: { 'Authorization': `Bearer ${$cookies.get("access_token")}` } };
+                fd.append('new_file', selected_video.value, selected_video.value.name);
+                response = await axios.put('https://guides-to-go.onrender.com/user_info/update_video', fd, update_request_headers);
             }
             console.log(response);
             is_uploading.value = false;
+            is_changing.value = false;
             toast.success(t('messages.video_upload_success'));
             emit('updated');
         } catch(err) {
             is_uploading.value = false;
+            is_changing.value = false;
             toast.error(t('errors.default'));
         }
     }
 
     const changeVideo = () => {
         selected_video.value = null;
-        emit('change');
+        is_changing.value = true;
     }
 
     const deleteVideo = async () => {
@@ -283,11 +289,11 @@
                 width: 1.5rem;
             }
         }
-        .video-size-tip {
+        .video-tip {
             display: block;
             margin-top: 0.5rem;
-            font-size: 0.75rem;
             color: $white;
+            line-height: 1.5;
         }
     }
 </style>

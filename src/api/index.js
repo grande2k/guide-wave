@@ -23,3 +23,5 @@ export * from './admin/addCallsCount';
 export * from './admin/updateEmail';
 export * from './admin/getInterface';
 export * from './admin/updateInterface';
+export * from './admin/getDuration';
+export * from './admin/updateDuration';

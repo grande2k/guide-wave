@@ -2,6 +2,7 @@
     <section class="admin-profile page page--bg" :class="{ opened: is_guides_open || is_languages_open || is_services_open }">
         <div class="admin-profile__content scroll-parent white-scroll" v-if="admin_profile">
             <admin-split/>
+            <admin-video-duration/>
             
             <div class="admin-profile__menu white-scroll" v-if="is_guides_open">
                 <div class="topbar">
@@ -149,6 +150,7 @@
     import { useVuelidate } from '@vuelidate/core';
     import { required, email } from '@vuelidate/validators';
     import AdminSplit from './AdminSplit.vue';
+    import AdminVideoDuration from './AdminVideoDuration.vue';
     import AdminGuideRequest from './AdminGuideRequest.vue';
     import AdminCreateModal from './modals/AdminCreateModal.vue';
     import AdminDialogModal from './modals/AdminDialogModal.vue';
