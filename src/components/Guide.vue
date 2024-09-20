@@ -19,7 +19,7 @@
                         type="button"
                         class="guide__btn whatsapp"
                         :class="{ disabled: isDisabled }"
-                        @click="handleCall"
+                        @click="handleCall('whatsapp')"
                         :disabled="isDisabled">
                         <img src="@/assets/images/icons/whatsapp.svg" alt="whatsapp icon" />
                         Whatsapp
@@ -29,7 +29,7 @@
                         :href="`tel:${guide.phone}`"
                         class="guide__btn call"
                         :class="{ disabled: isDisabled }"
-                        @click="handleCall"
+                        @click="handleCall('phone')"
                         :disabled="isDisabled">
                         <img src="@/assets/images/icons/call.svg" alt="call" />
                         {{ $t('call') }}
@@ -61,10 +61,10 @@
 
     const isDisabled = ref(false);
 
-    const handleCall = async () => {
+    const handleCall = async (source) => {
         if (isDisabled.value) return;
 
-        window.open(`https://wa.me/${props.guide.phone.slice(1)}`, '_blank');
+        if(source === 'whatsapp') window.open(`https://wa.me/${props.guide.phone.slice(1)}`, '_blank');
 
         const params = { user_id: props.guide.user_id };
         await addCallsCount(params, t);
@@ -162,11 +162,6 @@
             cursor: pointer;
             user-select: none;
             text-decoration: none;
-            &.disabled  {
-                background-color: #ccc;
-                pointer-events: none;
-                cursor: not-allowed;
-            }
             &.whatsapp {
                 background-color: #25d366;
                 color: $white;
@@ -174,6 +169,11 @@
             &.call {
                 background-color: $white;
                 color: $black;
+            }
+            &.disabled  {
+                background-color: #ccc;
+                pointer-events: none;
+                cursor: not-allowed;
             }
             @media screen and (max-width: 480px) {
                 font-size: 1rem;
