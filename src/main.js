@@ -12,7 +12,7 @@ import 'vue-toastification/dist/index.css'
 
 const toastOptions = {
     position: 'top-right',
-    timeout: 3000,
+    timeout: 10000,
     closeOnClick: true,
     pauseOnFocusLoss: true,
     pauseOnHover: true,
