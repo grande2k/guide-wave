@@ -66,6 +66,9 @@
         width: auto;
         top: 1rem;
         background-color: transparent;
+        @media screen and (max-width: 480px) {
+            top: 0;
+        }
     }
     .video {
         display: block;
@@ -94,11 +97,11 @@
 
     .v-enter-active,
     .v-leave-active {
-    transition: opacity 0.5s ease;
+        transition: opacity 0.5s ease;
     }
 
     .v-enter-from,
     .v-leave-to {
-    opacity: 0;
+        opacity: 0;
     }
 </style>
