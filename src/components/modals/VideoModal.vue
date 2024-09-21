@@ -15,8 +15,8 @@
                 <video
                     class="video"
                     :src="`https://guides-to-go.onrender.com${video_url}`"
-                    controls
                     autoplay
+                    playsinline
                     @ended="emit('ended')"/>
             </div>
         </div>
@@ -72,6 +72,8 @@
         max-height: 80vh;
         max-width: 100%;
         border-radius: inherit;
+        -webkit-appearance: none;
+        appearance: none;
     }
 
     .guide-name {
