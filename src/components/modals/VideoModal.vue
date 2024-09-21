@@ -61,6 +61,10 @@
 </script>
 
 <style lang="scss" scoped>
+    .video-modal {
+        position: fixed;
+        overflow: hidden;
+    }
     .modal__content {
         max-width: 850px;
         width: auto;
@@ -77,6 +81,9 @@
         border-radius: inherit;
         -webkit-appearance: none;
         appearance: none;
+        @media screen and (max-width: 480px) {
+            max-height: 80dvh;
+        }
     }
 
     .guide-name {
