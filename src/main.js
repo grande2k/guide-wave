@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
 import { getInterface } from '@/api'
+import axios from 'axios'
 import Toast from 'vue-toastification'
 import VueCookies from 'vue-cookies'
 import App from '@/App.vue'
@@ -22,8 +23,7 @@ const createI18nInstance = async () => {
     const defaultLocale = localStorage.getItem('language') || 'en';
 
     const translations = {
-        en: await getInterface('en'),
-        ru: await getInterface('ru')
+        [defaultLocale]: await getInterface(defaultLocale)
     };
 
     return createI18n({
@@ -48,4 +48,17 @@ const createI18nInstance = async () => {
     app.use(VueCookies, { expires: '1m' });
 
     app.mount('#app');
+
+    axios.interceptors.response.use(
+        response => response,
+        error => {
+            if (error.response.status === 401) {
+                $cookies.remove("access_token");
+                $cookies.remove("user_role");
+                router.push('/login');
+            }
+
+            return Promise.reject(error);
+        }
+    );
 })();

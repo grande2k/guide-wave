@@ -55,7 +55,7 @@
     import { useToast } from 'vue-toastification';
     import { useI18n } from 'vue-i18n';
     import axios from 'axios';
-    import VideoModal from './modals/VideoModal.vue';
+    import VideoModal from '@/components/modals/VideoModal.vue';
 
     const toast = useToast();
     const { t } = useI18n();

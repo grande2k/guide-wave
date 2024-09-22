@@ -107,7 +107,8 @@
             cursor: pointer;
             font-size: 0.875rem;
             &--busy {
-                opacity: 0;
+                color: #ff1313;
+                font-weight: bold;
             }
             @media screen and (max-width: 480px) {
                 font-size: 0.75rem;

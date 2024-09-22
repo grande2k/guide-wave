@@ -3,23 +3,20 @@ import { useToast } from "vue-toastification";
 
 const toast = useToast();
 
-export const deleteLanguage = async (params, t) => {
+export const deleteAdminLanguage = async (params) => {
     try {
         const request_headers = {
             headers: { 'Authorization': `Bearer ${$cookies.get("access_token")}` },
-            //withCredentials: true,
             data: params 
         };
 
-        const response = await axios.delete('https://guides-to-go.onrender.com/admin/delete_languages', request_headers);
+        await axios.delete('https://guides-to-go.onrender.com/admin/delete_languages', request_headers);
 
-        console.log(response.data);
-
-        return response.data;
+        toast.success('Язык был успешно удален')
     } catch (err) {
         switch (err.response.status) {
             default:
-                toast.error(t('errors.default'));
+                toast.error('Ошибка, попробуйте позже');
                 break;
         }
 

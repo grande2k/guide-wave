@@ -1,7 +1,7 @@
 <template>
-    <section class="tourist page page--bg">
-        <form v-show="!results" action="#" class="tourist__form scroll-parent white-scroll" @submit.prevent="submitForm">
-            <div class="tourist__form-field active">
+    <section class="search page page--bg">
+        <form v-show="!results" action="#" class="search__form scroll-parent white-scroll" @submit.prevent="submitForm">
+            <div class="search__form-field active">
                 <p class="form-label">
                     <span>1</span>
                     {{ $t('location') }}
@@ -22,7 +22,7 @@
                 </div>
             </div>
 
-            <div class="tourist__form-field" :class="{ 'active': form_data.country_id && form_data.city_id }">
+            <div class="search__form-field" :class="{ 'active': form_data.country_id && form_data.city_id }">
                 <p class="form-label">
                     <span>2</span>
                     {{ $t('language') }}
@@ -34,7 +34,7 @@
                     @choose="handleLanguageSelect"/>
             </div>
 
-            <div class="tourist__form-field" :class="{ 'active': form_data.country_id && form_data.city_id && form_data.language_code }">
+            <div class="search__form-field" :class="{ 'active': form_data.country_id && form_data.city_id && form_data.language_code }">
                 <p class="form-label">
                     <span>3</span>
                     {{ $t('service') }}
@@ -43,15 +43,15 @@
                 <services-select :options="services" :all_selected_services="[]" @choose="handleServiceSelect"/>
             </div>
 
-            <div class="tourist__form-field" :class="{ 'active': form_data.country_id && form_data.city_id && form_data.language_code && form_data.service_id }">
+            <div class="search__form-field" :class="{ 'active': form_data.country_id && form_data.city_id && form_data.language_code && form_data.service_id }">
                 <p class="form-label">
                     <span>4</span>
                     {{ $t('price') }}
                 </p>
             
-                <div class="tourist__form-tabs">
+                <div class="search__form-tabs">
                     <div
-                        class="tourist__form-tab"
+                        class="search__form-tab"
                         v-for="(price, index) in prices"
                         :key="price.id"
                         :class="{ 'active': price.is_active }"
@@ -63,12 +63,12 @@
             <submit-button
                 text="search"
                 icon="search"
-                class="tourist__form-submit form-submit"
+                class="search__form-submit form-submit"
                 :class="{ 'active': form_data.country_id && form_data.city_id && form_data.language_code && form_data.service_id }"
                 :loading="response_loading"/>
         </form>
 
-        <div v-if="paginatedResults && paginatedResults.length" class="tourist__results scroll-parent white-scroll">
+        <div v-if="paginatedResults && paginatedResults.length" class="search__results scroll-parent white-scroll">
             <p v-text="$t('search_results')" />
 
             <guide
@@ -79,14 +79,14 @@
 
             <button
                 v-if="canShowNextGroup"
-                class="tourist__results-next"
+                class="search__results-next"
                 v-text="$t('show_next')"
                 @click="showNextGroup"/>
 
             <button class="form-submit" v-text="$t('go_back_search')" @click="resetSearch" />
         </div>
 
-        <div v-if="results && !results.length" class="tourist__results">
+        <div v-if="results && !results.length" class="search__results">
             <p v-text="$t('errors.search_not_found')"/>
 
             <button class="form-submit" v-text="$t('go_back_search')" @click="resetSearch"/>
@@ -313,7 +313,7 @@
 </script>
 
 <style lang="scss" scoped>
-    .tourist {
+    .search {
         &__form {
             &-field {
                 margin-bottom: 2rem;
@@ -387,6 +387,11 @@
                 font-size: 1.25rem;
                 transition: all 0.3s ease;
                 text-decoration: none;
+                @media screen and (max-width: 480px) {
+                    padding: 0.875rem;
+                    font-size: 1rem;
+                    height: 3rem;
+                }
             }
         }
     }

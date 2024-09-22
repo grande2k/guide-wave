@@ -1,7 +1,7 @@
 <template>
-    <section class="start page">
-        <router-link to="/tourist" class="start__link">{{ $t('start.tourist') }}</router-link>
-        <router-link to="/login" class="start__link">{{ $t('start.guide') }}</router-link>
+    <section class="home page">
+        <router-link to="/search" class="home__link">{{ $t('start.tourist') }}</router-link>
+        <router-link to="/login" class="home__link">{{ $t('start.guide') }}</router-link>
     </section>
 
     <language-picker/>
@@ -12,7 +12,7 @@
 </script>
 
 <style lang="scss" scoped>
-    .start {
+    .home {
         color: $white;
         &__link {
             display: block;

@@ -1,14 +1,14 @@
 <template>
     <div class="layout">
-        <router-link v-if="$route.name !== 'start'" to="/" class="go-home">
+        <router-link v-if="$route.name !== 'home'" to="/" class="go-home">
             <img src="@/assets/images/icons/home.svg" alt="home">
             {{ $t('go_home') }}
         </router-link>
 
         <h1 class="logo">
             Guides to go
-            <br v-if="$cookies.get('user_role') === '2' && $route.name === 'profile'">
-            <span v-if="$cookies.get('user_role') === '2' && $route.name === 'profile'" v-text="$t('admin')"/>
+            <br v-if="$cookies.get('user_role') === '2' && $route.name === 'admin'">
+            <span v-if="$cookies.get('user_role') === '2' && $route.name === 'admin'" v-text="$t('admin')"/>
         </h1>
 
         <router-view/>
@@ -17,7 +17,7 @@
 
 <script setup>
     import { onMounted } from 'vue';
-    import { getAdminMail } from '@/api';
+    import { getAdminMail, getCountries, getInterfaceLanguages } from '@/api';
     import { useAppStore } from '@/stores/app';
     import { useI18n } from 'vue-i18n';
 
@@ -26,6 +26,8 @@
 
     onMounted(async () => {
         appStore.setAdminEmail(await getAdminMail(t));
+        appStore.setCountries(await getCountries(t));
+        appStore.setInterfaceLanguages(await getInterfaceLanguages(t));
     });
 </script>
 

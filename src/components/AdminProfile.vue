@@ -149,9 +149,9 @@
     import { useToast } from 'vue-toastification';
     import { useVuelidate } from '@vuelidate/core';
     import { required, email } from '@vuelidate/validators';
-    import AdminSplit from './AdminSplit.vue';
-    import AdminVideoDuration from './AdminVideoDuration.vue';
-    import AdminGuideRequest from './AdminGuideRequest.vue';
+    import AdminSplit from '@/components/admin/AdminSplit.vue';
+    import AdminVideoDuration from '@/components/admin/AdminVideoDuration.vue';
+    import AdminGuideRequest from '@/components/admin/AdminGuideRequest.vue';
     import AdminCreateModal from './modals/AdminCreateModal.vue';
     import AdminDialogModal from './modals/AdminDialogModal.vue';
     import AdminEditModal from './modals/AdminEditModal.vue';

@@ -90,37 +90,26 @@
 
     const login = async () => {
         try {
-            const params = {
-                email: form_data.email,
-                password: form_data.password
-            };
-
             response_loading.value = true;
-
-            const response = await axios.post('https://guides-to-go.onrender.com/auth/login', params);
-
+            const response = await axios.post('https://guides-to-go.onrender.com/auth/login', form_data);
             response_loading.value = false;
 
-            console.log(response.data);
+            const userRole = response.data.user_info[0].role_id;
+
             $cookies.set("access_token", response.data.access_token, "1m");
-            $cookies.set("user_role", response.data.user_info[0].role_id, "1m");
-            router.push('/profile');
-            toast.success( t('messages.login_success') );
+            $cookies.set("user_role", userRole, "1m");
+
+            if (userRole === 1) {
+                router.push('/profile');
+            } else if (userRole === 2) {
+                router.push('/admin');
+            }
+
+            toast.success(t('messages.login_success'));
             clearForm();
         } catch (error) {
             response_loading.value = false;
-
-            switch (error.response.status) {
-                case 401:
-                    toast.error( t('errors.login') );
-                    break;
-                case 422:
-                    toast.error( t('errors.validation') );
-                    break;
-                default:
-                    toast.error( t('errors.default') );
-                    break;
-            }
+            handleLoginError(error);
         }
     }
 
@@ -131,6 +120,20 @@
             login();
         } else {
             toast.error( t('errors.validation') );
+        }
+    }
+
+    const handleLoginError = (error) => {
+        switch (error.response.status) {
+            case 401:
+                toast.error(t('errors.login'));
+                break;
+            case 422:
+                toast.error(t('errors.validation'));
+                break;
+            default:
+                toast.error(t('errors.default'));
+                break;
         }
     }
 

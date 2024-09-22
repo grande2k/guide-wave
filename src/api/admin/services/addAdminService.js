@@ -3,21 +3,18 @@ import { useToast } from "vue-toastification";
 
 const toast = useToast();
 
-export const addServices = async (params, t) => {
+export const addAdminService = async (params) => {
     try {
         const request_headers = { headers: { 'Authorization': `Bearer ${$cookies.get("access_token")}` } };
-        const response = await axios.post('https://guides-to-go.onrender.com/admin/add_services', params, request_headers);
-
-        console.log(response.data);
-
-        return response.data;
+        await axios.post('https://guides-to-go.onrender.com/admin/add_services', params, request_headers);
+        toast.success('Услуга была добавлена успешно');
     } catch(err) {
         switch (err.response.status) {
             case 422:
-                toast.error(t('errors.validation'));
+                toast.error('Ошибка валидации');
                 break;
             default:
-                toast.error(t('errors.default'));
+                toast.error('Ошибка, попробуйте позже');
                 break;
         }
     }

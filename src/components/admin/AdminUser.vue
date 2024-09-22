@@ -26,7 +26,7 @@
             <div class="guide__languages" v-if="guide.languages && guide.languages.length">
                 <p class="guide__detail">Языки:</p>
 
-                <div v-for="(lang, index) in guide.languages" :key="index" class="guide__language" v-text="getLanguageName(lang, index)"/>
+                <div v-for="(lang, index) in guide.languages" :key="index" class="guide__language" v-text="getLanguageName(lang, index, guide.name)"/>
             </div>
 
             <p v-else class="guide__details-empty">Нет языков</p>
@@ -55,41 +55,35 @@
 <script setup>
     import { ref, computed, onMounted } from 'vue';
     import { getCities, approveGuide } from '@/api';
+    import { useAppStore } from '@/stores/app';
     import { useI18n } from 'vue-i18n';
     import { useToast } from 'vue-toastification';
 
     const { t } = useI18n();
+    const appStore = useAppStore();
     const toast = useToast();
     const cities = ref([]);
 
     const emit = defineEmits(['update']);
-
-    onMounted(async () => {
-       if(props.guide.city_id !== null) cities.value = await getCities(props.guide.country_id, t, 'ru'); 
-    });
 
     const props = defineProps({
         guide: {
             type: Object,
             required: true
         },
-        countries: {
-            type: Array,
-            required: true
-        },
         languages: {
             type: Array,
             required: true
         },
-        services: {
-            type: Array,
-            required: true
-        }
+    });
+
+    onMounted(async () => {
+        if (props.guide.city_id !== null) cities.value = await getCities(props.guide.country_id, t, 'ru');
     });
 
     const guide_country = computed(() => {
-        if(props.guide.country_id !== null) {
-            return props.countries.find(country => country.id === props.guide.country_id).name;
+        if(appStore.countries && props.guide.country_id !== null) {
+            return appStore.countries.find(country => country.id === props.guide.country_id).name;
         } else {
             return '';
         }
@@ -107,13 +101,17 @@
         }
     });
 
-    const getLanguageName = (lang, index) => {
-        if(props.languages) {
-            const found_lang = props.languages.find(l => l.lang_code === lang).languages_names.ru;
-            if((index + 1) < props.guide.languages.length) {
-                if (found_lang) return `${found_lang},`;
+    const getLanguageName = (lang, index, name) => {
+        if(props.guide.languages.length) {
+            const found_lang = props.languages.find(l => l.lang_code === lang);
+            if(found_lang) {
+                if ((index + 1) < props.guide.languages.length) {
+                    return `${found_lang.languages_names.ru},`;
+                } else {
+                    return found_lang.languages_names.ru;
+                }
             } else {
-                if (found_lang) return found_lang;
+                return 'Неизвестный язык';
             }
         } else {
             return '';

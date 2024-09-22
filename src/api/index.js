@@ -7,21 +7,29 @@ export * from './search';
 export * from './addCalendar';
 export * from './updateStatus';
 export * from './getAdminMail';
-export * from './admin/getGuides';
-export * from './admin/getAdminLanguages';
-export * from './admin/getAdminServices';
-export * from './admin/approveGuide';
-export * from './admin/addLanguages';
-export * from './admin/addServices';
+export * from './admin/guides/getGuides';
+export * from './admin/guides/approveGuide';
 export * from './admin/getSplit';
 export * from './admin/updateSplit';
 export * from './admin/updateLanguage';
-export * from './admin/deleteLanguage';
-export * from './admin/updateService';
-export * from './admin/deleteService';
 export * from './admin/addCallsCount';
 export * from './admin/updateEmail';
 export * from './admin/getInterface';
 export * from './admin/updateInterface';
 export * from './admin/getDuration';
 export * from './admin/updateDuration';
+
+export * from './admin/services/getAdminServices';
+export * from './admin/services/deleteAdminService';
+export * from './admin/services/addAdminService';
+export * from './admin/services/updateAdminService';
+
+export * from './admin/languages/getAdminLanguages';
+export * from './admin/languages/deleteAdminLanguage';
+export * from './admin/languages/addAdminLanguage';
+export * from './admin/languages/updateAdminLanguage';
+
+export * from './admin/interface-languages/getInterfaceLanguages';
+export * from './admin/interface-languages/deleteInterfaceLanguage';
+export * from './admin/interface-languages/addInterfaceLanguage';
+export * from './admin/interface-languages/updateInterfaceLanguage';

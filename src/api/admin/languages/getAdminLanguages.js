@@ -3,22 +3,19 @@ import { useToast } from "vue-toastification";
 
 const toast = useToast();
 
-export const addLanguages = async (params, t) => {
+export const getAdminLanguages = async (t) => {
     try {
         const request_headers = { headers: { 'Authorization': `Bearer ${$cookies.get("access_token")}` } };
-        const response = await axios.post('https://guides-to-go.onrender.com/admin/add_languages', params, request_headers);
-
+        const response = await axios.get('https://guides-to-go.onrender.com/admin/all_languages', request_headers);
         console.log(response.data);
-
         return response.data;
-    } catch(err) {
-        switch (err.response.status) {
-            case 422:
-                toast.error(t('errors.validation'));
-                break;
+    } catch (err) {
+        switch (err.response.status) {  
             default:
                 toast.error(t('errors.default'));
                 break;
         }
+
+        return [];
     }
 }

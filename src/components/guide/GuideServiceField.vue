@@ -18,7 +18,7 @@
 <script setup>
     import { ref, watch } from 'vue';
     import { validatePrice } from '@/utils/validatePrice';
-    import ServicesSelect from './ServicesSelect.vue';
+    import ServicesSelect from '@/components/ServicesSelect.vue';
 
     const emit = defineEmits(['update', 'delete']);
 

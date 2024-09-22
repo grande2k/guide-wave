@@ -3,22 +3,18 @@ import { useToast } from "vue-toastification";
 
 const toast = useToast();
 
-export const deleteService = async (params, t) => {
+export const deleteAdminService = async (params) => {
     try {
-        const request_headers = {
+        const request_params = {
             headers: { 'Authorization': `Bearer ${$cookies.get("access_token")}` },
             data: params 
         };
-
-        const response = await axios.delete('https://guides-to-go.onrender.com/admin/delete_service', request_headers);
-
-        console.log(response.data);
-
-        return response.data;
+        await axios.delete('https://guides-to-go.onrender.com/admin/delete_service', request_params);
+        toast.success('Услуга была успешно удалена');
     } catch (err) {
         switch (err.response.status) {
             default:
-                toast.error(t('errors.default'));
+                toast.error('Ошибка, попробуйте позже');
                 break;
         }
 

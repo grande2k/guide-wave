@@ -1,20 +1,20 @@
 <template>
-    <div class="language-picker" :class="{ 'language-picker--active': isPickerActive }">
+    <div v-if="languages" class="language-picker" :class="{ 'language-picker--active': isPickerActive }">
         <div class="language-picker__language language-picker__language--current" @click="isPickerActive = !isPickerActive">
             <div class="language-picker__flag">
-                <img :src="images[`${currentLanguage.name}-flag`]" alt="flag">
+                <img :src="images[`${currentLanguage.lang_code}`]" alt="flag">
             </div>
-            <span class="language-picker__langName" v-text="currentLanguage.name" />
+            <span class="language-picker__langName" v-text="currentLanguage.lang_code" />
         </div>
 
-        <ul class="language-picker__list">
+        <ul class="language-picker__list black-scroll">
             <li v-for="lang in filteredLanguages" :key="lang.id" class="language-picker__language"
-                @click="switchLanguage(lang.name)">
+                @click="switchLanguage(lang.lang_code)">
                 <div class="language-picker__flag">
-                    <img :src="images[`${lang.name}-flag`]" alt="flag">
+                    <img :src="images[`${lang.lang_code}`]" alt="flag">
                 </div>
 
-                <span class="language-picker__langName" v-text="lang.name" />
+                <span class="language-picker__langName" v-text="lang.lang_code" />
             </li>
         </ul>
 
@@ -23,56 +23,65 @@
 </template>
 
 <script setup>
-    import { ref, onMounted } from 'vue';
+    import { ref, onMounted, watch } from 'vue';
     import { filename } from 'pathe/utils';
     import { useI18n } from 'vue-i18n';
+    import { useAppStore } from '@/stores/app';
+    import { getInterface } from '@/api'
 
-    const { locale } = useI18n({ useScope: 'global' });
-
+    const appStore = useAppStore();
+    const { locale, getLocaleMessage, setLocaleMessage } = useI18n({ useScope: 'global' });
     const isPickerActive = ref(false);
+    const languages = ref(null);
 
-    const languages = [
-        {
-            id: 0,
-            name: "ru",
-            caption: "Русский",
-            is_current_language: false,
-        },
-        {
-            id: 1,
-            name: "en",
-            caption: "English",
-            is_current_language: true,
-        },
-    ];
+    const currentLanguage = ref(null);
+    const filteredLanguages = ref(null);
 
-    const currentLanguage = ref(languages.find(lang => lang.is_current_language === true));
-    const filteredLanguages = ref(languages.filter(lang => !lang.is_current_language));
+    const switchLanguage = async (lang) => {
+        if (locale.value !== lang && !Object.keys(getLocaleMessage(lang)).length) {
+            const translations = await getInterface(lang);
 
-    const switchLanguage = (lang) => {
+            if (translations) {
+                setLocaleMessage(lang, translations);
+            } else {
+                console.error(`Translations for ${lang} could not be loaded.`);
+            }
+        }
+
         locale.value = lang;
 
-        languages.forEach((language) => {
-            if (language.name === lang) {
+        languages.value.forEach((language) => {
+            if (language.lang_code === lang) {
                 language.is_current_language = true;
             } else {
                 language.is_current_language = false;
             }
         });
 
-        currentLanguage.value = languages.find(lang => lang.is_current_language === true);
-        filteredLanguages.value = languages.filter(lang => !lang.is_current_language);
+        currentLanguage.value = languages.value.find(lang => lang.is_current_language === true);
+        filteredLanguages.value = languages.value.filter(lang => !lang.is_current_language);
         isPickerActive.value = false;
 
         localStorage.setItem('language', lang);
     }
 
+    watch(() => appStore.interface_languages, (newLangs) => {
+        if(newLangs) {
+            languages.value = newLangs;
+            currentLanguage.value = languages.value.find(lang => lang.is_current_language === true);
+            filteredLanguages.value = languages.value.filter(lang => !lang.is_current_language);
+
+            const savedLanguage = localStorage.getItem('language');
+            if (savedLanguage && languages.value) switchLanguage(savedLanguage);
+        }
+    }, { immediate: true });
+
     onMounted(() => {
         const savedLanguage = localStorage.getItem('language');
-        if (savedLanguage) switchLanguage(savedLanguage);
+        if (savedLanguage && languages.value) switchLanguage(savedLanguage);
     });
 
-    const glob = import.meta.glob('@/assets/images/icons/*.svg', { eager: true });
+    const glob = import.meta.glob('@/assets/images/flags/*.svg', { eager: true });
 
     const images = Object.fromEntries(
         Object.entries(glob).map(([key, value]) => [filename(key), value.default])
@@ -99,7 +108,7 @@
         }
         &__arrow {
             position: absolute;
-            top: 1rem;
+            top: 1.25rem;
             right: 0.5rem;
             transition: $transition;
             @media screen and (max-width: 480px) {
@@ -109,7 +118,7 @@
         &__language {
             @include flex-center-vert;
             &:not(&--current, :last-child) {
-                margin-bottom: 1.5rem;
+                margin-bottom: 0.5rem;
             }
         }
         &__langName {
@@ -131,10 +140,19 @@
             top: 0.75rem;
             width: 100%;
             height: auto;
-            padding: 0.75rem;
+            max-height: 400px;
+            padding: 0.5rem 0;
             background-color: $white;
             border-bottom-left-radius: 0.5rem;
             border-bottom-right-radius: 0.5rem;
+            overflow: auto;
+            & > li {
+                padding: 0 0.5rem;
+                transition: all 0.15s ease;
+                &:hover {
+                    background-color: rgba($color: $black, $alpha: 0.125);
+                }
+            }
         }
         &--active {
             box-shadow: 0 2px 4px 0 rgba($color: $black, $alpha: 0.25);

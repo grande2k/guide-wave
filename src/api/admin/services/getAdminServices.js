@@ -3,10 +3,10 @@ import { useToast } from "vue-toastification";
 
 const toast = useToast();
 
-export const getAdminLanguages = async (t) => {
+export const getAdminServices = async () => {
     try {
         const request_headers = { headers: { 'Authorization': `Bearer ${$cookies.get("access_token")}` } };
-        const response = await axios.get('https://guides-to-go.onrender.com/admin/all_languages', request_headers);
+        const response = await axios.get('https://guides-to-go.onrender.com/admin/all_services', request_headers);
 
         console.log(response.data);
 
@@ -14,7 +14,7 @@ export const getAdminLanguages = async (t) => {
     } catch (err) {
         switch (err.response.status) {  
             default:
-                toast.error(t('errors.default'));
+                toast.error('Ошибка, попробуйте позже');
                 break;
         }
 
