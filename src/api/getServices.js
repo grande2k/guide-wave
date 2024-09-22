@@ -2,11 +2,11 @@ import axios from "axios";
 import { useToast } from "vue-toastification";
 
 const toast = useToast();
-const locale = localStorage.getItem('language') || 'en';
 
 export const getServices = async (source, t) => {
     if(source === 'tourist') {
         try {
+            const locale = localStorage.getItem('language') || 'en';
             const params = { language: locale };
             const response = await axios.post('https://guides-to-go.onrender.com/search/services', params);
 

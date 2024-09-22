@@ -93,12 +93,15 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba($color: $black, $alpha: 0.75);
+        background-color: rgba($color: $black, $alpha: 0.25);
         p {
             font-weight: 500;
             margin: 0;
             color: $white;
-            font-size: 1.25rem;
+            font-size: 1.325rem;
+            padding: 1rem;
+            background-color: $primary;
+            border-radius: 0.5rem;
         }
     }
 

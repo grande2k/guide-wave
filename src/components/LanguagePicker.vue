@@ -27,9 +27,10 @@
     import { filename } from 'pathe/utils';
     import { useI18n } from 'vue-i18n';
     import { useAppStore } from '@/stores/app';
-    import { getInterface } from '@/api'
+    import { getInterface, getCountries } from '@/api'
 
     const appStore = useAppStore();
+    const { t } = useI18n();
     const { locale, getLocaleMessage, setLocaleMessage } = useI18n({ useScope: 'global' });
     const isPickerActive = ref(false);
     const languages = ref(null);
@@ -63,12 +64,18 @@
         isPickerActive.value = false;
 
         localStorage.setItem('language', lang);
+        appStore.setCountries(await getCountries(t));
     }
 
     watch(() => appStore.interface_languages, (newLangs) => {
         if(newLangs) {
             languages.value = newLangs;
-            currentLanguage.value = languages.value.find(lang => lang.is_current_language === true);
+            if(!localStorage.getItem('language') && !currentLanguage.value) {
+                currentLanguage.value = languages.value.find(lang => lang.lang_code === 'en');
+                localStorage.setItem('language', currentLanguage.value.lang_code);
+            } else {
+                currentLanguage.value = languages.value.find(lang => lang.is_current_language === true);
+            }
             filteredLanguages.value = languages.value.filter(lang => !lang.is_current_language);
 
             const savedLanguage = localStorage.getItem('language');
