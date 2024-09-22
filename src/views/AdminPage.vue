@@ -80,6 +80,9 @@
             z-index: 1;
             background-color: $primary;
             padding: 1.5rem 1rem 1.5rem 1.5rem;
+            @media screen and (max-width: 480px) {
+                padding: 1.5rem 0.5rem 1.5rem 0.75rem;
+            }
             & > * {
                 overflow: auto;
                 height: 100%;
