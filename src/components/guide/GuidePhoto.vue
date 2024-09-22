@@ -8,7 +8,7 @@
         </div>
         <div v-if="!photo_url" class="guide-profile__photo-add">
             <span>+</span>
-            <p v-text="$t('profile.guide.upload_photo')"/>
+            <p v-text="$t('upload_photo')"/>
         </div>
     </label>
 

@@ -1,6 +1,6 @@
 <template>
     <section class="login page page--bg">
-        <h2 class="login__title form-title" v-text="$t('log_in.title')"/>
+        <h2 class="login__title form-title" v-text="$t('login_title')"/>
 
         <form action="" class="login__form" @submit.prevent="submitForm">
             <div class="login__form-field">
@@ -11,7 +11,7 @@
                     class="form-input"
                     :class="{ error: v$.email.$errors.length }"
                     id="email"
-                    :placeholder="$t('placeholders.email')"
+                    :placeholder="$t('email_placeholder')"
                     v-model="form_data.email">
             </div>
 
@@ -24,21 +24,21 @@
                         class="form-input"
                         :class="{ error: v$.password.$errors.length }"
                         id="password"
-                        :placeholder="$t('placeholders.password')"
+                        :placeholder="$t('password_placeholder')"
                         v-model="form_data.password">
 
                     <img v-if="!isPasswordVisible" src="@/assets/images/icons/eye-open.svg" @click="isPasswordVisible = true" alt="Show password">
                     <img v-else src="@/assets/images/icons/eye-close.svg" @click="isPasswordVisible = false" alt="Hide password">
                 </div>
 
-                <span v-if="v$.password.$errors.length && v$.password.minLength.$invalid" class="form-error" v-text="$t('errors.password_length')"/>
+                <span v-if="v$.password.$errors.length && v$.password.minLength.$invalid" class="form-error" v-text="$t('error_password_length')"/>
             </div>
 
-            <submit-button text="log_in.button" icon="login" :loading="response_loading"/>
+            <submit-button text="login_button" icon="login" :loading="response_loading"/>
         </form>
 
         <div class="form-links">
-            <router-link to="/signup" class="form-link" v-text="$t('sign_up.title')"/>
+            <router-link to="/signup" class="form-link" v-text="$t('signup_title')"/>
             
             <a :href="`mailto:${appStore.admin_email}`" class="form-link">
                 <img src="@/assets/images/icons/mail.svg" alt="Mail">
@@ -105,7 +105,7 @@
                 router.push('/admin');
             }
 
-            toast.success(t('messages.login_success'));
+            toast.success(t('message_login_success'));
             clearForm();
         } catch (error) {
             response_loading.value = false;
@@ -119,20 +119,20 @@
         if (result) {
             login();
         } else {
-            toast.error( t('errors.validation') );
+            toast.error( t('error_validation') );
         }
     }
 
     const handleLoginError = (error) => {
         switch (error.response.status) {
             case 401:
-                toast.error(t('errors.login'));
+                toast.error(t('error_login'));
                 break;
             case 422:
-                toast.error(t('errors.validation'));
+                toast.error(t('error_validation'));
                 break;
             default:
-                toast.error(t('errors.default'));
+                toast.error(t('error_default'));
                 break;
         }
     }

@@ -1,7 +1,7 @@
 <template>
     <section class="home page">
-        <router-link to="/search" class="home__link">{{ $t('start.tourist') }}</router-link>
-        <router-link to="/login" class="home__link">{{ $t('start.guide') }}</router-link>
+        <router-link to="/search" class="home__link">{{ $t('home_tourist') }}</router-link>
+        <router-link to="/login" class="home__link">{{ $t('home_guide') }}</router-link>
     </section>
 
     <language-picker/>

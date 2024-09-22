@@ -3,7 +3,7 @@
         <span/>
 
         <p>
-            {{ status_value ? $t('profile.guide.status.on') : $t('profile.guide.status.off') }}
+            {{ status_value ? $t('status_on') : $t('status_off') }}
         </p>
     </button>
 </template>
@@ -46,17 +46,17 @@
                     const params = { status: status_value.value };
                     await updateStatus(params, t);
                 } else {
-                    toast(t('messages.fill_profile'));
+                    toast(t('message_fill_profile'));
                 }
                 break;
             case 'not_checked':
-                toast(t('messages.not_approved_yet'));
+                toast(t('message_not_approved_yet'));
                 break;
             case 'declined':
-                toast.error(t('messages.declined'));
+                toast.error(t('message_account_declined'));
                 break;
             default:
-                toast.error(t('errors.default'));
+                toast.error(t('error_default'));
                 break;
         }
     }

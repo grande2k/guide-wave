@@ -27,6 +27,9 @@
                 <li class="admin__link">
                     <router-link to="/admin/interfaces">Языки (интерфейс)</router-link>
                 </li>
+                <li class="admin__link">
+                    <router-link to="/admin/translations">Надписи</router-link>
+                </li>
             </ul>
 
             <admin-email/>
@@ -51,7 +54,7 @@
 
     const hasRouteInside = computed(() => {
         return (
-            route.name === "admin-guides" || route.name === "admin-services" || route.name === "admin-languages" || route.name === "admin-interfaces"
+            route.name === "admin-guides" || route.name === "admin-services" || route.name === "admin-languages" || route.name === "admin-interfaces" || route.name === "admin-translations"
         );
     });
 

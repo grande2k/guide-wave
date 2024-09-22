@@ -1,27 +1,27 @@
 <template>
     <div class="guide-profile__video full-column">
-        <h2 class="form-label" v-text="$t('profile.guide.video.title')"/>
+        <h2 class="form-label" v-text="$t('video')"/>
 
         <div class="upload-element" v-if="is_changing || !video_url">
             <div class="flex">
                 <label class="upload-btn" for="upload-video">
                     <img src="@/assets/images/icons/upload.svg" alt="Upload">
-                    {{ $t('profile.guide.video.choose') }}
+                    {{ $t('choose_file') }}
                 </label>
             
                 <p v-if="selected_video" class="video-title" v-text="selected_video.name"/>
             </div>
 
             <span class="video-tip">
-                {{ `${ $t('profile.guide.video.size_tip') } ${maxVideoSize} ${$t('profile.guide.video.mb')}` }}
+                {{ `${ $t('video_size_tip') } ${maxVideoSize} ${$t('mb')}` }}
                 <br>
-                {{ `${$t('profile.guide.video.duration_tip')} ${max_video_duration} ${$t('profile.guide.video.seconds')}` }}
+                {{ `${$t('video_duration_tip')} ${max_video_duration} ${$t('seconds')}` }}
                 <br>
             </span>
 
             <button v-if="selected_video" type="button" class="video-save" :class="{ 'loading': is_uploading }" @click="uploadVideo">
                 <div v-if="is_uploading" class="preloader"><span></span></div>
-                {{ $t('profile.guide.video.upload') }}
+                {{ $t('upload') }}
             </button>
 
             <input id="upload-video" type="file" accept="video/*" @change="onFileChange" />
@@ -30,18 +30,18 @@
         <div v-else>
             <button type="button" class="video-watch" @click="is_watch_open = true">
                 <img src="@/assets/images/icons/play.svg" alt="play">
-                {{ $t('profile.guide.video.watch') }}
+                {{ $t('watch') }}
             </button>
 
             <div class="grid-half">
                 <button type="button" class="video-change" @click="changeVideo">
                     <img src="@/assets/images/icons/edit.svg" alt="edit">
-                    {{ $t('profile.guide.video.change') }}
+                    {{ $t('edit') }}
                 </button>
 
                 <button type="button" class="video-delete" @click="deleteVideo">
                     <img src="@/assets/images/icons/delete.svg" alt="delete">
-                    {{ $t('profile.guide.video.delete') }}
+                    {{ $t('delete') }}
                 </button>
             </div>
         </div>
@@ -85,7 +85,7 @@
         const maxFileSize = maxVideoSize.value * 1024 * 1024;
 
         if (file.size > maxFileSize) {
-            toast.error(`${t('errors.video_size')} ${maxFileSize.value} ${t('profile.guide.video.mb')}`);
+            toast.error(`${t('error_video_size')} ${maxFileSize.value} ${t('mb')}`);
             selected_video.value = null;
             event.target.value = '';
             return;
@@ -99,7 +99,7 @@
             const maxDuration = 15;
 
             if (videoDuration > maxDuration) {
-                toast.error(`${t('errors.video_duration')} ${props.max_video_duration} ${t('profile.guide.video.seconds')}`);
+                toast.error(`${t('error_video_duration')} ${props.max_video_duration} ${t('seconds')}`);
                 selected_video.value = null;
                 event.target.value = '';
                 return;
@@ -130,12 +130,12 @@
             console.log(response);
             is_uploading.value = false;
             is_changing.value = false;
-            toast.success(t('messages.video_upload_success'));
+            toast.success(t('message_video_upload_success'));
             emit('updated');
         } catch(err) {
             is_uploading.value = false;
             is_changing.value = false;
-            toast.error(t('errors.default'));
+            toast.error(t('error_default'));
         }
     }
 
@@ -154,9 +154,9 @@
             const response = await axios.delete('https://guides-to-go.onrender.com/user_info/delete_video', request_options);
             console.log(response);
             emit('deleted');
-            toast.success(t('messages.video_delete_success'));
+            toast.success(t('message_video_delete_success'));
         } catch (err) {
-            toast.error(t('errors.default'));
+            toast.error(t('error_default'));
         }
     }
 </script>

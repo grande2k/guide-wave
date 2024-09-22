@@ -163,7 +163,7 @@
                 emit('updated');
             }
 
-            toast.success(t('messages.save_success'));
+            toast.success(t('message_save_success'));
         }
     };
 

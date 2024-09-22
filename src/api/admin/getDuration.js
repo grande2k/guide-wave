@@ -14,7 +14,7 @@ export const getDuration = async (t) => {
     } catch (err) {
         switch (err.response.status) {
             default:
-                toast.error(t('errors.default'));
+                toast.error(t('error_default'));
                 break;
         }
 

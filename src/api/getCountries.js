@@ -13,9 +13,9 @@ export const getCountries = async (t) => {
     } catch (err) {
         switch (err.response.status) {
             case 422:
-                toast.error(t('errors.validation'));
+                toast.error(t('error_validation'));
             default:
-                toast.error(t('errors.default'));
+                toast.error(t('error_default'));
                 break;
         }
 

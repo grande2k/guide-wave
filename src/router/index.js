@@ -60,7 +60,13 @@ const routes = [
         name: "admin-interfaces",
         component: () => import("@/components/admin/AdminInterfaces.vue"),
         meta: { requiresAuth: true, role: '2' },
-      }
+      },
+      {
+        path: "translations",
+        name: "admin-translations",
+        component: () => import("@/components/admin/AdminTranslations.vue"),
+        meta: { requiresAuth: true, role: '2' },
+      },
     ]
   },
 ];

@@ -87,7 +87,7 @@
         </div>
 
         <div v-if="results && !results.length" class="search__results">
-            <p v-text="$t('errors.search_not_found')"/>
+            <p v-text="$t('error_search_not_found')"/>
 
             <button class="form-submit" v-text="$t('go_back_search')" @click="resetSearch"/>
         </div>
@@ -208,7 +208,7 @@
             response_loading.value = false;
             if (results.value && results.value.length > 0) showVideos();
         } else {
-            toast.error(t('errors.validation'));
+            toast.error(t('error_validation'));
         }
     }
 

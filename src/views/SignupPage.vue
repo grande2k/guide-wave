@@ -1,7 +1,7 @@
 <template>
     <section class="signup page page--bg">
         <div class="scroll-parent white-scroll">
-            <h2 class="signup__title form-title" v-text="$t('sign_up.title')"/>
+            <h2 class="signup__title form-title" v-text="$t('signup_title')"/>
 
             <form action="#" class="signup__form" @submit.prevent="submitForm">
                 <div class="signup__form-grid">
@@ -14,12 +14,12 @@
                             :class="{ error: v$.email.$errors.length }"
                             id="email"
                             name="email"
-                            :placeholder="$t('placeholders.email')"
+                            :placeholder="$t('email_placeholder')"
                             v-model="form_data.email">
                     </div>
 
                     <div class="signup__form-field">
-                        <label for="tel" class="form-label" v-text="$t('tel')"/>
+                        <label for="tel" class="form-label" v-text="$t('phone_number')"/>
 
                         <input
                             type="tel"
@@ -28,11 +28,11 @@
                             id="tel"
                             name="tel"
                             maxlength="15"
-                            :placeholder="$t('placeholders.tel')"
+                            :placeholder="$t('phone_number_placeholder')"
                             v-model="form_data.phone"
                             @input="form_data.phone = validatePhone($event.target.value)">
 
-                        <span v-if="v$.phone.$errors.length && v$.phone.minLength.$invalid" class="form-error" v-text="$t('errors.phone_length')"/>
+                        <span v-if="v$.phone.$errors.length && v$.phone.minLength.$invalid" class="form-error" v-text="$t('error_phone_length')"/>
                     </div>
 
                     <div class="signup__form-field">
@@ -45,14 +45,14 @@
                                 :class="{ error: v$.password.$errors.length }"
                                 id="password"
                                 name="password"
-                                :placeholder="$t('placeholders.password')"
+                                :placeholder="$t('password_placeholder')"
                                 v-model="form_data.password">
 
                             <img v-if="!isPasswordVisible" src="@/assets/images/icons/eye-open.svg" @click="isPasswordVisible = true" alt="Show password">
                             <img v-else src="@/assets/images/icons/eye-close.svg" @click="isPasswordVisible = false" alt="Hide password">
                         </div>
 
-                        <span v-if="v$.password.$errors.length && v$.password.minLength.$invalid" class="form-error" v-text="$t('errors.password_length')"/>
+                        <span v-if="v$.password.$errors.length && v$.password.minLength.$invalid" class="form-error" v-text="$t('error_password_length')"/>
                     </div>
 
                     <div class="signup__form-field">
@@ -65,22 +65,22 @@
                                 :class="{ error: v$.confirm_password.$errors.length }"
                                 id="confirm_password"
                                 name="confirm_password"
-                                :placeholder="$t('placeholders.password')"
+                                :placeholder="$t('password_placeholder')"
                                 v-model="form_data.confirm_password">
 
                             <img v-if="!isRepeatPasswordVisible" src="@/assets/images/icons/eye-open.svg" @click="isRepeatPasswordVisible = true" alt="Show password">
                             <img v-else src="@/assets/images/icons/eye-close.svg" @click="isRepeatPasswordVisible = false" alt="Hide password">
                         </div>
 
-                        <span v-if="v$.confirm_password.$errors.length && v$.confirm_password.sameAs.$invalid" class="form-error" v-text="$t('errors.password_not_same')"/>
+                        <span v-if="v$.confirm_password.$errors.length && v$.confirm_password.sameAs.$invalid" class="form-error" v-text="$t('error_password_not_same')"/>
                     </div>
                 </div>
 
-                <submit-button text="sign_up.button" icon="login" :loading="response_loading"/>
+                <submit-button text="signup_button" icon="login" :loading="response_loading"/>
             </form>
 
             <div class="form-links">
-                <router-link to="/login" class="form-link" v-text="$t('log_in.title')"/>
+                <router-link to="/login" class="form-link" v-text="$t('login_title')"/>
                 <a :href="`mailto:${appStore.admin_email}`" class="form-link">
                     <img src="@/assets/images/icons/mail.svg" alt="Mail">
                     {{ $t('contact_admin') }}
@@ -148,19 +148,19 @@
             clearForm();
 
             router.push('/login');
-            toast.success( t('messages.register_success') );
+            toast.success( t('message_register_success') );
         } catch (error) {
             response_loading.value = false;
 
             switch (error.response.status) {
                 case 400:
-                    toast.error( t('errors.already_exists') );
+                    toast.error( t('error_already_exists') );
                     break;
                 case 422:
-                    toast.error( t('errors.validation') );
+                    toast.error( t('error_validation') );
                     break;
                 default:
-                    toast.error( t('errors.default') );
+                    toast.error( t('error_default') );
                     break;
             }
         }
@@ -172,7 +172,7 @@
         if (result) {
             register();
         } else {
-            toast.error( t('errors.validation') );
+            toast.error( t('error_validation') );
         }
     }
 

@@ -19,7 +19,7 @@ export const getProfile = async (router, t) => {
                 router.push('/login');
                 break;
             default:
-                toast.error(t('errors.default'));
+                toast.error(t('error_default'));
                 break;
         }
 

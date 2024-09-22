@@ -6,7 +6,7 @@
                 <guide-photo :photo_url="guide_profile.photo_url" />
 
                 <div class="row">
-                    <p class="guide-profile__label" v-text="`${$t('profile.guide.status.label')}:`" />
+                    <p class="guide-profile__label" v-text="`${$t('status')}:`" />
                     <guide-status-toggler :approved_status="approved_status" :profile_valid="!v$.$invalid && !v1$.$invalid"
                         :status="guide_profile.status" />
                 </div>
@@ -22,21 +22,21 @@
 
             <form action="" class="guide-profile__form" @submit.prevent="submitForm">
                 <div class="guide-profile__form-field">
-                    <p class="form-label" v-text="$t('tel')" />
+                    <p class="form-label" v-text="$t('phone_number')" />
 
                     <input type="tel" class="form-input" :class="{ error: v$.phone.$errors.length }" name="tel"
-                        maxlength="15" :placeholder="$t('placeholders.tel')" v-model="guide_profile.phone"
+                        maxlength="15" :placeholder="$t('phone_number_placeholder')" v-model="guide_profile.phone"
                         @input="guide_profile.phone = validatePhone($event.target.value)">
 
                     <span v-if="v$.phone.$errors.length && v$.phone.minLength.$invalid" class="form-error"
-                        v-text="$t('errors.phone_length')" />
+                        v-text="$t('error_phone_length')" />
                 </div>
 
                 <div class="guide-profile__form-field">
-                    <p class="form-label" v-text="$t('profile.guide.name')" />
+                    <p class="form-label" v-text="$t('name')" />
 
                     <input type="text" class="form-input" :class="{ error: v$.phone.$errors.length }" name="name"
-                        :placeholder="$t('placeholders.name')" v-model="guide_profile.name">
+                        :placeholder="$t('name_placeholder')" v-model="guide_profile.name">
                 </div>
 
                 <div class="guide-profile__form-field full-column">
@@ -71,7 +71,7 @@
                 </div>
 
                 <div class="guide-profile__form-field full-column">
-                    <p class="form-label" v-text="$t('profile.guide.services_and_prices')" />
+                    <p class="form-label" v-text="$t('services_and_prices')" />
 
                     <div v-if="services.length">
                         <guide-service-field v-for="(service, index) in services" :key="index" :value="service"
@@ -100,7 +100,7 @@
 
                 <button type="button" class="logout full-column" @click="logout">
                     <img src="@/assets/images/icons/login.svg" alt="log out">
-                    {{ $t('log_out') }}
+                    {{ $t('logout') }}
                 </button>
             </form>
         </div>
@@ -234,7 +234,7 @@
             await axios.post('https://guides-to-go.onrender.com/service/update_services', services_params, request_headers);
 
             response_loading.value = false;
-            toast.success(t('messages.save_success'));
+            toast.success(t('message_save_success'));
 
             guide_profile.value = await getProfile(router, t);
             services.value = await getServices('guide', t);
@@ -243,7 +243,7 @@
 
             switch (err.response.status) {
                 default:
-                    toast.error(t('errors.default'));
+                    toast.error(t('error_default'));
                     break;
             }
         }
@@ -255,7 +255,7 @@
         if (result) {
             updateUserInfo();
         } else {
-            toast.error(t('errors.validation'));
+            toast.error(t('error_validation'));
         }
     }
 
@@ -351,7 +351,7 @@
         if (result) {
             isCalendarModalOpen.value = true
         } else {
-            toast(t('messages.fill_profile'));
+            toast(t('message_fill_profile'));
         }
     }
 

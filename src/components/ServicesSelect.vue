@@ -26,7 +26,7 @@
     const isSelectActive = ref(false);
     const currentOption = ref(null);
     const target = ref(null);
-    const select_placeholder = t('placeholders.service_type');
+    const select_placeholder = t('select_service');
 
     const props = defineProps({
         value: {
