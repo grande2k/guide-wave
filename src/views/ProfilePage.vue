@@ -118,7 +118,16 @@
         </div>
     </section>
 
-    <change-password-modal v-if="isUpdatePasswordModalOpen" @close="isUpdatePasswordModalOpen = false"/>
+    <change-password-modal
+        v-if="isUpdatePasswordModalOpen"
+        :new_password="new_password"
+        @close="isUpdatePasswordModalOpen = false"/>
+
+    <new-password-modal
+        v-if="isNewPasswordModalOpen"
+        :new_password="new_password"
+        @edit="isNewPasswordModalOpen = false; isUpdatePasswordModalOpen = true"
+        @close="isNewPasswordModalOpen = false"/>
 </template>
 
 <script setup>
@@ -126,7 +135,7 @@
     import { useToast } from 'vue-toastification';
     import { useI18n } from 'vue-i18n';
     import { useVuelidate } from '@vuelidate/core';
-    import { useRouter } from 'vue-router';
+    import { useRouter, useRoute } from 'vue-router';
     import { useAppStore } from '@/stores/app';
     import { required, minLength, helpers } from '@vuelidate/validators';
     import { validatePhone } from '@/utils/validatePhone';
@@ -141,10 +150,12 @@
     import CalendarModal from '@/components/modals/CalendarModal.vue';
     import GuideVideoUpload from '@/components/guide/GuideVideoUpload.vue';
     import ChangePasswordModal from '@/components/modals/ChangePasswordModal.vue';
+    import NewPasswordModal from '@/components/modals/NewPasswordModal.vue';
 
     const { t } = useI18n();
     const toast = useToast();
     const router = useRouter();
+    const route = useRoute();
     const appStore = useAppStore();
 
     const guide_profile = ref(null);
@@ -154,8 +165,10 @@
     const services = ref([]);
     const is_country_valid = ref(false);
     const response_loading = ref(false);
+    const new_password = ref(null);
     const isCalendarModalOpen = ref(false);
     const isUpdatePasswordModalOpen = ref(false);
+    const isNewPasswordModalOpen = ref(false);
 
     onMounted(async () => {
         guide_profile.value = await getProfile(router, t);
@@ -164,6 +177,12 @@
         countries.value = await getCountries(t);
         languages.value = await getLanguages(t);
         services.value = await getServices('guide', t);
+
+        if (route.query.newPassword) {
+            new_password.value = route.query.newPassword;
+            isNewPasswordModalOpen.value = true;
+            router.push('/profile');
+        }
     });
 
     const approved_status = computed(() => {

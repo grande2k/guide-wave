@@ -1,3 +1,9 @@
+export * from './auth/login';
+export * from './auth/register';
+export * from './auth/getRecoveryQuestions';
+export * from './auth/sendEmailForRecovery';
+export * from './auth/recoverPassword';
+
 export * from './getCountries';
 export * from './getCities';
 export * from './getLanguages';
@@ -7,7 +13,7 @@ export * from './search';
 export * from './addCalendar';
 export * from './updateStatus';
 export * from './getAdminMail';
-export * from './updatePassword';
+export * from './auth/updatePassword';
 
 export * from './admin/guides/getGuides';
 export * from './admin/guides/approveGuide';

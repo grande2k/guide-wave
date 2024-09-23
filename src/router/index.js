@@ -1,6 +1,7 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 import HomePage from "@/views/HomePage.vue";
 import LoginPage from "@/views/LoginPage.vue";
+import ForgotPasswordPage from "@/views/ForgotPasswordPage.vue";
 import SignupPage from "@/views/SignupPage.vue";
 import SearchPage from "@/views/SearchPage.vue";
 
@@ -14,6 +15,11 @@ const routes = [
     path: "/login",
     name: "login",
     component: LoginPage
+  },
+  {
+    path: "/forgot-password",
+    name: "forgot-password",
+    component: ForgotPasswordPage,
   },
   {
     path: "/signup",

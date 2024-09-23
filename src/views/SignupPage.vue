@@ -74,6 +74,37 @@
 
                         <span v-if="v$.confirm_password.$errors.length && v$.confirm_password.sameAs.$invalid" class="form-error" v-text="$t('error_password_not_same')"/>
                     </div>
+
+                    <div class="signup__form-field full-column">
+                        <label for="recovery_question" class="form-label" v-text="$t('recovery_question')"/>
+
+                        <div class="form-input-wrapper">
+                            <select
+                                class="signup__select"
+                                :class="{ error: v$.recovery_question.$errors.length }"
+                                id="recovery_question"
+                                name="recovery_question"
+                                v-model="form_data.recovery_question">
+                                <option selected disabled value="" v-text="$t('recovery_question')"/>
+                                <option v-for="(option, index) in recovery_questions" :key="index" :value="option" v-text="option"/>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div v-if="form_data.recovery_question" class="signup__form-field full-column">
+                        <label for="recovery_word" class="form-label" v-text="$t('recovery_word')"/>
+
+                        <div class="form-input-wrapper">
+                            <input
+                                type="text"
+                                class="form-input"
+                                :class="{ error: v$.recovery_word.$errors.length }"
+                                id="recovery_word"
+                                name="recovery_word"
+                                :placeholder="$t('recovery_word')"
+                                v-model="form_data.recovery_word">
+                        </div>
+                    </div>
                 </div>
 
                 <submit-button text="signup_button" icon="login" :loading="response_loading"/>
@@ -91,7 +122,7 @@
 </template>
 
 <script setup>
-    import { ref, reactive, computed } from 'vue';
+    import { ref, reactive, onMounted, computed } from 'vue';
     import { useVuelidate } from '@vuelidate/core';
     import { required, email, sameAs, minLength } from '@vuelidate/validators';
     import { useToast } from 'vue-toastification';
@@ -99,7 +130,7 @@
     import { useRouter } from 'vue-router';
     import { useAppStore } from '@/stores/app';
     import { validatePhone } from '@/utils/validatePhone';
-    import axios from 'axios';
+    import { register, getRecoveryQuestions } from '@/api';
     import SubmitButton from '@/components/SubmitButton.vue';
 
     const router = useRouter();
@@ -108,14 +139,21 @@
     const toast = useToast();
     const isPasswordVisible = ref(false);
     const isRepeatPasswordVisible = ref(false);
+    const recovery_questions = ref([]);
 
     const response_loading = ref(false);
+
+    onMounted(async () => {
+        recovery_questions.value = await getRecoveryQuestions(t);
+    });
 
     const form_data = reactive({
         email: "",
         phone: "",
         password: "",
-        confirm_password: ""
+        confirm_password: "",
+        recovery_question: "",
+        recovery_word: "",
     });
 
     const rules = computed(() => {
@@ -124,53 +162,28 @@
             phone: { required, minLength: minLength(6) },
             password: { required, minLength: minLength(6) },
             confirm_password: { required, sameAs: sameAs(form_data.password) },
+            recovery_question: { required },
+            recovery_word: { required }
         }
     });
 
     const v$ = useVuelidate(rules, form_data);
 
-    const register = async () => {
-        try {
-            const params = {
-                email: form_data.email,
-                phone: form_data.phone,
-                password: form_data.password,
-            };
-
-            response_loading.value = true;
-
-            const response = await axios.post('https://guides-to-go.onrender.com/auth/register', params);
-
-            response_loading.value = false;
-
-            console.log(response);
-
-            clearForm();
-
-            router.push('/login');
-            toast.success( t('message_register_success') );
-        } catch (error) {
-            response_loading.value = false;
-
-            switch (error.response.status) {
-                case 400:
-                    toast.error( t('error_already_exists') );
-                    break;
-                case 422:
-                    toast.error( t('error_validation') );
-                    break;
-                default:
-                    toast.error( t('error_default') );
-                    break;
-            }
-        }
-    }
-
     const submitForm = async () => {
         const result = await v$.value.$validate();
 
         if (result) {
-            register();
+            const params = {
+                email: form_data.email,
+                phone: form_data.phone,
+                password: form_data.password,
+                question: form_data.recovery_question,
+                answer: form_data.recovery_word
+            };
+
+            response_loading.value = true;
+            await register(params, router, t)
+            response_loading.value = false;
         } else {
             toast.error( t('error_validation') );
         }
@@ -221,6 +234,29 @@
         .form-links {
             @media screen and (max-width: 480px) {
                 margin-top: 1rem;
+            }
+        }
+
+        .full-column {
+            grid-column: 1/3;
+        }
+
+        &__select {
+            display: block;
+            width: 100%;
+            position: relative;
+            background-color: $white;
+            border-radius: 0.5rem;
+            border: 2px solid $white;
+            transition: box-shadow 0.2s ease;
+            cursor: pointer;
+            user-select: none;
+            color: $black;
+            line-height: 1.25;
+            height: 3rem;
+            outline: none;
+            &.error {
+                border-color: $error;
             }
         }
     }

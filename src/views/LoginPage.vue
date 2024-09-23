@@ -37,6 +37,8 @@
             <submit-button text="login_button" icon="login" :loading="response_loading"/>
         </form>
 
+        <router-link to="/forgot-password" class="forgot-password" v-text="$t('forgot_password')"/>
+
         <div class="form-links">
             <router-link to="/signup" class="form-link" v-text="$t('signup_title')"/>
             
@@ -56,7 +58,7 @@
     import { useI18n } from 'vue-i18n';
     import { useRouter } from 'vue-router';
     import { useAppStore } from '@/stores/app';
-    import axios from 'axios';
+    import { login } from '@/api';
     import SubmitButton from '@/components/SubmitButton.vue';
 
     const $cookies = inject('$cookies');
@@ -88,52 +90,15 @@
 
     const v$ = useVuelidate(rules, form_data);
 
-    const login = async () => {
-        try {
-            response_loading.value = true;
-            const response = await axios.post('https://guides-to-go.onrender.com/auth/login', form_data);
-            response_loading.value = false;
-
-            const userRole = response.data.user_info[0].role_id;
-
-            $cookies.set("access_token", response.data.access_token, "1m");
-            $cookies.set("user_role", userRole, "1m");
-
-            if (userRole === 1) {
-                router.push('/profile');
-            } else if (userRole === 2) {
-                router.push('/admin');
-            }
-
-            toast.success(t('message_login_success'));
-            clearForm();
-        } catch (error) {
-            response_loading.value = false;
-            handleLoginError(error);
-        }
-    }
-
     const submitForm = async () => {
         const result = await v$.value.$validate();
 
         if (result) {
-            login();
+            response_loading.value = true;
+            await login(form_data, router, t);
+            response_loading.value = false;
         } else {
             toast.error( t('error_validation') );
-        }
-    }
-
-    const handleLoginError = (error) => {
-        switch (error.response.status) {
-            case 401:
-                toast.error(t('error_login'));
-                break;
-            case 422:
-                toast.error(t('error_validation'));
-                break;
-            default:
-                toast.error(t('error_default'));
-                break;
         }
     }
 
@@ -168,6 +133,16 @@
                     margin-top: 1.25rem;
                 }
             }
+        }
+
+        .forgot-password {
+            display: block;
+            text-align: center;
+            text-decoration: none;
+            color: $white;
+            font-weight: 500;
+            margin-top: 1.25rem;
+            font-size: 1.25rem;
         }
     }
 </style>

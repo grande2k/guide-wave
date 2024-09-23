@@ -50,8 +50,14 @@
     const { t } = useI18n();
     const toast = useToast();
 
+    const props = defineProps({
+        new_password: {
+            type: String
+        }
+    });
+
     const form_data = reactive({
-        old_password: "",
+        old_password: props.new_password || "",
         new_password: "",
     });
 
