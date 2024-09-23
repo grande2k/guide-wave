@@ -6,7 +6,7 @@
                 <guide-photo :photo_url="guide_profile.photo_url" />
 
                 <div class="row">
-                    <p class="guide-profile__label" v-text="`${$t('status')}:`" />
+                    <p class="guide-profile__label" v-text="$t('status')" />
                     <guide-status-toggler :approved_status="approved_status" :profile_valid="!v$.$invalid && !v1$.$invalid"
                         :status="guide_profile.status" />
                 </div>
@@ -93,6 +93,14 @@
 
                 <submit-button text="save" icon="check" :loading="response_loading" class="full-column" />
 
+                <button
+                    type="button"
+                    class="change-password full-column"
+                    @click="isUpdatePasswordModalOpen = true">
+                    <img src="@/assets/images/icons/key.svg" alt="key">
+                    {{ $t('change_password') }}
+                </button>
+
                 <a :href="`mailto:${appStore.admin_email}`" class="form-link full-column">
                     <img src="@/assets/images/icons/mail.svg" alt="Mail">
                     {{ $t('contact_admin') }}
@@ -109,6 +117,8 @@
             <span></span>
         </div>
     </section>
+
+    <change-password-modal v-if="isUpdatePasswordModalOpen" @close="isUpdatePasswordModalOpen = false"/>
 </template>
 
 <script setup>
@@ -130,6 +140,7 @@
     import SubmitButton from '@/components/SubmitButton.vue';
     import CalendarModal from '@/components/modals/CalendarModal.vue';
     import GuideVideoUpload from '@/components/guide/GuideVideoUpload.vue';
+    import ChangePasswordModal from '@/components/modals/ChangePasswordModal.vue';
 
     const { t } = useI18n();
     const toast = useToast();
@@ -144,6 +155,7 @@
     const is_country_valid = ref(false);
     const response_loading = ref(false);
     const isCalendarModalOpen = ref(false);
+    const isUpdatePasswordModalOpen = ref(false);
 
     onMounted(async () => {
         guide_profile.value = await getProfile(router, t);
@@ -458,6 +470,29 @@
 
                 .row {
                     @include grid(2, 0.5rem);
+                }
+            }
+            .change-password {
+                @include flex-center;
+                width: 100%;
+                background-color: $white;
+                color: $black;
+                padding: 1rem;
+                border-radius: 0.5rem;
+                font-size: 1.25rem;
+                cursor: pointer;
+                margin: 0.25rem 0 0 0;
+                @media screen and (max-width: 480px) {
+                    padding: 0.875rem;
+                    font-size: 1rem;
+                    height: 3rem;
+                }
+                img {
+                    width: 1.5rem;
+                    margin-right: 0.5rem;
+                    @media screen and (max-width: 480px) {
+                        width: 1.25rem;
+                    }
                 }
             }
         }

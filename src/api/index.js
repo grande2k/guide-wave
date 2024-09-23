@@ -7,6 +7,8 @@ export * from './search';
 export * from './addCalendar';
 export * from './updateStatus';
 export * from './getAdminMail';
+export * from './updatePassword';
+
 export * from './admin/guides/getGuides';
 export * from './admin/guides/approveGuide';
 export * from './admin/getSplit';
