@@ -14,6 +14,11 @@
             <div class="guide__info">
                 <p class="guide__name" v-text="guide.name"/>
 
+                <button type="button" class="guide__btn video" @click="is_video_shown = true">
+                    <img src="@/assets/images/icons/play.svg" alt="play">
+                    {{ $t('video_card') }}
+                </button>
+
                 <div class="grid-half">
                     <button
                         type="button"
@@ -40,6 +45,13 @@
 
         <calendar v-if="guide.calendar" :dates="guide.calendar"/>
     </div>
+
+    <video-modal 
+        v-if="is_video_shown"
+        :guide_name="guide.name"
+        :video_url="guide.video_url"
+        @close="is_video_shown = false"
+        @ended="is_video_shown = false"/>
 </template>
 
 <script setup>
@@ -47,6 +59,7 @@
     import { addCallsCount } from '@/api';
     import { useI18n } from 'vue-i18n';
     import Calendar from '@/components/Calendar.vue';
+    import VideoModal from '@/components/modals/VideoModal.vue';
 
     const { t } = useI18n();
 
@@ -60,6 +73,7 @@
     });
 
     const isDisabled = ref(false);
+    const is_video_shown = ref(false);
 
     const handleCall = async (source) => {
         if (isDisabled.value) return;
@@ -162,6 +176,12 @@
             cursor: pointer;
             user-select: none;
             text-decoration: none;
+            &.video {
+                border: 2px solid $white;
+                color: $white;
+                max-width: 100%;
+                margin-bottom: 0.5rem;
+            }
             &.whatsapp {
                 background-color: #25d366;
                 color: $white;

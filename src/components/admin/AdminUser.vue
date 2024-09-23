@@ -40,6 +40,11 @@
             <p v-else class="guide__details-empty">Нет услуг</p>
         </div>
 
+        <button v-if="guide.video_url" type="button" class="guide__video" @click="is_video_shown = true">
+            <img src="@/assets/images/icons/play.svg" alt="play">
+            {{ $t('video_card') }}
+        </button>
+
         <div class="guide__controls">
             <button v-if="guide.approved" class="guide__decline" @click="decline">
                 Заблокировать
@@ -50,6 +55,13 @@
             </button>
         </div>
     </div>
+
+    <video-modal 
+        v-if="is_video_shown"
+        :guide_name="guide.name"
+        :video_url="guide.video_url"
+        @close="is_video_shown = false"
+        @ended="is_video_shown = false"/>
 </template>
 
 <script setup>
@@ -58,11 +70,13 @@
     import { useAppStore } from '@/stores/app';
     import { useI18n } from 'vue-i18n';
     import { useToast } from 'vue-toastification';
+    import VideoModal from '@/components/modals/VideoModal.vue';
 
     const { t } = useI18n();
     const appStore = useAppStore();
     const toast = useToast();
     const cities = ref([]);
+    const is_video_shown = ref(false);
 
     const emit = defineEmits(['update']);
 
@@ -294,12 +308,37 @@
             button {
                 @include flex-center;
                 width: 100%;
-                border-radius: 0.25rem;
+                border-radius: 0.5rem;
                 color: $white;
                 padding: 1rem;
                 cursor: pointer;
+                height: 3rem;
                 img {
                     width: 1.25rem;
+                    margin-right: 0.25rem;
+                }
+            }
+        }
+        &__video {
+            @include flex-center;
+            text-decoration: none;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            width: 100%;
+            font-weight: 500;
+            font-size: 1rem;
+            cursor: pointer;
+            user-select: none;
+            text-decoration: none;
+            border: 2px solid $white;
+            color: $white;
+            margin-bottom: 0.5rem;
+            height: 3rem;
+            img {
+                width: 1.25rem;
+                margin-right: 0.5rem;
+                @media screen and (max-width: 480px) {
+                    width: 1rem;
                     margin-right: 0.25rem;
                 }
             }
