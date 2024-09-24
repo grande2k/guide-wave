@@ -21,6 +21,18 @@
                         </div>
                     </div>
 
+                    <div v-else-if="type === 'countries'">
+                        <div class="admin-modal__field">
+                            <p>Двухзначный код страны:</p>
+                            <input
+                                type="text"
+                                v-model="form_data.country_code"
+                                placeholder="Например: ru, us"
+                                maxlength="2"
+                                :class="{ error: type === 'countries' && v$.country_code.$errors.length }" />
+                        </div>
+                    </div>
+
                     <div v-for="lang in appStore.interface_languages" :key="lang.lang_code" class="admin-modal__field">
                         <p>Перевод на {{ lang.name }}:</p>
                         <input type="text" v-model="form_data[lang.lang_code]"
@@ -42,7 +54,7 @@
     import { useAppStore } from '@/stores/app';
     import { useToast } from 'vue-toastification';
     import { onClickOutside } from '@vueuse/core';
-    import { addAdminLanguage, addAdminService } from '@/api';
+    import { addAdminLanguage, addAdminService, addCity, addCountry } from '@/api';
     import SubmitButton from '@/components/SubmitButton.vue';
 
     const toast = useToast();
@@ -53,7 +65,8 @@
     
     const props = defineProps({
         title: String,
-        type: String
+        type: String,
+        country_id: Number
     });
 
     const rules = computed(() => {
@@ -61,6 +74,7 @@
         appStore.interface_languages.forEach((lang) => {
             if(lang.lang_code === 'en') rules[lang.lang_code] = { required };
             if(props.type === 'languages') rules.lang_code = { required };
+            if (props.type === 'countries') rules.country_code = { required };
         });
         return rules;
     });
@@ -114,6 +128,30 @@
                 });
 
                 await addAdminService(services_formatted_data);
+                break;
+            case 'countries':
+                const countries_formatted_data = {
+                    country_code: form_data.country_code,
+                    country_names: {}
+                };
+
+                appStore.interface_languages.forEach((lang) => {
+                    countries_formatted_data.country_names[lang.lang_code] = form_data[lang.lang_code];
+                });
+
+                await addCountry(countries_formatted_data);
+                break;
+            case 'cities':
+                const cities_formatted_data = {
+                    country_id: props.country_id,
+                    city_names: {}
+                };
+
+                appStore.interface_languages.forEach((lang) => {
+                    cities_formatted_data.city_names[lang.lang_code] = form_data[lang.lang_code];
+                });
+
+                await addCity(cities_formatted_data);
                 break;
             default:
                 break;

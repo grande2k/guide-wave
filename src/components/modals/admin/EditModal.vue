@@ -21,6 +21,18 @@
                         </div>
                     </div>
 
+                    <div v-else-if="type === 'countries'">
+                        <div class="admin-modal__field">
+                            <p>Двухзначный код страны:</p>
+                            <input
+                                type="text"
+                                v-model="form_data.country_code"
+                                placeholder="Например: ru, us"
+                                maxlength="2"
+                                :class="{ error: type === 'countries' && v$.country_code.$errors.length }" />
+                        </div>
+                    </div>
+
                     <div v-for="lang in appStore.interface_languages" :key="lang.lang_code" class="admin-modal__field">
                         <p>Перевод на {{ lang.name }}:</p>
                         <input type="text" v-model="form_data[lang.lang_code]"
@@ -42,7 +54,7 @@
     import { useAppStore } from '@/stores/app';
     import { useToast } from 'vue-toastification';
     import { onClickOutside } from '@vueuse/core';
-    import { updateAdminLanguage, updateAdminService } from '@/api';
+    import { updateAdminLanguage, updateAdminService, updateCity, updateCountry } from '@/api';
     import SubmitButton from '@/components/SubmitButton.vue';
 
     const toast = useToast();
@@ -62,6 +74,7 @@
         appStore.interface_languages.forEach((lang) => {
             if (lang.lang_code === 'en') rules[lang.lang_code] = { required };
             if (props.type === 'languages') rules.lang_code = { required };
+            if (props.type === 'countries') rules.country_code = { required };
         });
         return rules;
     });
@@ -74,10 +87,15 @@
                 form_data[lang.lang_code] = props.initialData?.languages_names?.[lang.lang_code] || '';
             } else if(props.type === 'services') {
                 form_data[lang.lang_code] = props.initialData?.services_name?.[lang.lang_code] || '';
+            }  else if (props.type === 'countries') {
+                form_data[lang.lang_code] = props.initialData?.country_names?.[lang.lang_code] || '';
+            } else if(props.type === 'cities') {
+                form_data[lang.lang_code] = props.initialData?.city_names?.[lang.lang_code] || '';
             }
         });
 
         if(props.type === 'languages') form_data.lang_code = props.initialData?.lang_code || '';
+        if(props.type === 'countries') form_data.country_code = props.initialData?.country_code || '';
     }, { immediate: true });
 
     const emit = defineEmits(['close', 'submitted']);
@@ -88,7 +106,7 @@
         const result = await v$.value.$validate();
 
         if (result) {
-            handleSubmit(props.type);
+            await handleSubmit(props.type);
             clearForm();
             emit('submitted');
             emit('close');
@@ -119,6 +137,27 @@
                 };
 
                 await updateAdminService(services_formatted_data);
+                break;
+            case 'countries':
+                const countries_formatted_data = {
+                    old_country_code: props.initialData.country_code,
+                    new_country_code: form_data.country_code,
+                    country_names: {}
+                };
+
+                appStore.interface_languages.forEach((lang) => {
+                    countries_formatted_data.country_names[lang.lang_code] = form_data[lang.lang_code];
+                });
+
+                await updateCountry(countries_formatted_data);
+            break;
+            case 'cities':
+                const cities_formatted_data = {
+                    old_city_names: props.initialData.city_names,
+                    new_city_names: form_data
+                };
+
+                await updateCity(cities_formatted_data);
                 break;
             default:
                 break;

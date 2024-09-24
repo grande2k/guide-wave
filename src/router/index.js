@@ -56,6 +56,12 @@ const routes = [
         meta: { requiresAuth: true, role: '2' },
       },
       {
+        path: "locations",
+        name: "admin-locations",
+        component: () => import("@/components/admin/AdminLocations.vue"),
+        meta: { requiresAuth: true, role: '2' },
+      },
+      {
         path: "languages",
         name: "admin-languages",
         component: () => import("@/components/admin/AdminLanguages.vue"),

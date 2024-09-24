@@ -15,8 +15,6 @@ export * from './updateStatus';
 export * from './getAdminMail';
 export * from './auth/updatePassword';
 
-export * from './admin/guides/getGuides';
-export * from './admin/guides/approveGuide';
 export * from './admin/getSplit';
 export * from './admin/updateSplit';
 export * from './admin/updateLanguage';
@@ -26,6 +24,17 @@ export * from './admin/getInterface';
 export * from './admin/updateInterface';
 export * from './admin/getDuration';
 export * from './admin/updateDuration';
+
+export * from './admin/guides/getGuides';
+export * from './admin/guides/approveGuide';
+
+export * from './admin/locations/getLocations';
+export * from './admin/locations/deleteCountry';
+export * from './admin/locations/deleteCity';
+export * from './admin/locations/addCountry';
+export * from './admin/locations/addCity';
+export * from './admin/locations/updateCountry';
+export * from './admin/locations/updateCity';
 
 export * from './admin/services/getAdminServices';
 export * from './admin/services/deleteAdminService';

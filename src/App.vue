@@ -8,7 +8,7 @@
         <h1 class="logo">
             Guides to go
             <br v-if="$cookies.get('user_role') === '2' && $route.name === 'admin'">
-            <span v-if="$cookies.get('user_role') === '2' && $route.name === 'admin'" v-text="$t('admin')"/>
+            <span v-if="$cookies.get('user_role') === '2' && $route.name === 'admin'">Администратор</span>
         </h1>
 
         <router-view/>
