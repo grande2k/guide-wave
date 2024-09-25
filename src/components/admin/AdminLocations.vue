@@ -12,15 +12,15 @@
         <div v-if="locations.length" class="admin-locations__list">
             <div v-for="country in locations" :key="country.country_id">
                 <div class="admin-list-item" @click="handleCountryClick(country)">
-                    <strong v-text="country.country_names.ru"/>
+                    <strong v-text="country.country_names.ru || country.country_names.en"/>
                 </div>
 
                 <div class="cities">
                     <ul v-if="country.cities && country.cities.length" class="admin-locations__cities">
-                        <li v-for="city in country.cities" :key="city.city_id" class="admin-list-item" v-text="city.city_names.ru" @click="handleCityClick(city)"/>
+                        <li v-for="city in country.cities" :key="city.city_id" class="admin-list-item" v-text="city.city_names.ru || city.city_names.en" @click="handleCityClick(city)"/>
                     </ul>
 
-                    <p v-else class="admin-message">Пусто</p>
+                    <p v-else class="admin-message">Нет городов</p>
 
                     <button class="add-location form-submit" @click="handleCityAdd(country.country_id)">
                         <img src="@/assets/images/icons/close.svg" alt="plus">
@@ -30,7 +30,7 @@
             </div>
         </div>
 
-        <p v-else class="admin-message">Пусто</p>
+        <p v-else class="admin-message">Нет стран</p>
 
         <button class="add-location form-submit" @click="handleCountryAdd">
             <img src="@/assets/images/icons/close.svg" alt="plus">
