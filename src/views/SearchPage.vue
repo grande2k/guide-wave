@@ -97,6 +97,7 @@
         v-if="is_video_shown" 
         close_disabled
         :guide_name="paginatedResults[currentPage][video_index].name"
+        :guide_index="`${video_index + 1} / ${paginatedResults[currentPage].length}`"
         :video_url="current_video_url"
         @close="is_video_shown  = false"
         @ended="showNextVideo"/>
@@ -206,7 +207,7 @@
             results.value = response.users;
             split_by.value = response.split_by;
             response_loading.value = false;
-            // if (results.value && results.value.length > 0) showVideos();
+            if (results.value && results.value.length > 0) showVideos();
         } else {
             toast.error(t('error_validation'));
         }

@@ -47,7 +47,11 @@
         </div>
     </div>
 
-    <video-modal v-if="is_watch_open" :video_url="video_url" @close="is_watch_open = false"/>
+    <video-modal
+        v-if="is_watch_open"
+        :video_url="video_url"
+        @close="is_watch_open = false"
+        @ended="is_watch_open = false"/>
 </template>
 
 <script setup>

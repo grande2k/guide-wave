@@ -8,16 +8,33 @@
 
                 <transition>
                     <div v-if="guide_name && isNameShown" class="guide-name">
-                        <p v-text="guide_name"/>
+                        <p>
+                            <span v-if="guide_index" v-text="guide_index"/>
+                            <br v-if="guide_index">
+                            {{ guide_name }}
+                        </p>
                     </div>
                 </transition>
 
                 <video
                     class="video"
+                    ref="videoRef"
                     :src="`https://guides-to-go.onrender.com${video_url}`"
                     autoplay
                     playsinline
+                    @timeupdate="updateProgress"
+                    @loadedmetadata="setVideoDuration"
                     @ended="emit('ended')"/>
+
+                <div class="video-controls">
+                    <div class="video-timing">
+                        <span>{{ formatTime(currentTime) }} / {{ formatTime(duration) }}</span>
+                    </div>
+
+                    <div class="progress-container">
+                        <div class="progress-bar" :style="{ width: `${progress}%` }"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </teleport>
@@ -28,8 +45,12 @@
     import { onClickOutside } from '@vueuse/core';
 
     const target = ref(null);
+    const videoRef = ref(null);
     const isNameShown = ref(false);
     const emit = defineEmits(['close', 'ended']);
+    const currentTime = ref(0);
+    const duration = ref(0);
+    const progress = ref(0);
 
     const props = defineProps({
         video_url: {
@@ -37,6 +58,10 @@
             required: true
         },
         guide_name: {
+            type: String,
+            default: ''
+        },
+        guide_index: {
             type: String,
             default: ''
         },
@@ -58,6 +83,25 @@
     onClickOutside(target, () => {
         if (!props.close_disabled) emit('close');
     });
+
+    const updateProgress = () => {
+        if (videoRef.value) {
+            currentTime.value = videoRef.value.currentTime;
+            progress.value = (currentTime.value / duration.value) * 100; // Обновление прогресса
+        }
+    }
+
+    const setVideoDuration = () => {
+        if (videoRef.value) {
+            duration.value = videoRef.value.duration;
+        }
+    }
+
+    const formatTime = (time) => {
+        const minutes = Math.floor(time / 60);
+        const seconds = Math.floor(time % 60);
+        return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    }
 </script>
 
 <style lang="scss" scoped>
@@ -102,7 +146,38 @@
             padding: 1rem;
             background-color: $primary;
             border-radius: 0.5rem;
+            text-align: center;
         }
+    }
+
+    .video-controls {
+        position: absolute;
+        width: 95%;
+        left: 50%;
+        bottom: 1rem;
+        transform: translateX(-50%);
+    }
+
+    .video-timing {
+        text-align: center;
+        margin-top: 5px;
+        color: $white;
+        font-size: 0.875rem;
+    }
+
+    .progress-container {
+        width: 100%;
+        height: 0.5rem;
+        background-color: rgba(255, 255, 255, 0.3);
+        border-radius: 0.25rem;
+        overflow: hidden;
+        margin-top: 0.5rem;
+    }
+
+    .progress-bar {
+        height: 100%;
+        background-color: $white;
+        transition: width 0.2s;
     }
 
     .v-enter-active,

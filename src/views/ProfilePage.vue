@@ -89,7 +89,7 @@
                 <guide-video-upload :video_url="guide_profile.video_url ?? ''"
                     :max_video_duration="guide_profile.max_video_duration"
                     @deleted="async () => guide_profile = await getProfile(router, $t)"
-                    @updated="async () => guide_profile = await getProfile(router, $t)" />
+                    @updated="async () => {await updateUserInfo(); guide_profile = await getProfile(router, $t)}" />
 
                 <submit-button text="save" icon="check" :loading="response_loading" class="full-column" />
 
