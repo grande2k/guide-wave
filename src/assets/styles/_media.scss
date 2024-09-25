@@ -1,6 +1,8 @@
 @media screen and (max-width: 480px) {
     html > body {
         background-position: 75% 50%;
+        max-height: 100%;
+        overflow: hidden;
     }
     .layout {
         .page {

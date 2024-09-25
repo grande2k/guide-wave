@@ -181,6 +181,12 @@
                 color: $white;
                 max-width: 100%;
                 margin-bottom: 0.5rem;
+                @media screen and (max-width: 480px) {
+                    max-width: 200px;
+                    img {
+                        width: 1rem;
+                    }
+                }
             }
             &.whatsapp {
                 background-color: #25d366;

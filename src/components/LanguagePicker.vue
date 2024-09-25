@@ -60,7 +60,7 @@
         });
 
         currentLanguage.value = languages.value.find(lang => lang.is_current_language === true);
-        filteredLanguages.value = languages.value.filter(lang => !lang.is_current_language);
+        filteredLanguages.value = languages.value.filter(lang => !lang.is_current_language).sort((a, b) => a.lang_code.localeCompare(b.lang_code));
         isPickerActive.value = false;
 
         localStorage.setItem('language', lang);
@@ -76,7 +76,7 @@
             } else {
                 currentLanguage.value = languages.value.find(lang => lang.is_current_language === true);
             }
-            filteredLanguages.value = languages.value.filter(lang => !lang.is_current_language);
+            filteredLanguages.value = languages.value.filter(lang => !lang.is_current_language).sort((a, b) => a.lang_code.localeCompare(b.lang_code));
 
             const savedLanguage = localStorage.getItem('language');
             if (savedLanguage && languages.value) switchLanguage(savedLanguage);

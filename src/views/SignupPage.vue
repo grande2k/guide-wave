@@ -219,8 +219,7 @@
                 justify-content: flex-start;
                 font-size: 1.125rem;
                 @media screen and (max-width: 480px) {
-                    text-align: center;
-                    justify-content: center;
+                    justify-content: flex-start;
                 }
             }
             .form-submit {
@@ -239,6 +238,9 @@
 
         .full-column {
             grid-column: 1/3;
+            @media screen and (max-width: 480px) {
+                grid-column: auto;
+            }
         }
 
         &__select {
