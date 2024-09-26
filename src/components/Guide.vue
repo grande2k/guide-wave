@@ -171,7 +171,6 @@
             padding: 1rem;
             width: 100%;
             font-weight: 500;
-            max-width: 200px;
             font-size: 1.125rem;
             cursor: pointer;
             user-select: none;
@@ -182,7 +181,6 @@
                 max-width: 100%;
                 margin-bottom: 0.5rem;
                 @media screen and (max-width: 480px) {
-                    max-width: 200px;
                     img {
                         width: 1rem;
                     }
