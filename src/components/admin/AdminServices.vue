@@ -11,7 +11,7 @@
 
         <div v-if="services.length" class="admin-services__list">
             <div
-                v-for="service in services"
+                v-for="service in filteredServices"
                 :key="service.services_name.en"
                 class="admin-list-item"
                 v-text="service.services_name.ru || service.services_name.en"
@@ -49,7 +49,7 @@
 </template>
 
 <script setup>
-    import { ref, onMounted } from 'vue';
+    import { ref, onMounted, computed } from 'vue';
     import { getAdminServices, deleteAdminService } from '@/api';
     import EditOrDeleteModal from '@/components/modals/admin/EditOrDeleteModal.vue';
     import CreateModal from '@/components/modals/admin/CreateModal.vue';
@@ -64,6 +64,10 @@
     onMounted(async () => {
         await getServices();
     });
+
+    const filteredServices = computed(() => {
+        return services.value.filter(service => service.services_name.ru !== "Все услуги");
+    })
 
     const handleServiceClick = (data) => {
         is_dialog_modal_open.value = true;

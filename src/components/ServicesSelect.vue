@@ -32,6 +32,9 @@
         value: {
             type: Object,
         },
+        tourist: {
+            type: Boolean,
+        },
         all_selected_services: {
             type: Array,
             required: true
@@ -87,10 +90,27 @@
     const emit = defineEmits(['choose']);
 
     const filteredOptions = computed(() => {
-        return services.value.filter(service => {
+        const options = services.value.filter(service => {
             return !props.all_selected_services.some(selected => selected.service_id === service.id);
         });
+
+        if (props.tourist) {
+            return moveServiceToTop(options, 20);
+        } else {
+            const filtered = options.filter(option => option.id !== 20);
+            return moveServiceToTop(filtered, 20);
+        }
     });
+
+    const moveServiceToTop = (options, serviceId) => {
+        const serviceIndex = options.findIndex(service => service.id === serviceId);
+        if (serviceIndex > -1) {
+            const [service] = options.splice(serviceIndex, 1);
+            options.unshift(service);
+        }
+        return options;
+    }
+
 
     const chooseOption = (option) => {
         currentOption.value = option;
