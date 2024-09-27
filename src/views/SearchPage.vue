@@ -97,7 +97,8 @@
         v-if="is_video_shown" 
         close_disabled
         :guide_name="paginatedResults[currentPage][video_index].name"
-        :guide_index="`${video_index + 1} / ${paginatedResults[currentPage].length}`"
+        :guide_index="video_index + 1"
+        :guides_count="paginatedResults[currentPage].length"
         :video_url="current_video_url"
         @close="is_video_shown  = false"
         @ended="showNextVideo"/>

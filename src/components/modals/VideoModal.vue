@@ -8,11 +8,7 @@
 
                 <transition>
                     <div v-if="guide_name && isNameShown" class="guide-name">
-                        <p>
-                            <span v-if="guide_index" v-text="guide_index"/>
-                            <br v-if="guide_index">
-                            {{ guide_name }}
-                        </p>
+                        <p v-text="guide_name"/>
                     </div>
                 </transition>
 
@@ -26,13 +22,12 @@
                     @loadedmetadata="setVideoDuration"
                     @ended="emit('ended')"/>
 
-                <div class="video-controls">
-                    <div class="video-timing">
-                        <span>{{ formatTime(currentTime) }} / {{ formatTime(duration) }}</span>
-                    </div>
-
-                    <div class="progress-container">
-                        <div class="progress-bar" :style="{ width: `${progress}%` }"></div>
+                <div class="video-controls" v-if="guide_index && guides_count">
+                    <div 
+                        v-for="(circle, index) in guides_count" 
+                        :key="index" 
+                        :class="['circle', { active: guide_index === index + 1 }]">
+                        <span v-if="guide_index === index + 1" v-text="formatTime(countdown)"/>
                     </div>
                 </div>
             </div>
@@ -50,7 +45,7 @@
     const emit = defineEmits(['close', 'ended']);
     const currentTime = ref(0);
     const duration = ref(0);
-    const progress = ref(0);
+    const countdown = ref(0);
 
     const props = defineProps({
         video_url: {
@@ -62,8 +57,10 @@
             default: ''
         },
         guide_index: {
-            type: String,
-            default: ''
+            type: Number,
+        },
+        guides_count: {
+            type: Number
         },
         close_disabled: {
             type: Boolean,
@@ -87,7 +84,7 @@
     const updateProgress = () => {
         if (videoRef.value) {
             currentTime.value = videoRef.value.currentTime;
-            progress.value = (currentTime.value / duration.value) * 100; // Обновление прогресса
+            countdown.value = Math.max(0, Math.floor(duration.value - currentTime.value));
         }
     }
 
@@ -120,13 +117,13 @@
     }
     .video {
         display: block;
-        max-height: 80vh;
+        max-height: 70vh;
         max-width: 100%;
         border-radius: inherit;
         -webkit-appearance: none;
         appearance: none;
         @media screen and (max-width: 480px) {
-            max-height: 80dvh;
+            max-height: 75dvh;
         }
     }
 
@@ -136,8 +133,13 @@
         top: 0;
         left: 0;
         width: 100%;
+        max-height: 70vh;
         height: 100%;
-        background-color: rgba($color: $black, $alpha: 0.25);
+        background-color: rgba($color: $white, $alpha: 0.25);
+        border-radius: inherit;
+        @media screen and (max-width: 480px) {
+            max-height: 75dvh;
+        }
         p {
             font-weight: 500;
             margin: 0;
@@ -151,35 +153,33 @@
     }
 
     .video-controls {
-        position: absolute;
-        width: 95%;
-        left: 50%;
-        bottom: 1rem;
-        transform: translateX(-50%);
+        @include flex-center-vert;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-top: 2rem;
+        @media screen and (max-width: 480px) {
+            margin-top: 1rem;
+        }
+        .circle {
+            @include flex-center;
+            width: 3.5rem;
+            height: 3.5rem;
+            min-width: 3.5rem;
+            border-radius: 50%;
+            background-color: rgba($color: $white, $alpha: 0.25);
+            @media screen and (max-width: 480px) {
+                width: 3rem;
+                height: 3rem;
+                min-width: 3rem;
+                font-size: 0.875rem;
+            }
+            &.active {
+                background-color: $primary;
+                line-height: 1;
+                color: $white;
+            }
+        }
     }
-
-    .video-timing {
-        text-align: center;
-        margin-top: 5px;
-        color: $white;
-        font-size: 0.875rem;
-    }
-
-    .progress-container {
-        width: 100%;
-        height: 0.5rem;
-        background-color: rgba(255, 255, 255, 0.3);
-        border-radius: 0.25rem;
-        overflow: hidden;
-        margin-top: 0.5rem;
-    }
-
-    .progress-bar {
-        height: 100%;
-        background-color: $white;
-        transition: width 0.2s;
-    }
-
     .v-enter-active,
     .v-leave-active {
         transition: opacity 0.5s ease;
