@@ -19,11 +19,6 @@
                 <br>
             </span>
 
-            <button v-if="selected_video" type="button" class="video-save" :class="{ 'loading': is_uploading }" @click="uploadVideo">
-                <div v-if="is_uploading" class="preloader"><span></span></div>
-                {{ $t('upload') }}
-            </button>
-
             <input id="upload-video" type="file" accept="video/*" @change="onFileChange" />
         </div>
 
@@ -55,7 +50,7 @@
 </template>
 
 <script setup>
-    import { ref, computed } from 'vue';
+    import { ref, computed, watch } from 'vue';
     import { useToast } from 'vue-toastification';
     import { useI18n } from 'vue-i18n';
     import axios from 'axios';
@@ -75,11 +70,14 @@
         }
     });
 
-    const emit = defineEmits(['deleted', 'updated']);
+    watch(() => props.video_url, (newVideo) => {
+        if(newVideo) is_changing.value = false;
+    })
+
+    const emit = defineEmits(['deleted', 'upload', 'update']);
 
     const selected_video = ref(null);
     const is_watch_open = ref(false);
-    const is_uploading = ref(false);
     const is_changing = ref(false);
 
     const maxVideoSize = computed(() => props.max_video_duration * 1.5);
@@ -110,36 +108,17 @@
             }
 
             selected_video.value = file;
-            console.log(selected_video.value);
+            handleVideoAction();
         });
 
         videoElement.src = videoURL;
     }
 
-    const uploadVideo = async () => {
-        const fd = new FormData();
-        console.log(selected_video.value);
-        try {
-            let response;
-            is_uploading.value = true;
-            if(!props.video_url || props.video_url === '') {
-                const add_request_headers = { headers: { 'Authorization': `Bearer ${$cookies.get("access_token")}` } };
-                fd.append('file', selected_video.value, selected_video.value.name);
-                response = await axios.post('https://guides-to-go.onrender.com/user_info/add_video', fd, add_request_headers);
-            } else if(props.video_url && is_changing.value) {
-                const update_request_headers = { params: { old_video_url: props.video_url }, headers: { 'Authorization': `Bearer ${$cookies.get("access_token")}` } };
-                fd.append('new_file', selected_video.value, selected_video.value.name);
-                response = await axios.put('https://guides-to-go.onrender.com/user_info/update_video', fd, update_request_headers);
-            }
-            console.log(response);
-            is_uploading.value = false;
-            is_changing.value = false;
-            toast.success(t('message_video_upload_success'));
-            emit('updated');
-        } catch(err) {
-            is_uploading.value = false;
-            is_changing.value = false;
-            toast.error(t('error_default'));
+    const handleVideoAction = async () => {
+        if(!props.video_url || props.video_url === '') {
+            emit('upload', selected_video.value);
+        } else if(props.video_url && is_changing.value) {
+            emit('update', selected_video.value);
         }
     }
 

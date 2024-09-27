@@ -3,15 +3,15 @@
         <div class="guide-profile__content scroll-parent white-scroll"
             v-if="guide_profile && countries.length && languages.length">
             <div class="guide-profile__info">
-                <guide-photo :photo_url="guide_profile.photo_url" />
+                <guide-photo :photo_url="guide_profile.photo_url" @upload="preparePhoto"/>
 
                 <div class="row">
                     <p class="guide-profile__label" v-text="$t('status')" />
                     <guide-status-toggler :approved_status="approved_status" :profile_valid="!v$.$invalid && !v1$.$invalid"
-                        :status="guide_profile.status" />
+                        :status="guide_profile.status"/>
                 </div>
 
-                <button class="calendar-button" @click="openCalendar">
+                <button v-if="guide_profile.status" class="calendar-button" @click="openCalendar">
                     <img src="@/assets/images/icons/calendar.svg" alt="calendar">
                     {{ $t('calendar') }}
                 </button>
@@ -89,7 +89,8 @@
                 <guide-video-upload :video_url="guide_profile.video_url ?? ''"
                     :max_video_duration="guide_profile.max_video_duration"
                     @deleted="async () => guide_profile = await getProfile(router, $t)"
-                    @updated="async () => {await updateUserInfo(); guide_profile = await getProfile(router, $t)}" />
+                    @upload="file => prepareVideo(file, 'upload')"
+                    @update="file => prepareVideo(file, 'update')" />
 
                 <submit-button text="save" icon="check" :loading="response_loading" class="full-column" />
 
@@ -264,21 +265,81 @@
             await axios.post('https://guides-to-go.onrender.com/user_info/', params, request_headers);
             await axios.post('https://guides-to-go.onrender.com/service/update_services', services_params, request_headers);
 
+            let photoUploadPromise = null;
+
+            if (uploading_photo.value) {
+                photoUploadPromise = new Promise((resolve, reject) => {
+                    setTimeout(async () => {
+                        try {
+                            const fd = new FormData();
+                            fd.append('file', uploading_photo.value, uploading_photo.value.name);
+                            const response = await axios.post('https://guides-to-go.onrender.com/user_info/add_photo', fd, request_headers);
+                            resolve(response);
+                        } catch (error) {
+                            reject(error);
+                        }
+                    }, 1000);
+                });
+            }
+
+            let videoUploadPromise = null;
+
+            if (uploading_video.value) {
+                videoUploadPromise = new Promise((resolve, reject) => {
+                    setTimeout(async () => {
+                        try {
+                            const fd = new FormData();
+                            fd.append('file', uploading_video.value, uploading_video.value.name);
+                            const response = await axios.post('https://guides-to-go.onrender.com/user_info/add_video', fd, request_headers);
+                            resolve(response);
+                        } catch (error) {
+                            reject(error);
+                        }
+                    }, 1000);
+                });
+            } else if (updating_video.value) {
+                videoUploadPromise = new Promise((resolve, reject) => {
+                    setTimeout(async () => {
+                        try {
+                            const fd = new FormData();
+                            const request_params = { params: { old_video_url: guide_profile.value.video_url }, headers: { 'Authorization': `Bearer ${$cookies.get("access_token")}` } };
+                            fd.append('new_file', updating_video.value, updating_video.value.name);
+                            const response = await axios.put('https://guides-to-go.onrender.com/user_info/update_video', fd, request_params);
+                            resolve(response);
+                        } catch (error) {
+                            reject(error);
+                        }
+                    }, 1000);
+                });
+            }
+
+            if (photoUploadPromise) {
+                await photoUploadPromise;
+            }
+
+            if (videoUploadPromise) {
+                await videoUploadPromise;
+            }
+
             response_loading.value = false;
+            uploading_video.value = null;
+            updating_video.value = null;
             toast.success(t('message_save_success'));
 
             guide_profile.value = await getProfile(router, t);
             services.value = await getServices('guide', t);
+
         } catch (err) {
             response_loading.value = false;
 
-            switch (err.response.status) {
+            switch (err.response?.status) {
                 default:
                     toast.error(t('error_default'));
                     break;
             }
         }
     }
+
 
     const submitForm = async () => {
         const result = await v$.value.$validate() && await v1$.value.$validate();
@@ -389,6 +450,30 @@
     const closeCalendar = async (isCalendarChanged) => {
         isCalendarModalOpen.value = false;
         if (isCalendarChanged) guide_profile.value = await getProfile(router, t);
+    }
+
+    const uploading_photo = ref(null);
+
+    const preparePhoto = (file) => {
+        uploading_photo.value = file;
+    }
+
+    const uploading_video = ref(null);
+    const updating_video = ref(null);
+
+    const prepareVideo = (file, action)=> {
+        console.log(file);
+        switch (action) {
+            case 'upload':
+                uploading_video.value = file;
+                break;
+            case 'update':
+                updating_video.value = file;
+                break;
+            default:
+                console.error('wrong action prepareVideo');
+                break;
+        }
     }
 
     const logout = () => {
