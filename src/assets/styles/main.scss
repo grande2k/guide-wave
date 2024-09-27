@@ -18,8 +18,9 @@ section.page {
 }
 
 body {
-    width: 100%;
-    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
     background-image: url('../images/paris-background.jpg');
     background-repeat: no-repeat;
     background-position: center;
