@@ -43,7 +43,14 @@
     };
 
     const handlePriceInput = () => {
-        local_service.value.price = +validatePrice(local_service.value.price);
+        const validPrice = validatePrice(local_service.value.price);
+
+        if (validPrice === '') {
+            local_service.value.price = 0;
+        } else {
+            local_service.value.price = validPrice;
+        }
+
         emit('update', { ...local_service.value });
     };
 </script>

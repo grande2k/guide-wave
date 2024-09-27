@@ -40,7 +40,7 @@
                     {{ $t('service') }}
                 </p>
                 
-                <services-select :options="services" :all_selected_services="[]" @choose="handleServiceSelect"/>
+                <services-select tourist :options="services" :all_selected_services="[]" @choose="handleServiceSelect"/>
             </div>
 
             <div class="search__form-field" :class="{ 'active': form_data.country_id && form_data.city_id && form_data.language_code && form_data.service_id }">

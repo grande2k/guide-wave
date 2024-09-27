@@ -153,8 +153,7 @@
     }
 
     .video-controls {
-        @include flex-center-vert;
-        justify-content: space-between;
+        @include flex-center;
         gap: 1rem;
         margin-top: 2rem;
         @media screen and (max-width: 480px) {
@@ -168,10 +167,10 @@
             border-radius: 50%;
             background-color: rgba($color: $white, $alpha: 0.25);
             @media screen and (max-width: 480px) {
-                width: 3rem;
-                height: 3rem;
-                min-width: 3rem;
-                font-size: 0.875rem;
+                width: 4rem;
+                height: 4rem;
+                min-width: 4rem;
+                font-size: 1rem;
             }
             &.active {
                 background-color: $primary;

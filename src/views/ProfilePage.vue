@@ -211,7 +211,7 @@
 
     const servicePriceValidator = helpers.withMessage(
         'price',
-        (value) => value.every(service => service.price)
+        (value) => value.every(service => service.price !== '' && service.price !== null && service.price !== undefined && service.price >= 0)
     );
 
     const rules = computed(() => {
