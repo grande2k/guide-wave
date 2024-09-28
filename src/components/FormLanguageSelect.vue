@@ -201,9 +201,6 @@
             max-height: 200px;
             overflow: auto;
             border-top: 1px solid $black;
-            @media screen and (max-width: 480px) {
-                margin-top: 2rem;
-            }
         }
         &--active {
             box-shadow: 0 2px 4px 0 rgba($color: $black, $alpha: 0.25);

@@ -55,7 +55,7 @@
                         v-for="(price, index) in prices"
                         :key="price.id"
                         :class="{ 'active': price.is_active }"
-                        v-text="`${price.range}$`"
+                        v-text="`${price.title}$`"
                         @click="handleTabClick(index)"/>
                 </div>
             </div>
@@ -175,8 +175,9 @@
 
                     const response = await axios.post('https://guides-to-go.onrender.com/search/price_list', params, request_headers);
 
-                    prices.value = response.data.price_list.map((range, index) => ({
-                        range,
+                    prices.value = response.data.price_list.map((price, index) => ({
+                        title: price.title,
+                        range: price.range,
                         id: index,
                         is_active: false
                     }));
