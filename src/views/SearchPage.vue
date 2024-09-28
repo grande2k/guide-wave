@@ -49,7 +49,7 @@
                     {{ $t('price') }}
                 </p>
             
-                <div class="search__form-tabs">
+                <div class="search__form-tabs" v-if="prices && prices.length">
                     <div
                         class="search__form-tab"
                         v-for="(price, index) in prices"
@@ -105,7 +105,7 @@
 </template>
 
 <script setup>
-    import { ref, onMounted, computed} from 'vue';
+    import { ref, onMounted, computed, watch } from 'vue';
     import { getCountries, getCities, getLanguages, getServices, search } from '@/api';
     import { useVuelidate } from '@vuelidate/core';
     import { required } from '@vuelidate/validators';
@@ -117,6 +117,7 @@
     import SubmitButton from '@/components/SubmitButton.vue';
     import Guide from '@/components/Guide.vue';
     import VideoModal from '@/components/modals/VideoModal.vue';
+    import axios from 'axios';
 
     const { t } = useI18n();
     const is_country_valid = ref(false);
@@ -158,23 +159,34 @@
 
     const v$ = useVuelidate(rules, form_data);
 
-    const prices = ref([
-        {
-            range: '10-20',
-            id: 0,
-            is_active: false,
-        },
-        {
-            range: '20-30',
-            id: 1,
-            is_active: false,
-        },
-        {
-            range: '>30',
-            id: 2,
-            is_active: false,
+    const prices = ref([]);
+
+    watch(() => form_data.value.service_id, async (newId) => {
+        if(newId !== "" && newId !== null && newId !== undefined) {
+            if(!v$.$invalid) {
+                try {
+                    const params = {
+                        country_id: form_data.value.country_id,
+                        city_id: form_data.value.city_id,
+                        language_code: form_data.value.language_code,
+                        service_id: form_data.value.service_id,
+                    };
+                    const request_headers = { headers: { 'Authorization': `Bearer ${$cookies.get("access_token")}` } };
+
+                    const response = await axios.post('https://guides-to-go.onrender.com/search/price_list', params, request_headers);
+
+                    prices.value = response.data.price_list.map((range, index) => ({
+                        range,
+                        id: index,
+                        is_active: false
+                    }));
+                } catch(error) {
+                    console.err(error);
+                    toast.error(t('error_default'));
+                }
+            }
         }
-    ]);
+    });
 
     const video_index = ref(0);
     const is_video_shown  = ref(false);
@@ -348,6 +360,8 @@
                 cursor: pointer;
                 transition: $transition;
                 color: $white;
+                font-weight: bold;
+                font-size: 1.25rem;
                 &.active {
                     background-color: $white;
                     color: $primary;

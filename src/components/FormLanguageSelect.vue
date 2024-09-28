@@ -1,13 +1,17 @@
 <template>
     <div class="form-row" :class="{ 'able_delete': able_delete }">
         <div class="form-select" :class="{ 'form-select--active': isSelectActive, 'error': error }" ref="target">
-            <div class="form-select__top" @click="isSelectActive = !isSelectActive">
+            <div class="form-select__top" @click="toggleSelect">
                 <span class="form-select__current" :class="{ 'placeholder': !currentOption }" v-text="currentOption?.name ?? select_placeholder"/>
             </div>
 
-            <ul class="form-select__options black-scroll">
-                <li v-for="option in filteredOptions" :key="option.lang_code" class="form-select__option" @click="chooseOption(option.lang_code)" v-text="option.name"/>
-            </ul>
+            <teleport to="body">
+                <ul v-if="isSelectActive" class="form-select__options black-scroll" :style="dropdownPosition">
+                    <li v-for="option in filteredOptions" :key="option.lang_code" class="form-select__option" @click="chooseOption(option.lang_code)">
+                        {{ option.name }}
+                    </li>
+                </ul>
+            </teleport>
 
             <img src="@/assets/images/icons/arrow-down.svg" class="form-select__arrow" alt="arrow" @click="isSelectActive = !isSelectActive">
         </div>
@@ -28,6 +32,7 @@
     const currentOption = ref(null);
     const target = ref(null);
     const select_placeholder = t('select_language');
+    const dropdownPosition = ref({ top: '0px', left: '0px', width: 'auto' });
 
     onClickOutside(target, () => isSelectActive.value = false);
 
@@ -73,6 +78,23 @@
     const filteredOptions = computed(() => {
         return props.options.filter(option => !props.allSelectedLanguages.includes(option.lang_code));
     });
+
+    const toggleSelect = () => {
+        isSelectActive.value = !isSelectActive.value;
+        if (isSelectActive.value) {
+            updateDropdownPosition();
+        }
+    }
+
+    const updateDropdownPosition = () => {
+        const rect = target.value.getBoundingClientRect();
+
+        dropdownPosition.value = {
+            top: `${rect.bottom + window.scrollY}px`,
+            left: `${rect.left + window.scrollX}px`,
+            width: `${rect.width}px`
+        };
+    }
 
     const chooseOption = (lang_code) => {
         currentOption.value = props.options.find(option => option.lang_code === lang_code);
@@ -169,14 +191,8 @@
             }
         }
         &__options {
-            visibility: hidden;
-            opacity: 0;
-            margin-top: 2.75rem;
             transition: opacity 0.3s ease;
-            position: absolute;
-            left: 0;
-            top: 0.75rem;
-            width: 100%;
+            position: fixed;
             height: auto;
             background-color: $white;
             border-bottom-left-radius: 0.5rem;
@@ -194,8 +210,6 @@
             border-bottom-left-radius: 0 !important;
             border-bottom-right-radius: 0 !important;
             .form-select__options {
-                visibility: visible;
-                opacity: 1;
                 box-shadow: 0 2px 4px 0 rgba($color: $black, $alpha: 0.25);
             }
             .form-select__arrow {

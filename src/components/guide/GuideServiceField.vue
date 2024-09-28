@@ -6,7 +6,7 @@
             :all_selected_services="all_selected_services"
             @choose="handleServiceSelect" />
 
-        <input type="text" class="form-input service-price" :class="{ error: error }" :placeholder="$t('price')"
+        <input type="text" class="form-input service-price" :class="{ error: error }" placeholder="$"
             maxlength="5" v-model="local_service.price" @input="handlePriceInput" />
 
         <button type="button" class="delete-btn" @click="emit('delete')">
