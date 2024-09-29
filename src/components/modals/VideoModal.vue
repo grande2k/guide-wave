@@ -6,21 +6,23 @@
                     <img src="@/assets/images/icons/close.svg" alt="close">
                 </div>
 
-                <transition>
-                    <div v-if="guide_name && isNameShown" class="guide-name">
-                        <p v-text="guide_name"/>
-                    </div>
-                </transition>
+                <div class="video-wrapper">
+                    <transition>
+                        <div v-if="guide_name && isNameShown" class="guide-name">
+                            <p v-text="guide_name"/>
+                        </div>
+                    </transition>
 
-                <video
-                    class="video"
-                    ref="videoRef"
-                    :src="`https://guides-to-go.onrender.com${video_url}`"
-                    autoplay
-                    playsinline
-                    @timeupdate="updateProgress"
-                    @loadedmetadata="setVideoDuration"
-                    @ended="emit('ended')"/>
+                    <video
+                        class="video"
+                        ref="videoRef"
+                        :src="`https://guides-to-go.onrender.com${video_url}`"
+                        autoplay
+                        playsinline
+                        @timeupdate="updateProgress"
+                        @loadedmetadata="setVideoDuration"
+                        @ended="emit('ended')"/>
+                </div>
 
                 <div class="video-controls" v-if="guide_index && guides_count">
                     <div 
@@ -115,6 +117,12 @@
             top: 0;
         }
     }
+    .video-wrapper {
+        position: relative;
+        border-radius: inherit;
+        width: fit-content;
+        margin: 0 auto;
+    }
     .video {
         display: block;
         max-height: 70vh;
@@ -122,6 +130,7 @@
         border-radius: inherit;
         -webkit-appearance: none;
         appearance: none;
+        margin: 0 auto;
         @media screen and (max-width: 480px) {
             max-height: 75dvh;
         }
