@@ -351,6 +351,9 @@
             }
             &-tabs {
                 @include grid(3, 1rem);
+                @media screen and (max-width: 480px) {
+                    grid-gap: 0.5rem;
+                }
             }
             &-tab {
                 text-align: center;
@@ -369,6 +372,7 @@
                 }
                 @media screen and (max-width: 480px) {
                     padding: 0.75rem;
+                    font-size: 1.125rem;
                 }
             }
             &-submit {
