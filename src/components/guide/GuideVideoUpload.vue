@@ -87,7 +87,7 @@
         const maxFileSize = maxVideoSize.value * 1024 * 1024;
 
         if (file.size > maxFileSize) {
-            toast.error(`${t('error_video_size')} ${maxFileSize.value} ${t('mb')}`);
+            toast.error(`${t('error_video_size')} ${maxFileSize} ${t('mb')}`);
             selected_video.value = null;
             event.target.value = '';
             return;

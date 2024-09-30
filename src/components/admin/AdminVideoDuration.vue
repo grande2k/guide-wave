@@ -11,16 +11,18 @@
 </template>
 
 <script setup>
-    import { ref, onMounted } from 'vue';
-    import { getDuration, updateDuration } from '@/api';
+    import { ref, watch } from 'vue';
+    import { updateDuration } from '@/api';
+    import { useAppStore } from '@/stores/app';
     import { useI18n } from 'vue-i18n';
 
     const { t } = useI18n();
-    const video_duration = ref(null);
+    const appStore = useAppStore();
+    const video_duration = ref(appStore.max_video_duration);
 
-    onMounted(async () => {
-        video_duration.value = await getDuration(t);
-    });
+    watch(() => appStore.max_video_duration, (newDuration) => {
+        if(newDuration) video_duration.value = newDuration;
+    }, { immediate: true });
 
     const handleDurationUpdate = async (action) => {
         if (video_duration.value > 1) {
@@ -33,6 +35,7 @@
 
         const params = { time_video: video_duration.value };
         await updateDuration(params, t);
+        appStore.setMaxVideoDuration(video_duration.value);
     }
 </script>
 

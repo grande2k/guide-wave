@@ -40,13 +40,16 @@
 <script setup>
     import { ref, watch } from 'vue';
     import { onClickOutside } from '@vueuse/core';
+    import { useAppStore } from '@/stores/app';
 
+    const appStore = useAppStore();
     const target = ref(null);
     const videoRef = ref(null);
     const isNameShown = ref(false);
     const emit = defineEmits(['close', 'ended']);
     const currentTime = ref(0);
     const duration = ref(0);
+    const max_duration = ref(appStore.max_video_duration);
     const countdown = ref(0);
 
     const props = defineProps({
@@ -79,22 +82,34 @@
         }
     }, { immediate: true });
 
+    watch(() => appStore.max_video_duration, (newDuration) => {
+        if(newDuration) max_duration.value = newDuration;
+    });
+
     onClickOutside(target, () => {
         if (!props.close_disabled) emit('close');
     });
 
     const updateProgress = () => {
-        if (videoRef.value) {
+        if (videoRef.value && max_duration.value) {
             currentTime.value = videoRef.value.currentTime;
-            countdown.value = Math.max(0, Math.floor(duration.value - currentTime.value));
+            const effectiveDuration = Math.min(duration.value, max_duration.value);
+            countdown.value = Math.max(0, Math.floor(effectiveDuration - currentTime.value));
+
+            if (Math.round(currentTime.value) >= max_duration.value) {
+                emit('ended');
+            }
         }
     }
 
     const setVideoDuration = () => {
-        if (videoRef.value) {
+        if (videoRef.value && max_duration.value) {
             duration.value = videoRef.value.duration;
+            const effectiveDuration = Math.min(duration.value, max_duration.value);
+            countdown.value = Math.floor(effectiveDuration);
         }
     }
+
 
     const formatTime = (time) => {
         const minutes = Math.floor(time / 60);

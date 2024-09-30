@@ -5,6 +5,7 @@ export const useAppStore = defineStore("appStore", {
         admin_email: null,
         countries: null,
         interface_languages: null,
+        max_video_duration: null,
     }),
     actions: {
         setAdminEmail(data) {
@@ -15,6 +16,9 @@ export const useAppStore = defineStore("appStore", {
         },
         setInterfaceLanguages(data) {
             this.interface_languages = data;
+        },
+        setMaxVideoDuration(data) {
+            this.max_video_duration = data;
         },
     },
 });

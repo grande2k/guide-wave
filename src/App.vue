@@ -17,7 +17,7 @@
 
 <script setup>
     import { onMounted } from 'vue';
-    import { getAdminMail, getCountries, getInterfaceLanguages } from '@/api';
+    import { getAdminMail, getCountries, getInterfaceLanguages, getDuration } from '@/api';
     import { useAppStore } from '@/stores/app';
     import { useI18n } from 'vue-i18n';
 
@@ -28,6 +28,7 @@
         appStore.setAdminEmail(await getAdminMail(t));
         appStore.setCountries(await getCountries(t));
         appStore.setInterfaceLanguages(await getInterfaceLanguages(t));
+        appStore.setMaxVideoDuration(await getDuration(t));
     });
 </script>
 
