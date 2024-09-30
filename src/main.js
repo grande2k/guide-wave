@@ -20,7 +20,7 @@ const toastOptions = {
 };
 
 const createI18nInstance = async () => {
-    const defaultLocale = localStorage.getItem('language') || 'en';
+    const defaultLocale = localStorage.getItem("language") || navigator.userLanguage || navigator.language || "en";
 
     const translations = {
         [defaultLocale]: await getInterface(defaultLocale)

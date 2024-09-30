@@ -71,7 +71,8 @@
         if(newLangs) {
             languages.value = newLangs;
             if(!localStorage.getItem('language') && !currentLanguage.value) {
-                currentLanguage.value = languages.value.find(lang => lang.lang_code === 'en');
+                const userLang = navigator.userLanguage || navigator.language || "en";
+                currentLanguage.value = languages.value.find(lang => lang.lang_code === userLang);
                 localStorage.setItem('language', currentLanguage.value.lang_code);
             } else {
                 currentLanguage.value = languages.value.find(lang => lang.is_current_language === true);
