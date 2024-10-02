@@ -21,7 +21,7 @@ body {
     position: fixed;
     top: 0;
     left: 0;
-    background-image: url('../images/paris-background.jpg');
+    background-image: url('../images/background.jpg');
     background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
@@ -32,7 +32,7 @@ body {
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba($color: $black, $alpha: 0.25);
+        background-color: rgba($color: $black, $alpha: 0.325);
         z-index: 1;
     }
 }

@@ -25,6 +25,9 @@
                     <router-link to="/admin/locations">Страны и города</router-link>
                 </li>
                 <li class="admin__link">
+                    <router-link to="/admin/backgrounds">Фоновые изображения</router-link>
+                </li>
+                <li class="admin__link">
                     <router-link to="/admin/languages">Языки (критерий)</router-link>
                 </li>
                 <li class="admin__link">
@@ -57,7 +60,7 @@
 
     const hasRouteInside = computed(() => {
         return (
-            route.name === "admin-guides" || route.name === "admin-services" || route.name === "admin-languages" || route.name === "admin-interfaces" || route.name === "admin-translations"  || route.name === "admin-locations"
+            route.name === "admin-guides" || route.name === "admin-services" || route.name === "admin-languages" || route.name === "admin-interfaces" || route.name === "admin-translations"  || route.name === "admin-locations" || route.name === "admin-backgrounds"
         );
     });
 

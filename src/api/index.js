@@ -4,6 +4,8 @@ export * from './auth/getRecoveryQuestions';
 export * from './auth/sendEmailForRecovery';
 export * from './auth/recoverPassword';
 
+export * from './getUserLocation';
+export * from './getBackgroundPhoto';
 export * from './getCountries';
 export * from './getCities';
 export * from './getLanguages';
@@ -27,6 +29,11 @@ export * from './admin/updateDuration';
 
 export * from './admin/guides/getGuides';
 export * from './admin/guides/approveGuide';
+
+export * from './admin/backgrounds/getAdminBackgrounds';
+export * from './admin/backgrounds/deleteBackground';
+export * from './admin/backgrounds/addBackground';
+export * from './admin/backgrounds/updateBackground';
 
 export * from './admin/locations/getLocations';
 export * from './admin/locations/deleteCountry';

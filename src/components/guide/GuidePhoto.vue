@@ -47,11 +47,6 @@
 
     const uploadImage = async () => {
         emit('upload', selected_image.value);
-        // const fd = new FormData();
-        // fd.append('file', selected_image.value, selected_image.value.name);
-        // console.log(selected_image.value);
-        // const request_headers = { headers: { 'Authorization': `Bearer ${$cookies.get("access_token")}` } };
-        // const response = await axios.post('https://guides-to-go.onrender.com/user_info/add_photo', fd, request_headers);
     }
 </script>
 

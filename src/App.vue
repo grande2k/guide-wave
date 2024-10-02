@@ -17,7 +17,7 @@
 
 <script setup>
     import { onMounted } from 'vue';
-    import { getAdminMail, getCountries, getInterfaceLanguages, getDuration } from '@/api';
+    import { getUserLocation, getBackgroundPhoto, getAdminMail, getCountries, getInterfaceLanguages, getDuration } from '@/api';
     import { useAppStore } from '@/stores/app';
     import { useI18n } from 'vue-i18n';
 
@@ -25,6 +25,13 @@
     const { t } = useI18n();
 
     onMounted(async () => {
+        const user_location = await getUserLocation(t);
+        const user_country_code = user_location?.countryCode.toLowerCase();
+        if(user_country_code) {
+            const photo_url = await getBackgroundPhoto(user_country_code, t);
+            if(photo_url) document.body.style.backgroundImage = `url('https://guides-to-go.onrender.com${photo_url}')`;
+        }
+        
         appStore.setAdminEmail(await getAdminMail(t));
         appStore.setCountries(await getCountries(t));
         appStore.setInterfaceLanguages(await getInterfaceLanguages(t));

@@ -79,6 +79,12 @@ const routes = [
         component: () => import("@/components/admin/AdminTranslations.vue"),
         meta: { requiresAuth: true, role: '2' },
       },
+      {
+        path: "backgrounds",
+        name: "admin-backgrounds",
+        component: () => import("@/components/admin/AdminBackgrounds.vue"),
+        meta: { requiresAuth: true, role: '2' },
+      },
     ]
   },
 ];
