@@ -57,7 +57,7 @@
                     <p class="form-label" v-text="$t('language')" />
 
                     <div v-if="guide_profile.languages.length" class="guide-profile__languages">
-                        <form-language-select v-for="(language, index) in guide_profile.languages" :key="index"
+                        <guide-language-field v-for="(language, index) in guide_profile.languages" :key="index"
                             :options="languages" :all-selected-languages="guide_profile.languages" :selected="language"
                             :error="language === '' && v$.languages.$errors.length ? true : false" able_delete
                             @choose="(lang) => handleLanguageSelect(lang, index)" @delete="handleLanguageDelete(index)" />
@@ -143,7 +143,7 @@
     import { getCountries, getCities, getLanguages, getProfile, getServices } from '@/api';
     import axios from 'axios';
     import AutocompleteField from '@/components/AutocompleteField.vue';
-    import FormLanguageSelect from '@/components/FormLanguageSelect.vue';
+    import GuideLanguageField from '@/components/guide/GuideLanguageField.vue';
     import GuideServiceField from '@/components/guide/GuideServiceField.vue';
     import GuideStatusToggler from '@/components/guide/GuideStatusToggler.vue';
     import GuidePhoto from '@/components/guide/GuidePhoto.vue';

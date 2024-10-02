@@ -28,13 +28,13 @@
                     {{ $t('language') }}
                 </p>
 
-                <form-language-select
+                <search-language-select
                     :options="languages"
                     :all-selected-languages="[form_data.language]"
-                    @choose="handleLanguageSelect"/>
+                    @choose="handleLanguagesSelect"/>
             </div>
 
-            <div class="search__form-field" :class="{ 'active': form_data.country_id && form_data.city_id && form_data.language_code }">
+            <div class="search__form-field" :class="{ 'active': form_data.country_id && form_data.city_id && (form_data.language_code && form_data.language_code.length) }">
                 <p class="form-label">
                     <span>3</span>
                     {{ $t('service') }}
@@ -43,7 +43,7 @@
                 <services-select tourist :options="services" :all_selected_services="[]" @choose="handleServiceSelect"/>
             </div>
 
-            <div class="search__form-field" :class="{ 'active': form_data.country_id && form_data.city_id && form_data.language_code && form_data.service_id }">
+            <div class="search__form-field" :class="{ 'active': form_data.country_id && form_data.city_id && (form_data.language_code && form_data.language_code.length) && form_data.service_id }">
                 <p class="form-label">
                     <span>4</span>
                     {{ $t('price') }}
@@ -64,7 +64,7 @@
                 text="search"
                 icon="search"
                 class="search__form-submit form-submit"
-                :class="{ 'active': form_data.country_id && form_data.city_id && form_data.language_code && form_data.service_id }"
+                :class="{ 'active': form_data.country_id && form_data.city_id && (form_data.language_code && form_data.language_code.length) && form_data.service_id }"
                 :loading="response_loading"/>
         </form>
 
@@ -111,7 +111,7 @@
     import { required } from '@vuelidate/validators';
     import { useToast } from 'vue-toastification';
     import { useI18n } from 'vue-i18n';
-    import FormLanguageSelect from '@/components/FormLanguageSelect.vue';
+    import SearchLanguageSelect from '@/components/SearchLanguageSelect.vue';
     import AutocompleteField from '@/components/AutocompleteField.vue';
     import ServicesSelect from '@/components/ServicesSelect.vue';
     import SubmitButton from '@/components/SubmitButton.vue';
@@ -272,8 +272,9 @@
         }
     }
 
-    const handleLanguageSelect = (lang) => {
-        if (lang) form_data.value.language_code = lang;
+    const handleLanguagesSelect = (langs) => {
+        if (langs) form_data.value.language_code = langs;
+        console.log(langs);
     }
 
     const handleServiceSelect = (service) => {

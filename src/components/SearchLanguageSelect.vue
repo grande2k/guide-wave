@@ -1,13 +1,19 @@
 <template>
-    <div class="form-row" :class="{ 'able_delete': able_delete }">
-        <div class="form-select" :class="{ 'form-select--active': isSelectActive, 'error': error }" ref="target">
+    <div class="form-row">
+        <div class="form-select" :class="{ 'form-select--active': isSelectActive }" ref="target">
             <div class="form-select__top" @click="toggleSelect">
-                <span class="form-select__current" :class="{ 'placeholder': !currentOption }" v-text="currentOption?.name ?? select_placeholder"/>
+                <span class="form-select__current" :class="{ 'placeholder': !selectedLanguages.length }">
+                    <span v-if="selectedLanguages.length" v-text="selectedLanguages.map(option => option.name).join(', ')" />
+                    <span v-else v-text="select_placeholder" />
+                </span>
             </div>
 
             <teleport to="body">
-                <ul v-if="isSelectActive" class="form-select__options black-scroll" :style="dropdownPosition">
-                    <li v-for="option in filteredOptions" :key="option.lang_code" class="form-select__option" @click="chooseOption(option.lang_code)">
+                <ul v-if="isSelectActive" class="form-select__options black-scroll" :style="dropdownPosition" ref="dropdown">
+                    <li v-for="option in filteredOptions" :key="option.lang_code" class="form-select__option" :class="{ active: isSelected(option.lang_code) }" @click="toggleLanguage(option.lang_code)">
+                        <span class="checkbox">
+                            <img v-if="isSelected(option.lang_code)" src="@/assets/images/icons/check.svg" alt="check">
+                        </span>
                         {{ option.name }}
                     </li>
                 </ul>
@@ -15,28 +21,28 @@
 
             <img src="@/assets/images/icons/arrow-down.svg" class="form-select__arrow" alt="arrow" @click="isSelectActive = !isSelectActive">
         </div>
-
-        <button v-if="able_delete" type="button" class="delete-btn" @click="emit('delete')">
-            <img src="@/assets/images/icons/delete.svg" alt="delete">
-        </button>
     </div>
 </template>
 
 <script setup>
-    import { ref, watch, computed } from 'vue';
+    import { ref, computed } from 'vue';
     import { onClickOutside } from '@vueuse/core';
     import { useI18n } from 'vue-i18n';
 
     const { t } = useI18n();
     const isSelectActive = ref(false);
-    const currentOption = ref(null);
+    const selectedLanguages = ref([]);
     const target = ref(null);
+    const dropdown = ref(null);
     const select_placeholder = t('select_language');
     const dropdownPosition = ref({ top: '0px', left: '0px', width: 'auto' });
 
-    onClickOutside(target, () => isSelectActive.value = false);
+    onClickOutside(target, (event) => {
+        if (dropdown.value && dropdown.value.contains(event.target)) return;
+        isSelectActive.value = false;
+    });
 
-    const emit = defineEmits(['choose', 'delete']);
+    const emit = defineEmits(['choose']);
 
     const props = defineProps({
         options: {
@@ -47,34 +53,8 @@
         allSelectedLanguages: {
             type: Array,
             required: true,
-        },
-        able_delete: {
-            type: Boolean,
-            default: false
-        },
-        error: {
-            type: Boolean,
-            default: false
-        },
-        selected: {
-            type: String,
         }
     });
-
-    watch(() => props.options, (newVal) => {
-        if(newVal) {
-            props.options.sort((a, b) => a.name.localeCompare(b.name));
-            const selectedOption = props.options.find(option => option.lang_code === props.selected);
-            if(selectedOption) currentOption.value = selectedOption;
-        }
-    }, { immediate: true });
-
-    watch(() => props.selected, (newVal) => {
-        if (newVal) {
-            const selectedOption = props.options.find(option => option.lang_code === props.selected);
-            if (selectedOption) currentOption.value = selectedOption;
-        }
-    }, { deep: true });
 
     const filteredOptions = computed(() => {
         return props.options.filter(option => !props.allSelectedLanguages.includes(option.lang_code));
@@ -89,7 +69,6 @@
 
     const updateDropdownPosition = () => {
         const rect = target.value.getBoundingClientRect();
-
         dropdownPosition.value = {
             top: `${rect.bottom + window.scrollY}px`,
             left: `${rect.left + window.scrollX}px`,
@@ -97,10 +76,21 @@
         };
     }
 
-    const chooseOption = (lang_code) => {
-        currentOption.value = props.options.find(option => option.lang_code === lang_code);
-        emit('choose', currentOption.value.lang_code);
-        isSelectActive.value = false;
+    const isSelected = (lang_code) => {
+        return selectedLanguages.value.some(option => option.lang_code === lang_code);
+    }
+
+    const toggleLanguage = (lang_code) => {
+        const index = selectedLanguages.value.findIndex(option => option.lang_code === lang_code);
+
+        if (index === -1) {
+            const selectedOption = props.options.find(option => option.lang_code === lang_code);
+            selectedLanguages.value.push(selectedOption);
+        } else {
+            selectedLanguages.value.splice(index, 1);
+        }
+
+        emit('choose', selectedLanguages.value.map(option => option.lang_code));
     }
 </script>
 
@@ -170,6 +160,7 @@
             color: $black;
             font-weight: normal;
             background-color: $white;
+            cursor: pointer;
         }
         &__current {
             padding: 1rem 0.75rem;
@@ -183,10 +174,28 @@
             }
         }
         &__option {
+            @include flex-center-vert;
             padding: 1rem 0.75rem;
+            cursor: pointer;
             @media screen and (max-width: 480px) {
                 padding: 0.75rem 0.5rem;
                 font-size: 0.875rem;
+            }
+            .checkbox {
+                @include flex-center;
+                width: 1.25rem;
+                height: 1.25rem;
+                border-radius: 1rem;
+                background-color: #c5c5c5;
+                margin-right: 0.5rem;
+                img {
+                    width: 0.75rem;
+                }
+            }
+            &.active {
+                .checkbox {
+                    background-color: $primary;
+                }
             }
             &:hover {
                 background-color: rgba($color: $primary, $alpha: 0.125);
