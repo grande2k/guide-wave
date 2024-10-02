@@ -107,6 +107,7 @@
     });
 
     watch(() => props.items, (newItems) => {
+        if(newItems) props.items.sort((a, b) => a.name.localeCompare(b.name));
         if (newItems && props.value !== '') {
             const val = props.items.find(item => item.id === props.value);
             if(val) query.value = val.name;

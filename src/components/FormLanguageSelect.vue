@@ -63,6 +63,7 @@
 
     watch(() => props.options, (newVal) => {
         if(newVal) {
+            props.options.sort((a, b) => a.name.localeCompare(b.name));
             const selectedOption = props.options.find(option => option.lang_code === props.selected);
             if(selectedOption) currentOption.value = selectedOption;
         }
