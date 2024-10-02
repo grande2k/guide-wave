@@ -9,7 +9,7 @@
             <img v-if="previewImage" :src="previewImage" alt="Photo Preview" />
         </div>
 
-        <input type="file" accept="image/*" id="photo" @change="onFileChange">
+        <input type="file" :accept="only_jpg ? 'image/jpeg' : 'image/*'" id="photo" @change="onFileChange">
     </div>
 </template>
 
@@ -20,6 +20,10 @@
         photo_url: {
             type: String,
             default: ''
+        },
+        only_jpg: {
+            type: Boolean,
+            default: false
         }
     });
 

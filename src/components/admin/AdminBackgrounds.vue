@@ -28,21 +28,32 @@
         @delete="deleteItem"
         @close="closeModal" />
 
-    <create-modal v-if="is_create_modal_open" type="backgrounds" title="Добавить новый фон" @submitted="getBackgrounds"
+    <create-modal
+        v-if="is_create_modal_open"
+        type="backgrounds"
+        title="Добавить новый фон"
+        @submitted="getBackgrounds"
         @close="closeModal" />
 
-    <edit-modal v-if="is_edit_modal_open" type="backgrounds"
-        :title="`Редактировать ${selectedItem.name} фон`" :initial-data="selectedItem" @submitted="getBackgrounds" @close="closeModal" />
+    <edit-modal
+        v-if="is_edit_modal_open"
+        type="backgrounds"
+        title="Редактировать фон"
+        :initial-data="selectedItem"
+        @submitted="getBackgrounds"
+        @close="closeModal" />
 </template>
 
 <script setup>
     import { ref, onMounted } from 'vue';
+    import { useToast } from 'vue-toastification';
     import { getAdminBackgrounds, deleteBackground } from '@/api';
     import EditOrDeleteModal from '@/components/modals/admin/EditOrDeleteModal.vue';
     import CreateModal from '@/components/modals/admin/CreateModal.vue';
     import EditModal from '@/components/modals/admin/EditModal.vue';
 
     const backgrounds = ref([]);
+    const toast = useToast();
     const is_dialog_modal_open = ref(false);
     const is_create_modal_open = ref(false);
     const is_edit_modal_open = ref(false);
@@ -66,14 +77,19 @@
     }
 
     const deleteItem = async () => {
-        const params = {
-            photo_url: selectedItem.value.photo_url,
-            country_code: selectedItem.value.country_code
-        };
+        if(selectedItem.value.country_code === 'default') {
+            toast.error('Нельзя удалить');
+            closeModal();
+        } else {
+            const params = {
+                photo_url: selectedItem.value.photo_url,
+                country_code: selectedItem.value.country_code
+            };
 
-        await deleteBackground(params);
-        await getBackgrounds();
-        closeModal();
+            await deleteBackground(params);
+            await getBackgrounds();
+            closeModal();
+        }
     }
 
     const editItem = () => {

@@ -21,7 +21,7 @@
                         </div>
                     </div>
 
-                    <div v-else-if="type === 'countries' || type === 'backgrounds'">
+                    <div v-else-if="type === 'countries' || (type === 'backgrounds' && initialData?.country_code !== 'default')">
                         <div class="admin-modal__field">
                             <p>Двухзначный код страны:</p>
                             <input
@@ -34,7 +34,7 @@
                     </div>
 
                     <div v-if="type === 'backgrounds'">
-                        <div class="admin-modal__field">
+                        <div class="admin-modal__field" v-if="initialData?.country_code !== 'default'">
                             <p>Название локации на Русском:</p>
                             <input type="text" v-model="form_data.ru"
                                 placeholder="Введите текст"
@@ -44,7 +44,10 @@
                         <div class="admin-modal__field">
                             <p>Фон:</p>
                             <span v-if="v$.background_image.$errors.length" class="form-error" style="margin-bottom: 0.5rem;">Загрузите изображение</span>
-                            <admin-background-upload :photo_url="form_data.background_image" @upload="file => form_data.background_image = file"/>
+                            <admin-background-upload
+                                :photo_url="initialData?.photo_url"
+                                :only_jpg="initialData?.country_code === 'default'"
+                                @upload="file => form_data.background_image = file"/>
                         </div>
                     </div>
 
