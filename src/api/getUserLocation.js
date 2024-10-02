@@ -5,7 +5,7 @@ const toast = useToast();
 
 export const getUserLocation = async (t) => {
     try {
-        const response = await axios.get('http://ip-api.com/json');
+        const response = await axios.get('https://ipinfo.io');
         return response.data;
     } catch (err) {
         switch (err.response.status) {

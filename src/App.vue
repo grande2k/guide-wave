@@ -26,7 +26,7 @@
 
     onMounted(async () => {
         const user_location = await getUserLocation(t);
-        const user_country_code = user_location?.countryCode.toLowerCase();
+        const user_country_code = user_location?.country.toLowerCase();
         if(user_country_code) {
             const photo_url = await getBackgroundPhoto(user_country_code, t);
             if(photo_url) document.body.style.backgroundImage = `url('https://guides-to-go.onrender.com${photo_url}')`;
