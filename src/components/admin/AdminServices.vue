@@ -66,7 +66,7 @@
     });
 
     const filteredServices = computed(() => {
-        return services.value.filter(service => service.services_name.ru !== "Все услуги");
+        return services.value;
     })
 
     const handleServiceClick = (data) => {
