@@ -161,7 +161,7 @@
         }
         &__top {
             border: 2px solid transparent;
-            border-radius: inherit
+            border-radius: inherit;
         }
         &__option,
         &__current {
@@ -174,6 +174,7 @@
         &__current {
             padding: 1rem 0.75rem;
             border-radius: 0.5rem;
+            max-width: 95%;
             @media screen and (max-width: 480px) {
                 padding: 0.75rem 0.5rem;
             }

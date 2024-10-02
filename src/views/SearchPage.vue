@@ -55,7 +55,7 @@
                         v-for="(price, index) in prices"
                         :key="price.id"
                         :class="{ 'active': price.is_active }"
-                        v-text="`${price.title}$`"
+                        v-text="`${price.title}€`"
                         @click="handleTabClick(index)"/>
                 </div>
             </div>

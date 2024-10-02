@@ -6,7 +6,7 @@
             :all_selected_services="all_selected_services"
             @choose="handleServiceSelect" />
 
-        <input type="text" class="form-input service-price" :class="{ error: error }" placeholder="$"
+        <input type="text" class="form-input service-price" :class="{ error: error }" placeholder="€"
             maxlength="5" v-model="local_service.price" @input="handlePriceInput" />
 
         <button type="button" class="delete-btn" @click="emit('delete')">
@@ -60,6 +60,7 @@
     .guide-profile__service {
         display: flex;
         margin-bottom: 0.5rem;
+        min-height: 3.5rem;
         &.delete {
             .delete-btn {
                 @include flex-center;
@@ -85,7 +86,6 @@
             flex: auto;
             margin-right: 0.5rem;
             text-transform: capitalize;
-            height: 3.5rem;
             margin-bottom: 0 !important;
             @media screen and (max-width: 480px) {
                 height: auto;
@@ -93,7 +93,6 @@
         }
         input.service-price {
             width: 17.5%;
-            height: 3.5rem;
             @media screen and (max-width: 480px) {
                 height: auto;
             }
