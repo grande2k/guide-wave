@@ -28,8 +28,10 @@
                     <div 
                         v-for="(circle, index) in guides_count" 
                         :key="index" 
-                        :class="['circle', { active: guide_index === index + 1 }]">
+                        :class="['circle', { active: guide_index === index + 1 }]"
+                        @click="emit('switch', index)">
                         <span v-if="guide_index === index + 1" v-text="formatTime(countdown)"/>
+                        <span v-else v-text="index + 1"/>
                     </div>
                 </div>
             </div>
@@ -46,7 +48,7 @@
     const target = ref(null);
     const videoRef = ref(null);
     const isNameShown = ref(false);
-    const emit = defineEmits(['close', 'ended']);
+    const emit = defineEmits(['close', 'ended', 'switch']);
     const currentTime = ref(0);
     const duration = ref(0);
     const max_duration = ref(appStore.max_video_duration);
@@ -190,6 +192,10 @@
             min-width: 3.5rem;
             border-radius: 50%;
             background-color: rgba($color: $white, $alpha: 0.25);
+            color: rgba($color: $white, $alpha: 0.5);
+            line-height: 1;
+            cursor: pointer;
+            user-select: none;
             @media screen and (max-width: 480px) {
                 width: 4rem;
                 height: 4rem;
@@ -198,7 +204,6 @@
             }
             &.active {
                 background-color: $primary;
-                line-height: 1;
                 color: $white;
             }
         }

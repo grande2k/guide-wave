@@ -101,7 +101,8 @@
         :guides_count="paginatedResults[currentPage].length"
         :video_url="current_video_url"
         @close="is_video_shown  = false"
-        @ended="showNextVideo"/>
+        @ended="showNextVideo"
+        @switch="switchVideo"/>
 </template>
 
 <script setup>
@@ -209,6 +210,11 @@
         } else {
             is_video_shown.value = false;
         }
+    }
+
+    const switchVideo = (index) => {
+        video_index.value = index;
+        current_video_url.value = paginatedResults.value[currentPage.value][video_index.value].video_url;
     }
 
     const submitForm = async () => {
