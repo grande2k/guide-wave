@@ -29,7 +29,10 @@
         const user_country_code = user_location?.country.toLowerCase();
         if(user_country_code) {
             const photo_url = await getBackgroundPhoto(user_country_code, t);
-            if(photo_url) document.body.style.backgroundImage = `url('https://guides-to-go.onrender.com${photo_url}')`;
+            if(photo_url) {
+                document.body.style.backgroundImage = `url('https://guides-to-go.onrender.com${photo_url}')`;
+                sessionStorage.setItem("background_image", `url('https://guides-to-go.onrender.com${photo_url}')`);
+            }
         }
         
         appStore.setAdminEmail(await getAdminMail(t));

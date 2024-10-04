@@ -113,7 +113,7 @@
 
 <script setup>
     import { ref, onMounted, computed, watch } from 'vue';
-    import { getCountries, getCities, getLanguages, getServices, search } from '@/api';
+    import { getCountries, getCities, getBackgroundPhoto, getLanguages, getServices, search } from '@/api';
     import { useVuelidate } from '@vuelidate/core';
     import { required } from '@vuelidate/validators';
     import { useToast } from 'vue-toastification';
@@ -255,6 +255,12 @@
         if (isValidCountry) {
             form_data.value.country_id = country_found.id;
             is_country_valid.value = true;
+            const photo_url = await getBackgroundPhoto(country_found.country_code, t);
+            if (photo_url) {
+                document.body.style.backgroundImage = `url('https://guides-to-go.onrender.com${photo_url}')`;
+            } else {
+                document.body.style.backgroundImage = sessionStorage.getItem("background_image");
+            }
             cities.value = await getCities(form_data.value.country_id, t);
         } else {
             form_data.value.country_id = null;
