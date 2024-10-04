@@ -71,10 +71,16 @@
         <div v-if="paginatedResults && paginatedResults.length" class="search__results scroll-parent white-scroll">
             <p v-text="$t('search_results')" />
 
+            <button class="search__results-repeat" @click="if(results && results.length > 0) showVideos();">
+                <img src="@/assets/images/icons/refresh.svg" alt="refresh">
+                {{ $t('watch_videos_again') }}
+            </button>
+
             <guide
                 v-for="(guide, index) in paginatedResults[currentPage]"
                 :key="guide.user_id"
                 :guide="guide"
+                :services="services"
                 @callMade="handleCallMade(index)"/>
 
             <button
@@ -396,7 +402,7 @@
                 color: $white;
                 text-align: center;
                 font-size: 1.5rem;
-                margin: 0 0 2rem 0;
+                margin: 0 0 1rem 0;
                 @media screen and (max-width: 480px) {
                     font-size: 1.25rem;
                 }
@@ -419,6 +425,43 @@
                     padding: 0.875rem;
                     font-size: 1rem;
                     height: 3rem;
+                }
+            }
+            &-repeat {
+                @include flex-center;
+                position: relative;
+                text-decoration: none;
+                border-radius: 1rem;
+                background-color: $white;
+                padding: 1rem;
+                width: 100%;
+                font-weight: 500;
+                font-size: 1rem;
+                cursor: pointer;
+                user-select: none;
+                text-decoration: none;
+                border: 2px solid $white;
+                color: $black;
+                max-width: 100%;
+                margin-bottom: 3rem;
+                &::after {
+                    content: "";
+                    position: absolute;
+                    bottom: -1.5rem;
+                    left: 0;
+                    width: 100%;
+                    height: 2px;
+                    background-color: $white;
+                }
+                img {
+                    margin-right: 0.5rem;
+                    width: 1.5rem;
+                    @media screen and (max-width: 480px) {
+                        width: 1.325rem;
+                    }
+                }
+                @media screen and (max-width: 480px) {
+                    font-size: 0.875rem;
                 }
             }
         }

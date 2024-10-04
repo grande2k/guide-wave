@@ -1,12 +1,12 @@
 <template>
     <teleport to="body">
-        <div class="video-modal modal" ref="swiper">
+        <div class="video-modal modal">
             <div class="modal__content" ref="target">
                 <div v-if="!close_disabled" class="modal__close" @click="emit('close')">
                     <img src="@/assets/images/icons/close.svg" alt="close">
                 </div>
 
-                <div class="video-wrapper">
+                <div class="video-wrapper" ref="swiper">
                     <transition>
                         <div v-if="guide_name && isNameShown" class="guide-name">
                             <p v-text="guide_name"/>
@@ -23,16 +23,17 @@
                         @loadedmetadata="setVideoDuration"
                         @ended="emit('ended')"/>
                 </div>
+            </div>
 
-                <div class="video-controls" v-if="guide_index && guides_count">
-                    <div 
-                        v-for="(circle, index) in guides_count" 
-                        :key="index" 
-                        :class="['circle', { active: guide_index === index + 1 }]"
-                        @click="emit('switch', index)">
-                        <span v-if="guide_index === index + 1" v-text="formatTime(countdown)"/>
-                        <span v-else v-text="index + 1"/>
-                    </div>
+            <div class="video-controls" v-if="guide_index && guides_count" ref="videoControlsRef" :class="{ 'flex-start': isScrollable }">
+                <div 
+                    v-for="(circle, index) in guides_count" 
+                    :key="index" 
+                    :class="['circle', { active: guide_index === index + 1 }]"
+                    :ref="el => circleRefs[index] = el"
+                    @click="emit('switch', index)">
+                    <span v-if="guide_index === index + 1" v-text="formatTime(countdown)"/>
+                    <span v-else v-text="index + 1"/>
                 </div>
             </div>
         </div>
@@ -49,6 +50,9 @@
     const videoRef = ref(null);
     const isNameShown = ref(false);
     const swiper = ref(false);
+    const circleRefs = ref([]);
+    const videoControlsRef = ref(null);
+    const isScrollable = ref(false);
     const emit = defineEmits(['close', 'ended', 'switch']);
     const currentTime = ref(0);
     const duration = ref(0);
@@ -76,6 +80,24 @@
         }
     });
 
+    watch(() => props.guide_index, (newIndex) => {
+        if (circleRefs.value[newIndex - 1]) {
+            circleRefs.value[newIndex - 1].scrollIntoView({
+                behavior: 'smooth',
+                inline: 'center',
+                block: 'nearest'
+            });
+        }
+    });
+
+    watch(() => videoControlsRef.value, (newVal) => {
+        if (newVal) {
+            const controlsEl = videoControlsRef.value;
+            const isContentOverflowing = controlsEl.scrollWidth > controlsEl.clientWidth;
+            isScrollable.value = isContentOverflowing;
+        }
+    }, { immediate: true });
+
     watch(() => props.guide_name, (newName) => {
         if(newName) {
             isNameShown.value = true;
@@ -96,7 +118,7 @@
     const swipe_result = ref(null);
 
     const { direction, lengthX } = useSwipe(
-        swiper,
+        target,
         {
             passive: true,
             onSwipe() {
@@ -154,16 +176,18 @@
 
 <style lang="scss" scoped>
     .video-modal {
+        padding: 1rem 0;
         position: fixed;
         overflow: hidden;
     }
     .modal__content {
         max-width: 850px;
-        width: auto;
-        top: 1rem;
+        width: 100%;
+        top: -1rem;
         background-color: transparent;
+        z-index: 2;
         @media screen and (max-width: 480px) {
-            top: 0;
+            top: -2.25rem;
         }
     }
     .video-wrapper {
@@ -211,11 +235,22 @@
     }
 
     .video-controls {
-        @include flex-center;
+        display: flex;
+        padding: 0 0.875rem;
+        position: absolute;
+        z-index: 3;
+        bottom: 4rem;
+        left: 0;
         gap: 1rem;
-        margin-top: 2rem;
+        width: 100%;
+        overflow-x: auto;
+        justify-content: center;
+        &.flex-start {
+            justify-content: flex-start;
+        }
         @media screen and (max-width: 480px) {
-            margin-top: 1rem;
+            bottom: 2rem;
+            // justify-content: flex-start;
         }
         .circle {
             @include flex-center;

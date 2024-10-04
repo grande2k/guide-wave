@@ -44,6 +44,11 @@
         </div>
 
         <calendar v-if="guide.calendar" :dates="guide.calendar"/>
+
+        <div class="guide__services" v-if="filtered_services.length">
+            <p class="guide__label" v-text="`${$t('all_guide_services')}:`"/>
+            <span v-text="filtered_services.map(service => service.name).join(', ')"/>
+        </div>
     </div>
 
     <video-modal 
@@ -55,25 +60,44 @@
 </template>
 
 <script setup>
-    import { ref } from 'vue';
+    import { ref, computed } from 'vue';
     import { addCallsCount } from '@/api';
     import { useI18n } from 'vue-i18n';
     import Calendar from '@/components/Calendar.vue';
     import VideoModal from '@/components/modals/VideoModal.vue';
 
     const { t } = useI18n();
-
     const emit = defineEmits(['callMade']);
 
     const props = defineProps({
         guide: {
             type: Object,
             required: true
+        },
+        services: {
+            type: Array,
+            default: []
         }
     });
 
     const isDisabled = ref(false);
     const is_video_shown = ref(false);
+
+    const filtered_services = computed(() => {
+        return props.guide.services.map(guideService => {
+            const matchedService = props.services.find(service => service.id === guideService.service_id);
+
+            if (matchedService) {
+                return {
+                    name: matchedService.name,
+                    price: guideService.price
+                };
+            }
+
+            return null;
+        }).filter(service => service !== null);
+    });
+
 
     const handleCall = async (source) => {
         if (isDisabled.value) return;
@@ -162,6 +186,25 @@
             @media screen and (max-width: 480px) {
                 grid-template-columns: 1fr;
                 grid-gap: 0.75rem;
+            }
+        }
+        &__label {
+            color: $white;
+            font-weight: bold;
+            font-size: 1rem;
+            margin: 1.5rem 0 0.5rem 0;
+            @media screen and (max-width: 480px) {
+                margin-top: 0.75rem;
+            }
+        }
+        &__services {
+            span {
+                color: $white;
+                line-height: 1.325;
+                @media screen and (max-width: 480px) {
+                    margin-top: 0.75rem;
+                    font-size: 0.875rem;
+                }
             }
         }
         &__btn {
