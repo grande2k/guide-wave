@@ -41,7 +41,7 @@
 </template>
 
 <script setup>
-    import { ref, watch } from 'vue';
+    import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
     import { onClickOutside, useSwipe } from '@vueuse/core';
     import { useAppStore } from '@/stores/app';
 
@@ -78,6 +78,18 @@
             type: Boolean,
             default: false
         }
+    });
+
+    const preventSwipeNavigation = (event) => {
+        if (event.type === 'touchmove') event.preventDefault();
+    }
+
+    onMounted(() => {
+        window.addEventListener('touchmove', preventSwipeNavigation, { passive: false });
+    });
+
+    onBeforeUnmount(() => {
+        window.removeEventListener('touchmove', preventSwipeNavigation);
     });
 
     watch(() => props.guide_index, (newIndex) => {
@@ -132,7 +144,7 @@
             onSwipeEnd() {
                 switch (swipe_result.value) {
                     case "next":
-                        if(props.guide_index < props.guides_count) emit("ended");
+                        emit("ended");
                         break;
                     case "prev":
                         if(props.guide_index > 1) emit("switch", props.guide_index - 2);
