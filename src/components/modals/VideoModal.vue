@@ -1,6 +1,6 @@
 <template>
     <teleport to="body">
-        <div class="video-modal modal">
+        <div class="video-modal modal" ref="swiper">
             <div class="modal__content" ref="target">
                 <div v-if="!close_disabled" class="modal__close" @click="emit('close')">
                     <img src="@/assets/images/icons/close.svg" alt="close">
@@ -41,13 +41,14 @@
 
 <script setup>
     import { ref, watch } from 'vue';
-    import { onClickOutside } from '@vueuse/core';
+    import { onClickOutside, useSwipe } from '@vueuse/core';
     import { useAppStore } from '@/stores/app';
 
     const appStore = useAppStore();
     const target = ref(null);
     const videoRef = ref(null);
     const isNameShown = ref(false);
+    const swiper = ref(false);
     const emit = defineEmits(['close', 'ended', 'switch']);
     const currentTime = ref(0);
     const duration = ref(0);
@@ -91,6 +92,37 @@
     onClickOutside(target, () => {
         if (!props.close_disabled) emit('close');
     });
+
+    const swipe_result = ref(null);
+
+    const { direction, lengthX } = useSwipe(
+        swiper,
+        {
+            passive: true,
+            onSwipe() {
+                const screenWidth = window.innerWidth;
+                if( direction.value === "left" && lengthX.value > (screenWidth / 3)  ) {
+                    swipe_result.value = "next";
+                } else if ( direction.value === "right" && Math.abs(lengthX.value) > (screenWidth / 3)) {
+                    swipe_result.value = "prev";
+                }
+            },
+            onSwipeEnd() {
+                switch (swipe_result.value) {
+                    case "next":
+                        if(props.guide_index < props.guides_count) emit("ended");
+                        break;
+                    case "prev":
+                        if(props.guide_index > 1) emit("switch", props.guide_index - 2);
+                        break;
+                    default:
+                        break;
+                };
+
+                swipe_result.value = null;
+            },
+        },
+    )
 
     const updateProgress = () => {
         if (videoRef.value && max_duration.value) {
