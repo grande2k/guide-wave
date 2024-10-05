@@ -6,14 +6,12 @@
                     v-text="currentOption?.name ?? select_placeholder" />
             </div>
 
-            <teleport to="body">
-                <ul v-if="isSelectActive" class="form-select__options black-scroll" :style="dropdownPosition">
-                    <li v-for="option in filteredOptions" :key="option.lang_code" class="form-select__option"
-                        @click="chooseOption(option.lang_code)">
-                        {{ option.name }}
-                    </li>
-                </ul>
-            </teleport>
+            <ul v-if="isSelectActive" class="form-select__options black-scroll">
+                <li v-for="option in filteredOptions" :key="option.lang_code" class="form-select__option"
+                    @click="chooseOption(option.lang_code)">
+                    {{ option.name }}
+                </li>
+            </ul>
 
             <img src="@/assets/images/icons/arrow-down.svg" class="form-select__arrow" alt="arrow"
                 @click="isSelectActive = !isSelectActive">
@@ -35,7 +33,6 @@
     const currentOption = ref(null);
     const target = ref(null);
     const select_placeholder = t('select_language');
-    const dropdownPosition = ref({ top: '0px', left: '0px', width: 'auto' });
 
     onClickOutside(target, () => isSelectActive.value = false);
 
@@ -85,19 +82,6 @@
 
     const toggleSelect = () => {
         isSelectActive.value = !isSelectActive.value;
-        if (isSelectActive.value) {
-            updateDropdownPosition();
-        }
-    }
-
-    const updateDropdownPosition = () => {
-        const rect = target.value.getBoundingClientRect();
-
-        dropdownPosition.value = {
-            top: `${rect.bottom + window.scrollY}px`,
-            left: `${rect.left + window.scrollX}px`,
-            width: `${rect.width}px`
-        };
     }
 
     const chooseOption = (lang_code) => {

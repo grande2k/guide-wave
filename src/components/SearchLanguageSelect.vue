@@ -8,16 +8,14 @@
                 </span>
             </div>
 
-            <teleport to="body">
-                <ul v-if="isSelectActive" class="form-select__options black-scroll" :style="dropdownPosition" ref="dropdown">
-                    <li v-for="option in filteredOptions" :key="option.lang_code" class="form-select__option" :class="{ active: isSelected(option.lang_code) }" @click="toggleLanguage(option.lang_code)">
-                        <span class="checkbox">
-                            <img v-if="isSelected(option.lang_code)" src="@/assets/images/icons/check.svg" alt="check">
-                        </span>
-                        {{ option.name }}
-                    </li>
-                </ul>
-            </teleport>
+            <ul v-if="isSelectActive" class="form-select__options black-scroll" ref="dropdown">
+                <li v-for="option in filteredOptions" :key="option.lang_code" class="form-select__option" :class="{ active: isSelected(option.lang_code) }" @click="toggleLanguage(option.lang_code)">
+                    <span class="checkbox">
+                        <img v-if="isSelected(option.lang_code)" src="@/assets/images/icons/check.svg" alt="check">
+                    </span>
+                    {{ option.name }}
+                </li>
+            </ul>
 
             <img src="@/assets/images/icons/arrow-down.svg" class="form-select__arrow" alt="arrow" @click="isSelectActive = !isSelectActive">
         </div>
@@ -35,7 +33,6 @@
     const target = ref(null);
     const dropdown = ref(null);
     const select_placeholder = t('select_language');
-    const dropdownPosition = ref({ top: '0px', left: '0px', width: 'auto' });
 
     onClickOutside(target, (event) => {
         if (dropdown.value && dropdown.value.contains(event.target)) return;
@@ -62,18 +59,6 @@
 
     const toggleSelect = () => {
         isSelectActive.value = !isSelectActive.value;
-        if (isSelectActive.value) {
-            updateDropdownPosition();
-        }
-    }
-
-    const updateDropdownPosition = () => {
-        const rect = target.value.getBoundingClientRect();
-        dropdownPosition.value = {
-            top: `${rect.bottom + window.scrollY}px`,
-            left: `${rect.left + window.scrollX}px`,
-            width: `${rect.width}px`
-        };
     }
 
     const isSelected = (lang_code) => {
@@ -202,24 +187,28 @@
             }
         }
         &__options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            box-shadow: -2px 4px 8px rgba($color: $black, $alpha: 0.5);
             transition: opacity 0.3s ease;
-            position: fixed;
             height: auto;
             background-color: $white;
             border-bottom-left-radius: 0.5rem;
             border-bottom-right-radius: 0.5rem;
-            z-index: 3;
             max-height: 200px;
             overflow: auto;
             border-top: 1px solid $black;
+            @media screen and (max-width: 480px) {
+                max-height: 170px;
+            }
         }
         &--active {
             box-shadow: 0 2px 4px 0 rgba($color: $black, $alpha: 0.25);
             border-bottom-left-radius: 0 !important;
             border-bottom-right-radius: 0 !important;
-            .form-select__options {
-                box-shadow: 0 2px 4px 0 rgba($color: $black, $alpha: 0.25);
-            }
             .form-select__arrow {
                 transform: rotate(180deg);
             }

@@ -15,6 +15,7 @@
                         @select="handleCountrySelect"/>
 
                     <autocomplete-field
+                        cities
                         :items="cities"
                         :placeholder="$t('city')"
                         :disabled="!cities || !cities.length || !is_country_valid"
@@ -22,7 +23,7 @@
                 </div>
             </div>
 
-            <div class="search__form-field" :class="{ 'active': form_data.country_id && form_data.city_id }">
+            <div class="search__form-field" :class="{ 'active': form_data.country_id && form_data.cities }">
                 <p class="form-label">
                     <span>2</span>
                     {{ $t('language') }}
@@ -34,16 +35,20 @@
                     @choose="handleLanguagesSelect"/>
             </div>
 
-            <div class="search__form-field" :class="{ 'active': form_data.country_id && form_data.city_id && (form_data.language_code && form_data.language_code.length) }">
+            <div class="search__form-field" :class="{ 'active': form_data.country_id && form_data.cities && (form_data.language_code && form_data.language_code.length) }">
                 <p class="form-label">
                     <span>3</span>
                     {{ $t('service') }}
                 </p>
                 
-                <services-select tourist :options="services" :all_selected_services="[]" @choose="handleServiceSelect"/>
+                <services-select
+                    fixed_position
+                    tourist
+                    :options="services"
+                    :all_selected_services="[]" @choose="handleServiceSelect"/>
             </div>
 
-            <div class="search__form-field" :class="{ 'active': form_data.country_id && form_data.city_id && (form_data.language_code && form_data.language_code.length) && form_data.service_id }">
+            <div class="search__form-field" :class="{ 'active': form_data.country_id && form_data.cities && (form_data.language_code && form_data.language_code.length) && form_data.service_id }">
                 <p class="form-label">
                     <span>4</span>
                     {{ $t('price') }}
@@ -64,7 +69,7 @@
                 text="search"
                 icon="search"
                 class="search__form-submit form-submit"
-                :class="{ 'active': form_data.country_id && form_data.city_id && (form_data.language_code && form_data.language_code.length) && form_data.service_id }"
+                :class="{ 'active': form_data.country_id && form_data.cities && (form_data.language_code && form_data.language_code.length) && form_data.service_id }"
                 :loading="response_loading"/>
         </form>
 
@@ -81,6 +86,7 @@
                 :key="guide.user_id"
                 :guide="guide"
                 :services="services"
+                :cities="cities"
                 @callMade="handleCallMade(index)"/>
 
             <button
@@ -136,7 +142,7 @@
 
     const form_data = ref({
         country_id: null,
-        city_id: null,
+        cities: null,
         service_id: null,
         language_code: null,
         price: [],
@@ -158,7 +164,7 @@
     const rules = computed(() => {
         return {
             country_id: { required },
-            city_id: { required},
+            cities: { required},
             service_id: { required },
             language_code: { required }
         }
@@ -174,7 +180,7 @@
                 try {
                     const params = {
                         country_id: form_data.value.country_id,
-                        city_id: form_data.value.city_id,
+                        cities: form_data.value.cities,
                         language_code: form_data.value.language_code,
                         service_id: form_data.value.service_id,
                     };
@@ -264,7 +270,7 @@
             cities.value = await getCities(form_data.value.country_id, t);
         } else {
             form_data.value.country_id = null;
-            form_data.value.city_id = null;
+            form_data.value.cities = null;
             is_country_valid.value = false;
             cities.value = [];
         }
@@ -284,9 +290,9 @@
         if (city_found) isValidCity = cities.value.some(item => item.name.toLowerCase() === city_found.name.toLowerCase());
 
         if (isValidCity) {
-            form_data.value.city_id = city_found.id;
+            form_data.value.cities = [city_found.id];
         } else {
-            form_data.value.city_id = null;
+            form_data.value.cities = null;
         }
     }
 

@@ -40,6 +40,10 @@
             type: Boolean,
             default: false
         },
+        cities: {
+            type: Boolean,
+            default: false
+        },
         value: {
             type: Number,
             default: null
@@ -64,10 +68,11 @@
             filteredItems.value = props.items.filter(item =>
                 item.name.toLowerCase().startsWith(query.value.toLowerCase())
             );
-            isDropdownVisible.value = true;
         } else {
             filteredItems.value = props.items;
         }
+
+        isDropdownVisible.value = true;
     }
 
     const onFocus = () => {
@@ -107,10 +112,21 @@
     });
 
     watch(() => props.items, (newItems) => {
-        if(newItems) props.items.sort((a, b) => a.name.localeCompare(b.name));
+        if (newItems) {
+            props.items.sort((a, b) => a.name.localeCompare(b.name));
+            
+            if(props.cities) {
+                const all_cities_index = props.items.findIndex(item => item.id === 131);
+                if (all_cities_index !== -1) {
+                    const all_cities = props.items.splice(all_cities_index, 1)[0];
+                    props.items.unshift(all_cities);
+                }
+            }
+        }
+
         if (newItems && props.value !== '') {
             const val = props.items.find(item => item.id === props.value);
-            if(val) query.value = val.name;
+            if (val) query.value = val.name;
         }
     }, { immediate: true });
 

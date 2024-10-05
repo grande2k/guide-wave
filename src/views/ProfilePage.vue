@@ -43,13 +43,18 @@
                     <p class="form-label" v-text="$t('location')" />
 
                     <div class="row">
-                        <autocomplete-field :items="countries" :value="guide_profile.country_id"
+                        <autocomplete-field
+                            :items="countries"
+                            :value="guide_profile.country_id"
                             :placeholder="$t('country')" :error="v$.country_id.$errors.length"
                             @select="handleCountrySelect" />
 
-                        <autocomplete-field :items="cities" :value="guide_profile.city_id" :placeholder="$t('city')"
+                        <guide-city-field
+                            :options="cities"
+                            :all-selected-cities="guide_profile.cities"
                             :disabled="!cities || !is_country_valid"
-                            :error="guide_profile.country_id && v$.city_id.$errors.length" @select="handleCitySelect" />
+                            :error="guide_profile.country_id && v$.cities.$errors.length"
+                            @select="(data) => guide_profile.cities = data" />
                     </div>
                 </div>
 
@@ -143,6 +148,7 @@
     import { getCountries, getCities, getLanguages, getProfile, getServices } from '@/api';
     import axios from 'axios';
     import AutocompleteField from '@/components/AutocompleteField.vue';
+    import GuideCityField from '@/components/guide/GuideCityField.vue';
     import GuideLanguageField from '@/components/guide/GuideLanguageField.vue';
     import GuideServiceField from '@/components/guide/GuideServiceField.vue';
     import GuideStatusToggler from '@/components/guide/GuideStatusToggler.vue';
@@ -221,7 +227,7 @@
                     phone: { required, minLength: minLength(7) },
                     name: { required },
                     country_id: { required },
-                    city_id: { required },
+                    cities: { required },
                     languages: { required, languagesValidator }
                 }
             } else {
@@ -229,7 +235,7 @@
                     phone: { required, minLength: minLength(7) },
                     name: { required },
                     country_id: { required },
-                    city_id: { required }
+                    cities: { required }
                 }
             }
         }
@@ -370,29 +376,9 @@
             cities.value = await getCities(guide_profile.value.country_id, t);
         } else {
             guide_profile.value.country_id = null;
-            guide_profile.value.city_id = null;
+            guide_profile.value.cities = [];
             is_country_valid.value = false;
             cities.value = [];
-        }
-    }
-
-    const handleCitySelect = (city) => {
-        let city_found;
-        let isValidCity;
-
-        if (typeof city === 'string') {
-            const string_city = cities.value.find(item => item.name.toLowerCase() === city.toLowerCase());
-            if (string_city) city_found = string_city;
-        } else if (typeof city === 'object') {
-            city_found = city;
-        }
-
-        if (city_found) isValidCity = cities.value.some(item => item.name.toLowerCase() === city_found.name.toLowerCase());
-
-        if (isValidCity) {
-            guide_profile.value.city_id = city_found.id;
-        } else {
-            guide_profile.value.city_id = null;
         }
     }
 

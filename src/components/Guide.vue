@@ -49,6 +49,11 @@
             <p class="guide__label" v-text="`${$t('all_guide_services')}:`"/>
             <span v-text="filtered_services.map(service => service.name).join(', ')"/>
         </div>
+
+        <div class="guide__cities" v-if="filtered_cities.length">
+            <p class="guide__label" v-text="`${$t('cities')}:`"/>
+            <span v-text="filtered_cities.map(city => city.name).join(', ')"/>
+        </div>
     </div>
 
     <video-modal 
@@ -77,6 +82,10 @@
         services: {
             type: Array,
             default: []
+        },
+        cities: {
+            type: Array,
+            default: []
         }
     });
 
@@ -98,6 +107,19 @@
         }).filter(service => service !== null);
     });
 
+    const filtered_cities = computed(() => {
+        return props.guide.cities.map(guideCity => {
+            const matchedCity = props.cities.find(city => city.id === guideCity);
+
+            if (matchedCity) {
+                return {
+                    name: matchedCity.name,
+                };
+            }
+
+            return null;
+        }).filter(city => city !== null);
+    });
 
     const handleCall = async (source) => {
         if (isDisabled.value) return;
@@ -197,7 +219,8 @@
                 margin-top: 0.75rem;
             }
         }
-        &__services {
+        &__services,
+        &__cities {
             span {
                 color: $white;
                 line-height: 1.325;
