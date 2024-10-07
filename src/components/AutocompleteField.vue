@@ -116,10 +116,18 @@
             props.items.sort((a, b) => a.name.localeCompare(b.name));
             
             if(props.cities) {
+                const capital_index = props.items.findIndex(item => item.name.startsWith('*'));
+                if (capital_index !== -1) {
+                    const capital = props.items.splice(capital_index, 1)[0];
+                    capital.name = capital.name.slice(1);
+                    props.items.unshift(capital);
+                }
+
                 const all_cities_index = props.items.findIndex(item => item.id === 131);
                 if (all_cities_index !== -1) {
                     const all_cities = props.items.splice(all_cities_index, 1)[0];
                     props.items.unshift(all_cities);
+
                 }
             }
         }

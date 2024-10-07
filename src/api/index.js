@@ -29,6 +29,7 @@ export * from './admin/updateDuration';
 
 export * from './admin/guides/getGuides';
 export * from './admin/guides/approveGuide';
+export * from './admin/guides/deleteGuide';
 
 export * from './admin/backgrounds/getAdminBackgrounds';
 export * from './admin/backgrounds/deleteBackground';

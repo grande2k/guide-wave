@@ -15,7 +15,7 @@
                 <h3 class="guide__name" v-text="guide.name ?? 'Имя не указано'"/>
                 <p class="guide__detail guide__status">Статус: <span :class="{ 'on': guide.is_active, 'off': !guide.is_active }"/></p>
                 <p class="guide__detail" v-text="`Страна: ${guide_country}`"/>
-                <p class="guide__detail" v-text="`Город: ${guide_city}`"/>
+                <p class="guide__detail" v-text="`Города: ${cleanCities.map(city => city).join(', ')}`"/>
                 <p class="guide__detail" v-text="`Телефон: ${guide.phone ?? ''}`"/>
                 <p class="guide__detail" v-text="`Дата регистрации: ${formatDate(guide.date_registered)}`"/>
                 <p class="guide__detail" v-text="`Количество звонков: ${guide.count}`"/>
@@ -46,12 +46,21 @@
         </button>
 
         <div class="guide__controls">
-            <button v-if="guide.approved" class="guide__decline" @click="decline">
-                Заблокировать
-            </button>
+            <div>
+                <button v-if="guide.approved" class="guide__decline" @click="decline">
+                    <img src="@/assets/images/icons/lock.svg" alt="lock">
+                    Заблокировать
+                </button>
 
-            <button v-else class="guide__approve" @click="approve">
-                Разблокировать
+                <button v-else class="guide__approve" @click="approve">
+                    <img src="@/assets/images/icons/unlock.svg" alt="unlock">
+                    Разблокировать
+                </button>
+            </div>
+
+            <button class="guide__delete" @click="deleteUser">
+                <img src="@/assets/images/icons/delete.svg" alt="delete">
+                Удалить
             </button>
         </div>
     </div>
@@ -65,8 +74,8 @@
 </template>
 
 <script setup>
-    import { ref, computed, onMounted } from 'vue';
-    import { getCities, approveGuide } from '@/api';
+    import { ref, computed } from 'vue';
+    import { approveGuide, deleteGuide } from '@/api';
     import { useAppStore } from '@/stores/app';
     import { useI18n } from 'vue-i18n';
     import { useToast } from 'vue-toastification';
@@ -75,7 +84,6 @@
     const { t } = useI18n();
     const appStore = useAppStore();
     const toast = useToast();
-    const cities = ref([]);
     const is_video_shown = ref(false);
 
     const emit = defineEmits(['update']);
@@ -91,25 +99,18 @@
         },
     });
 
-    onMounted(async () => {
-        if (props.guide.city_id !== null) cities.value = await getCities(props.guide.country_id, t, 'ru');
+    const cleanCities = computed(() => {
+        return props.guide.cities.map(city => {
+            if (city.startsWith('*')) {
+                return city.slice(1);
+            }
+            return city;
+        });
     });
 
     const guide_country = computed(() => {
         if(appStore.countries && props.guide.country_id !== null) {
             return appStore.countries.find(country => country.id === props.guide.country_id).name;
-        } else {
-            return '';
-        }
-    });
-
-    const guide_city = computed(() => {
-        if(cities.value.length) {
-            if(props.guide.city_id !== null) {
-                return cities.value.find(city => city.id === props.guide.city_id).name;
-            } else {
-                return '';
-            }
         } else {
             return '';
         }
@@ -174,6 +175,15 @@
             toast.success('Успешно');
             emit('update');
         }
+    }
+
+    const deleteUser = async () => {
+        const params = {
+            user_id: props.guide.user_id,
+        };
+
+        await deleteGuide(params);
+        emit('update');
     }
 
     const formatDate = (dateString) => {
@@ -304,7 +314,8 @@
             }
         }
         &__controls {
-            margin-top: 1rem;
+            @include grid(2, 0.5rem);
+            margin-top: 0.75rem;
             button {
                 @include flex-center;
                 width: 100%;
@@ -312,7 +323,7 @@
                 color: $white;
                 padding: 1rem;
                 cursor: pointer;
-                height: 3rem;
+                height: 3.25rem;
                 img {
                     width: 1.25rem;
                     margin-right: 0.25rem;
@@ -332,8 +343,7 @@
             text-decoration: none;
             border: 2px solid $white;
             color: $white;
-            margin-bottom: 0.5rem;
-            height: 3rem;
+            height: 3.25rem;
             img {
                 width: 1.25rem;
                 margin-right: 0.5rem;
@@ -347,6 +357,9 @@
             background-color: $success;
         }
         &__decline {
+            background-color: #4e3f3f;
+        }
+        &__delete {
             background-color: $error;
         }
     }
