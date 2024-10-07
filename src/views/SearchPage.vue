@@ -261,7 +261,7 @@
         if (isValidCountry) {
             form_data.value.country_id = country_found.id;
             is_country_valid.value = true;
-            const photo_url = await getBackgroundPhoto(country_found.country_code, t);
+            const photo_url = await getBackgroundPhoto(country_found.country_code.toLowerCase(), t);
             if (photo_url) {
                 document.body.style.backgroundImage = `url('https://guides-to-go.onrender.com${photo_url}')`;
             } else {
