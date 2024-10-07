@@ -39,6 +39,8 @@
                         :placeholder="$t('name_placeholder')" v-model="guide_profile.name">
                 </div>
 
+                <div class="guide-profile__line"/>
+
                 <div class="guide-profile__form-field full-column">
                     <p class="form-label" v-text="$t('location')" />
 
@@ -58,6 +60,8 @@
                     </div>
                 </div>
 
+                <div class="guide-profile__line"/>
+
                 <div class="guide-profile__form-field full-column">
                     <p class="form-label" v-text="$t('language')" />
 
@@ -74,6 +78,8 @@
                         {{ $t('add') }}
                     </div>
                 </div>
+
+                <div class="guide-profile__line"/>
 
                 <div class="guide-profile__form-field full-column">
                     <p class="form-label" v-text="$t('services_and_prices')" />
@@ -100,6 +106,8 @@
                         {{ $t('add') }}
                     </div>
                 </div>
+
+                <div class="guide-profile__line"/>
 
                 <guide-video-upload
                     :video_url="guide_profile.video_url ?? ''"
@@ -538,24 +546,29 @@
         min-height: 500px;
         overflow: hidden;
         padding-right: 1rem;
-
+        &__line {
+            width: 100%;
+            height: 2px;
+            background-color: $white;
+            margin: 0.75rem 0;
+            grid-column: 1 / 3;
+            @media screen and (max-width: 480px) {
+                margin: 0.5rem 0;
+            }
+        }
         &__label {
             margin: 0;
             color: $white;
         }
-
         &__content {
             display: flex;
-
             @media screen and (max-width: 480px) {
                 display: block;
-
                 .row {
                     @include flex-center;
                 }
             }
         }
-
         &__info {
             .calendar-button {
                 @include flex-center-column;
@@ -569,18 +582,15 @@
                 color: $white;
                 font-weight: bold;
                 padding: 0.5rem;
-
                 img {
                     width: 2.25rem;
                     margin-bottom: 0.5rem;
                 }
-
                 @media screen and (max-width: 480px) {
                     flex-direction: row;
                     aspect-ratio: unset;
                     margin: 1rem 0;
                     padding: 1rem;
-
                     img {
                         width: 1.5rem;
                         margin: 0 0.5rem 0 0;
@@ -588,24 +598,20 @@
                 }
             }
         }
-
         &__form {
             @include grid(2, 0.5rem);
             margin-left: 1.25rem;
             flex: auto;
-
             @media screen and (max-width: 480px) {
                 margin-left: 0;
                 margin-top: 0.75rem;
+                grid-gap: 0.25rem 0.5rem;
             }
-
             .full-column {
                 grid-column: 1/3;
             }
-
             .form-link {
                 margin: 0.25rem 0;
-
                 @media screen and (max-width: 480px) {
                     padding: 0.875rem;
                     font-size: 1rem;
@@ -613,7 +619,6 @@
                     margin: 0.25rem 0 !important;
                 }
             }
-
             &-field {
                 &.full-column {
                     .form-label {
@@ -621,7 +626,6 @@
                         justify-content: center;
                     }
                 }
-
                 .row {
                     @include grid(2, 0.5rem);
                 }
@@ -650,7 +654,6 @@
                 }
             }
         }
-
         .logout {
             margin: 0;
         }

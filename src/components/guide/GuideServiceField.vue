@@ -37,23 +37,21 @@
             <input :id="`upload-video-${index}`" type="file" accept="video/*" @change="onFileChange" />
         </div>
 
-        <div v-else>
+        <div v-else class="video-buttons">
             <button type="button" class="video-watch" @click="is_watch_open = true">
                 <img src="@/assets/images/icons/play.svg" alt="play">
                 {{ $t('watch') }}
             </button>
 
-            <div class="grid-half">
-                <button type="button" class="video-change" @click="changeVideo">
-                    <img src="@/assets/images/icons/edit.svg" alt="edit">
-                    {{ $t('edit') }}
-                </button>
+            <button type="button" class="video-change" @click="changeVideo">
+                <img src="@/assets/images/icons/edit.svg" alt="edit">
+                {{ $t('edit') }}
+            </button>
 
-                <button type="button" class="video-delete" @click="deleteVideo">
-                    <img src="@/assets/images/icons/delete.svg" alt="delete">
-                    {{ $t('delete') }}
-                </button>
-            </div>
+            <button type="button" class="video-delete" @click="deleteVideo">
+                <img src="@/assets/images/icons/delete.svg" alt="delete">
+                {{ $t('delete') }}
+            </button>
         </div>
     </div>
 
@@ -329,45 +327,68 @@
                 opacity: 1;
             }
         }
+        .video-buttons {
+            @include grid(3, 0.25rem);
+        }
         .video-watch {
             @include flex-center;
             border: 2px solid $white;
             color: $white;
-            padding: 1rem;
+            padding: 0.75rem;
             border-radius: 0.5rem;
             width: 100%;
             cursor: pointer;
-            img {
-                margin-right: 0.5rem;
-                width: 1.5rem;
+            font-size: 0.75rem;
+            @media screen and (max-width: 480px) {
+                padding: 0.75rem 0.25rem;
+                font-size: 0.625rem;
             }
-        }
-        .grid-half {
-            @include grid(2, 0.5rem);
-            margin-top: 0.5rem;
+            img {
+                margin-right: 0.375rem;
+                width: 0.875rem;
+                @media screen and (max-width: 480px) {
+                    width: 0.75rem;
+                }
+            }
         }
         .video-change {
             @include flex-center;
             background-color: $dark;
             color: $white;
-            padding: 1rem;
+            padding: 0.75rem;
             border-radius: 0.5rem;
             cursor: pointer;
+            font-size: 0.75rem;
+            @media screen and (max-width: 480px) {
+                padding: 0.75rem 0.25rem;
+                font-size: 0.625rem;
+            }
             img {
                 margin-right: 0.25rem;
-                width: 1.5rem;
+                width: 1rem;
+                @media screen and (max-width: 480px) {
+                    width: 0.875rem;
+                }
             }
         }
         .video-delete {
             @include flex-center;
             background-color: #f50a0a;
             color: $white;
-            padding: 1rem;
+            padding: 0.75rem;
             border-radius: 0.5rem;
             cursor: pointer;
+            font-size: 0.75rem;
+            @media screen and (max-width: 480px) {
+                padding: 0.75rem 0.25rem;
+                font-size: 0.625rem;
+            }
             img {
                 margin-right: 0.25rem;
-                width: 1.5rem;
+                width: 1.125rem;
+                @media screen and (max-width: 480px) {
+                    width: 1rem;
+                }
             }
         }
         .video-tip {
@@ -375,6 +396,9 @@
             margin-top: 0.5rem;
             color: $white;
             line-height: 1.5;
+            @media screen and (max-width: 480px) {
+                font-size: 0.75rem;
+            }
         }
     }
 </style>
