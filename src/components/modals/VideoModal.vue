@@ -1,6 +1,6 @@
 <template>
     <teleport to="body">
-        <div class="video-modal modal">
+        <div class="video-modal modal" :class="{ tourist: guide_name }">
             <div class="modal__content" ref="target">
                 <div v-if="!close_disabled" class="modal__close" @click="emit('close')">
                     <img src="@/assets/images/icons/close.svg" alt="close">
@@ -191,16 +191,21 @@
         padding: 1rem 0;
         position: fixed;
         overflow: hidden;
+        &.tourist {
+            .modal__content {
+                max-width: 850px;
+                top: -1rem;
+                @media screen and (max-width: 480px) {
+                    top: -2.25rem;
+                }
+            }
+        }
     }
     .modal__content {
-        max-width: 850px;
+        max-width: fit-content;
         width: 100%;
-        top: -1rem;
         background-color: transparent;
         z-index: 2;
-        @media screen and (max-width: 480px) {
-            top: -2.25rem;
-        }
     }
     .video-wrapper {
         position: relative;
@@ -262,7 +267,6 @@
         }
         @media screen and (max-width: 480px) {
             bottom: 2rem;
-            // justify-content: flex-start;
         }
         .circle {
             @include flex-center;

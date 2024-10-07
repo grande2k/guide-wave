@@ -79,10 +79,20 @@
                     <p class="form-label" v-text="$t('services_and_prices')" />
 
                     <div v-if="services.length">
-                        <guide-service-field v-for="(service, index) in services" :key="index" :value="service"
+                        <guide-service-field
+                            v-for="(service, index) in services"
+                            :key="index"
+                            :index="index"
+                            :value="service"
                             :all_selected_services="services"
+                            :video_url="service.video_url ?? ''"
+                            :max_video_duration="guide_profile.max_video_duration"
                             :error="((!service.service_id || !service.price) && v1$.$errors.length) ? true : false"
-                            @update="s => handleServiceUpdate(s, index)" @delete="handleServiceDelete(index)" />
+                            @update="s => handleServiceUpdate(s, index)"
+                            @delete="handleServiceDelete(index)"
+                            @upload_video="({ file, service_id }) => prepareServiceVideo(file, service_id, 'upload')"
+                            @update_video="({ file, service_id }) => prepareServiceVideo(file, service_id, 'update')"
+                            @delete_video="async () => services = await getServices('guide', $t)"/>
                     </div>
 
                     <div v-if="services.length < 5" class="form-add" @click="addService">
@@ -91,7 +101,8 @@
                     </div>
                 </div>
 
-                <guide-video-upload :video_url="guide_profile.video_url ?? ''"
+                <guide-video-upload
+                    :video_url="guide_profile.video_url ?? ''"
                     :max_video_duration="guide_profile.max_video_duration"
                     @deleted="async () => guide_profile = await getProfile(router, $t)"
                     @upload="file => prepareVideo(file, 'upload')"
@@ -319,6 +330,48 @@
                 });
             }
 
+            const serviceVideoPromises = services.value.map(service => {
+                if (service.uploading_video) {
+                    return new Promise(async (resolve, reject) => {
+                        try {
+                            const fd = new FormData();
+                            
+                            let request_params;
+                            let response;
+
+                            if(service.video_url) {
+                                fd.append('new_file', service.uploading_video, service.uploading_video.name);
+
+                                request_params = {
+                                    params: {
+                                        service_id: service.service_id,
+                                        old_video_url: service.video_url
+                                    },
+                                    headers: request_headers.headers
+                                };
+
+                                response = await axios.put('https://guides-to-go.onrender.com/service/update_video_service', fd, request_params);
+                            } else {
+                                fd.append('file', service.uploading_video, service.uploading_video.name);
+
+                                request_params = {
+                                    params: {
+                                        service_id: service.service_id
+                                    },
+                                    headers: request_headers.headers
+                                };
+
+                                response = await axios.post('https://guides-to-go.onrender.com/service/add_video_service', fd, request_params);
+                            }
+                            resolve(response);
+                        } catch (error) {
+                            reject(error);
+                        }
+                    });
+                }
+                return Promise.resolve();
+            });
+
             if (photoUploadPromise) {
                 await photoUploadPromise;
             }
@@ -326,6 +379,8 @@
             if (videoUploadPromise) {
                 await videoUploadPromise;
             }
+
+            await Promise.all([...serviceVideoPromises]);
 
             response_loading.value = false;
             uploading_video.value = null;
@@ -460,6 +515,15 @@
                 console.error('wrong action prepareVideo');
                 break;
         }
+    }
+
+    const prepareServiceVideo = (file, service_id, action) => {
+        console.log(file, service_id);
+        services.value.forEach(service => {
+            if (service.service_id === service_id) {
+                service.uploading_video = file;
+            }
+        });
     }
 
     const logout = () => {
