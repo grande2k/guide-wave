@@ -1,7 +1,11 @@
 <template>
     <teleport to="body">
-        <div class="video-modal modal" :class="{ tourist: guide_name }">
+        <div class="video-modal modal" :class="{ tourist: guide_name && guides_count }">
             <div class="modal__content" ref="target">
+                <div v-if="guide_name && guides_count" class="video-modal__back" @click="emit('back')">
+                    <img src="@/assets/images/icons/arrow-left.svg" alt="back">
+                </div>
+
                 <div v-if="!close_disabled" class="modal__close" @click="emit('close')">
                     <img src="@/assets/images/icons/close.svg" alt="close">
                 </div>
@@ -53,7 +57,7 @@
     const circleRefs = ref([]);
     const videoControlsRef = ref(null);
     const isScrollable = ref(false);
-    const emit = defineEmits(['close', 'ended', 'switch']);
+    const emit = defineEmits(['close', 'ended', 'switch', 'back']);
     const currentTime = ref(0);
     const duration = ref(0);
     const max_duration = ref(appStore.max_video_duration);
@@ -86,10 +90,16 @@
 
     onMounted(() => {
         window.addEventListener('touchmove', preventSwipeNavigation, { passive: false });
+        if(props.guide_name) {
+            document.querySelector('.layout > .go-home').style.display = "none";
+        }
     });
 
     onBeforeUnmount(() => {
         window.removeEventListener('touchmove', preventSwipeNavigation);
+        if(props.guide_name) {
+            document.querySelector('.layout > .go-home').style.display = "block";
+        }
     });
 
     watch(() => props.guide_index, (newIndex) => {
@@ -191,12 +201,38 @@
         padding: 1rem 0;
         position: fixed;
         overflow: hidden;
+        &__back {
+            position: fixed;
+            top: 2rem;
+            left: 2rem;
+            background-color: $white;
+            padding: 1rem;
+            text-decoration: none;
+            border-radius: 0.5rem;
+            color: $black;
+            cursor: pointer;
+            z-index: 5;
+            img {
+                filter: invert(1);
+                width: 1.5rem;
+            }
+            @media screen and (max-width: 480px) {
+                @include flex-center;
+                top: 1rem;
+                left: 1rem;
+                font-size: 0;
+                padding: 0.675rem;
+                img {
+                    width: 1rem;
+                }
+            }
+        }
         &.tourist {
             .modal__content {
                 max-width: 850px;
                 top: -1rem;
                 @media screen and (max-width: 480px) {
-                    top: -2.25rem;
+                    top: -1.5rem;
                 }
             }
         }
@@ -279,12 +315,6 @@
             line-height: 1;
             cursor: pointer;
             user-select: none;
-            @media screen and (max-width: 480px) {
-                width: 4rem;
-                height: 4rem;
-                min-width: 4rem;
-                font-size: 1rem;
-            }
             &.active {
                 background-color: $primary;
                 color: $white;

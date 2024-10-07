@@ -114,7 +114,8 @@
         :video_url="current_video_url"
         @close="is_video_shown  = false"
         @ended="showNextVideo"
-        @switch="switchVideo"/>
+        @switch="switchVideo"
+        @back="is_video_shown = false; resetSearch()"/>
 </template>
 
 <script setup>
@@ -235,8 +236,7 @@
         if (result) {
             response_loading.value = true;
             let response = await search(form_data.value, t);
-            console.log(response);
-            results.value = response.users;
+            results.value = randomSort(response.users);
             split_by.value = response.split_by;
             response_loading.value = false;
             if (results.value && results.value.length > 0) showVideos();
@@ -349,6 +349,10 @@
             callsMade.value = [];
             showVideos();
         }
+    }
+
+    const randomSort = (array) => {
+        return array.sort(() => Math.random() - 0.5);
     }
 </script>
 
