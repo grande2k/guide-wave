@@ -44,19 +44,29 @@
                 <img src="@/assets/images/icons/login.svg" alt="log out">
                 Выйти
             </button>
+
+            <button type="button" class="change-password form-link" @click="showChangePasswordModal = true">
+                <img src="@/assets/images/icons/edit.svg" alt="edit">
+                Изменить пароль
+            </button>
         </div>
     </section>
+
+    <change-password-modal admin v-if="showChangePasswordModal" @close="showChangePasswordModal = false"/>
 </template>
 
 <script setup>
-    import { computed } from 'vue';
+    import { ref, computed } from 'vue';
     import { useRoute, useRouter } from 'vue-router';
     import AdminSplit from '@/components/admin/AdminSplit.vue';
     import AdminVideoDuration from '@/components/admin/AdminVideoDuration.vue';
     import AdminEmail from '@/components/admin/AdminEmail.vue';
+    import ChangePasswordModal from '@/components/modals/ChangePasswordModal.vue';
 
     const route = useRoute();
     const router = useRouter();
+
+    const showChangePasswordModal = ref(false);
 
     const hasRouteInside = computed(() => {
         return (
@@ -120,6 +130,9 @@
                 font-size: 1.25rem;
                 text-decoration: none;
             }
+        }
+        .change-password {
+            margin-top: 1rem;
         }
     }
 </style>

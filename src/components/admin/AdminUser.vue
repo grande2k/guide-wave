@@ -63,6 +63,11 @@
             </div>
 
             <p v-else class="guide__details-empty">Нет услуг</p>
+
+            <a v-if="guide.email" :href="`mailto:${guide.email}`" class="form-link">
+                <img src="@/assets/images/icons/mail.svg" alt="Mail">
+                Написать пользователю
+            </a>
         </div>
     </div>
 

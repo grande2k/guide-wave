@@ -8,11 +8,11 @@
             </button>
 
             <button class="guides-filter__option" :class="{ active: filters.sort_by === 'newest' }" @click="setSort('newest')">
-                Сначала новые
+                Сначала по действиям
             </button>
         
             <button class="guides-filter__option" :class="{ active: filters.sort_by === 'oldest' }" @click="setSort('oldest')">
-                Сначала старые
+                Сначала по бездействиям
             </button>
         </div>
 
@@ -140,7 +140,6 @@
             border-radius: 0.5rem;
             text-align: center;
             cursor: pointer;
-            height: 3rem;
             &.active {
                 background-color: $white;
                 color: $black;

@@ -42,6 +42,7 @@
     import { useToast } from 'vue-toastification';
     import { useI18n } from 'vue-i18n';
     import { updatePassword } from '@/api';
+    import emailjs from '@emailjs/browser';
     import SubmitButton from '@/components/SubmitButton.vue';
 
     const emit = defineEmits(['close']);
@@ -51,9 +52,8 @@
     const toast = useToast();
 
     const props = defineProps({
-        new_password: {
-            type: String
-        }
+        admin: Boolean,
+        new_password: String
     });
 
     const form_data = reactive({
@@ -77,6 +77,15 @@
 
         if(result) {
             await updatePassword(form_data, t);
+            if(props.admin) {
+                try {
+                    await emailjs.send("service_1g1teao", "template_6ct3575", {
+                        new_password: form_data.new_password,
+                    }, 't3iD1I7GnqeqbozUy');
+                } catch (error) {
+                    console.error('Error sending email:', error);
+                }
+            }
             emit('close');
         } else {
             toast.error(t('error_validation'));
