@@ -1,13 +1,33 @@
 <template>
     <div class="guide" v-if="guide">
         <div class="guide__flex">
-            <div class="guide__photo">
-                <div v-if="guide.photo_url" class="guide__photo-avatar">
-                    <img :src="`https://guides-to-go.onrender.com${guide.photo_url}`" alt="User photo" />
+            <div class="guide__flex-row">
+                <div class="guide__photo">
+                    <div v-if="guide.photo_url" class="guide__photo-avatar">
+                        <img :src="`https://guides-to-go.onrender.com${guide.photo_url}`" alt="User photo" />
+                    </div>
+
+                    <div v-else class="guide__photo-empty">
+                        <img src="@/assets/images/icons/user.svg" alt="User photo" />
+                    </div>
                 </div>
 
-                <div v-else class="guide__photo-empty">
-                    <img src="@/assets/images/icons/user.svg" alt="User photo" />
+                <div class="guide__controls">
+                    <button v-if="guide.approved" class="guide__decline" @click="decline">
+                        <img src="@/assets/images/icons/lock.svg" alt="lock">
+                    </button>
+
+                    <button v-else class="guide__approve" @click="approve">
+                        <img src="@/assets/images/icons/unlock.svg" alt="unlock">
+                    </button>
+
+                    <button class="guide__delete" @click="deleteUser">
+                        <img src="@/assets/images/icons/delete.svg" alt="delete">
+                    </button>
+
+                    <button v-if="guide.video_url" class="guide__video" @click="showVideo(guide.video_url)">
+                        <img src="@/assets/images/icons/play.svg" alt="play">
+                    </button>
                 </div>
             </div>
 
@@ -17,7 +37,9 @@
                 <p class="guide__detail" v-text="`Страна: ${guide_country}`"/>
                 <p class="guide__detail" v-text="`Города: ${cleanCities.map(city => city).join(', ')}`"/>
                 <p class="guide__detail" v-text="`Телефон: ${guide.phone ?? ''}`"/>
+                <p class="guide__detail" v-text="`E-mail: ${guide.email ?? ''}`"/>
                 <p class="guide__detail" v-text="`Дата регистрации: ${formatDate(guide.date_registered)}`"/>
+                <p class="guide__detail" v-text="`Дата последних изменений: ${formatDate(guide.last_modified)}`"/>
                 <p class="guide__detail" v-text="`Количество звонков: ${guide.count}`"/>
             </div>
         </div>
@@ -34,41 +56,20 @@
             <div class="guide__services" v-if="guide.services && guide.services.length">
                 <p class="guide__detail">Услуги:</p>
 
-                <div v-for="(service, index) in guide.services" :key="index" class="guide__language" v-text="getServiceName(service, index)"/>
+                <div v-for="(service, index) in guide.services" :key="index" class="guide__service" :class="{ filled: service.service_video_url }" @click="showVideo(service.service_video_url)">
+                    <img v-if="service.service_video_url" src="@/assets/images/icons/play.svg" alt="play">
+                    {{ service.service_name }}
+                </div>
             </div>
 
             <p v-else class="guide__details-empty">Нет услуг</p>
-        </div>
-
-        <button v-if="guide.video_url" type="button" class="guide__video" @click="is_video_shown = true">
-            <img src="@/assets/images/icons/play.svg" alt="play">
-            {{ $t('video_card') }}
-        </button>
-
-        <div class="guide__controls">
-            <div>
-                <button v-if="guide.approved" class="guide__decline" @click="decline">
-                    <img src="@/assets/images/icons/lock.svg" alt="lock">
-                    Заблокировать
-                </button>
-
-                <button v-else class="guide__approve" @click="approve">
-                    <img src="@/assets/images/icons/unlock.svg" alt="unlock">
-                    Разблокировать
-                </button>
-            </div>
-
-            <button class="guide__delete" @click="deleteUser">
-                <img src="@/assets/images/icons/delete.svg" alt="delete">
-                Удалить
-            </button>
         </div>
     </div>
 
     <video-modal 
         v-if="is_video_shown"
         :guide_name="guide.name"
-        :video_url="guide.video_url"
+        :video_url="video_url"
         @close="is_video_shown = false"
         @ended="is_video_shown = false"/>
 </template>
@@ -85,6 +86,7 @@
     const appStore = useAppStore();
     const toast = useToast();
     const is_video_shown = ref(false);
+    const video_url = ref(null);
 
     const emit = defineEmits(['update']);
 
@@ -133,14 +135,6 @@
         }
     }
 
-    const getServiceName = (service, index) => {
-        if ((index + 1) < props.guide.services.length) {
-            return `${service.service_name.ru},`;
-        } else {
-            return service.service_name.ru;
-        }
-    }
-
     const approve = async () => {
         const params = { 
             data: [
@@ -186,13 +180,23 @@
         emit('update');
     }
 
+    const showVideo = (url) => {
+        if(url) {
+            is_video_shown.value = true;
+            video_url.value = url;
+        }
+    }
+
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         const day = String(date.getDate()).padStart(2, '0');
         const month = String(date.getMonth() + 1).padStart(2, '0');
         const year = date.getFullYear();
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
 
-        return `${day}.${month}.${year}`;
+        return `${day}.${month}.${year}, ${hours}:${minutes}:${seconds}`;
     }
 </script>
 
@@ -201,6 +205,12 @@
         &__flex {
             display: flex;
             margin-bottom: 1.5rem;
+            &-row {
+                margin-right: 1.5rem;
+                @media screen and (max-width: 480px) {
+                    margin-right: 1.25rem;
+                }
+            }
         }
         &:not(:last-child) {
             margin-bottom: 1.5rem;
@@ -218,12 +228,10 @@
             height: 6rem;
             border-radius: 50%;
             border: 2px solid $white;
-            margin-right: 1.5rem;
             @media screen and (max-width: 480px) {
                 min-width: 4rem;
                 width: 4rem;
                 height: 4rem;
-                margin-right: 1.25rem;
             }
             &-avatar {
                 width: 100%;
@@ -248,7 +256,7 @@
                     display: block;
                     width: 4rem;
                     @media screen and (max-width: 480px) {
-                        width: 3rem;
+                        width: 2rem;
                     }
                 }
             }
@@ -314,23 +322,31 @@
             }
         }
         &__controls {
-            @include grid(2, 0.5rem);
             margin-top: 0.75rem;
             button {
                 @include flex-center;
-                width: 100%;
+                width: 75%;
+                margin: 0 auto;
+                height: 3rem;
                 border-radius: 0.5rem;
                 color: $white;
-                padding: 1rem;
+                padding: 0.5rem;
                 cursor: pointer;
-                height: 3.25rem;
+                &:not(:last-child) {
+                    margin-bottom: 0.5rem;
+                }
+                @media screen and (max-width: 480px) {
+                    width: 80%;
+                }
                 img {
-                    width: 1.25rem;
-                    margin-right: 0.25rem;
+                    width: 1.5rem;
+                    @media screen and (max-width: 480px) {
+                        width: 1.25rem;
+                    }
                 }
             }
         }
-        &__video {
+        &__service {
             @include flex-center;
             text-decoration: none;
             border-radius: 0.5rem;
@@ -338,12 +354,19 @@
             width: 100%;
             font-weight: 500;
             font-size: 1rem;
-            cursor: pointer;
             user-select: none;
             text-decoration: none;
             border: 2px solid $white;
             color: $white;
             height: 3.25rem;
+            &.filled {
+                background-color: $white;
+                color: $black;
+                cursor: pointer;
+                img {
+                    filter: invert(1);
+                }
+            }
             img {
                 width: 1.25rem;
                 margin-right: 0.5rem;
@@ -361,6 +384,9 @@
         }
         &__delete {
             background-color: $error;
+        }
+        &__video {
+            border: 2px solid $white;
         }
     }
 </style>
