@@ -28,6 +28,10 @@
                     <button v-if="guide.video_url" class="guide__video" @click="showVideo(guide.video_url)">
                         <img src="@/assets/images/icons/play.svg" alt="play">
                     </button>
+
+                    <a v-if="guide.email" class="guide__email" :href="`mailto:${guide.email}`">
+                        <img src="@/assets/images/icons/mail.svg" alt="Mail">
+                    </a>
                 </div>
             </div>
 
@@ -63,11 +67,6 @@
             </div>
 
             <p v-else class="guide__details-empty">Нет услуг</p>
-
-            <a v-if="guide.email" :href="`mailto:${guide.email}`" class="form-link">
-                <img src="@/assets/images/icons/mail.svg" alt="Mail">
-                Написать пользователю
-            </a>
         </div>
     </div>
 
@@ -328,7 +327,7 @@
         }
         &__controls {
             margin-top: 0.75rem;
-            button {
+            & > * {
                 @include flex-center;
                 width: 75%;
                 margin: 0 auto;
@@ -337,6 +336,7 @@
                 color: $white;
                 padding: 0.5rem;
                 cursor: pointer;
+                text-decoration: none;
                 &:not(:last-child) {
                     margin-bottom: 0.5rem;
                 }
@@ -392,6 +392,12 @@
         }
         &__video {
             border: 2px solid $white;
+        }
+        &__email {
+            background-color: $white;
+            img {
+                filter: invert(1);
+            }
         }
     }
 </style>
