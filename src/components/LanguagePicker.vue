@@ -2,7 +2,7 @@
     <div v-if="languages" class="language-picker" :class="{ 'language-picker--active': isPickerActive }">
         <div class="language-picker__language language-picker__language--current" @click="isPickerActive = !isPickerActive">
             <div class="language-picker__flag">
-                <img :src="images[`${currentLanguage.lang_code}`]" alt="flag">
+                <img :src="`https://guides-to-go.onrender.com/flags/${currentLanguage.lang_code}.svg`" alt="flag">
             </div>
             <span class="language-picker__langName" v-text="currentLanguage.lang_code" />
         </div>
@@ -11,7 +11,7 @@
             <li v-for="lang in filteredLanguages" :key="lang.id" class="language-picker__language"
                 @click="switchLanguage(lang.lang_code)">
                 <div class="language-picker__flag">
-                    <img :src="images[`${lang.lang_code}`]" alt="flag">
+                    <img :src="`https://guides-to-go.onrender.com/flags/${lang.lang_code}.svg`" alt="flag">
                 </div>
 
                 <span class="language-picker__langName" v-text="lang.lang_code" />
@@ -24,7 +24,6 @@
 
 <script setup>
     import { ref, onMounted, watch } from 'vue';
-    import { filename } from 'pathe/utils';
     import { useI18n } from 'vue-i18n';
     import { useAppStore } from '@/stores/app';
     import { getInterface, getCountries } from '@/api'
@@ -89,12 +88,6 @@
         const savedLanguage = localStorage.getItem('language');
         if (savedLanguage && languages.value) switchLanguage(savedLanguage);
     });
-
-    const glob = import.meta.glob('@/assets/images/flags/*.svg', { eager: true });
-
-    const images = Object.fromEntries(
-        Object.entries(glob).map(([key, value]) => [filename(key), value.default])
-    )
 </script>
 
 <style lang="scss">
