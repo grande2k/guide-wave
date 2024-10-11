@@ -6,6 +6,7 @@
             :value="local_service"
             :error="error"
             :all_selected_services="all_selected_services"
+            :disabled="value.service_id !== null && value.price !== null"
             @choose="handleServiceSelect" />
 
         <input type="text" class="form-input service-price" :class="{ error: error }" placeholder="€"

@@ -1,5 +1,5 @@
 <template>
-    <div class="form-select" :class="{ 'form-select--active': isSelectActive, 'error': error }" ref="target">
+    <div class="form-select" :class="{ 'form-select--active': isSelectActive, 'error': error, 'disabled': disabled }" ref="target">
         <div class="form-select__top" @click="toggleSelect">
             <span class="form-select__current" :class="{ 'placeholder': !currentOption }"
                 v-text="currentOption?.name ?? select_placeholder" />
@@ -19,8 +19,8 @@
                 @click="chooseOption(option)" v-text="option?.name ?? option" />
         </ul>
 
-        <img src="@/assets/images/icons/arrow-down.svg" class="form-select__arrow" alt="arrow"
-            @click="isSelectActive = !isSelectActive">
+        <img v-if="!disabled" src="@/assets/images/icons/arrow-down.svg" class="form-select__arrow" alt="arrow"
+            @click="toggleSelect">
     </div>
 </template>
 
@@ -54,6 +54,10 @@
             default: false
         },
         fixed_position: {
+            type: Boolean,
+            default: false
+        },
+        disabled: {
             type: Boolean,
             default: false
         }
@@ -133,9 +137,11 @@
     }
 
     const toggleSelect = () => {
-        isSelectActive.value = !isSelectActive.value;
-        if (isSelectActive.value) {
-            updateDropdownPosition();
+        if(!props.disabled) {
+            isSelectActive.value = !isSelectActive.value;
+            if (isSelectActive.value) {
+                updateDropdownPosition();
+            }
         }
     }
 
@@ -151,6 +157,12 @@
         &__option,
         &__current {
             text-transform: capitalize;
+        }
+        &.disabled {
+            &,
+            .form-select__current {
+                cursor: default;
+            }
         }
     }
 </style>
