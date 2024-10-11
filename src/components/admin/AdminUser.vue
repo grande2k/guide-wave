@@ -2,7 +2,7 @@
     <div class="guide" v-if="guide">
         <div class="guide__flex">
             <div class="guide__flex-row">
-                <div class="guide__photo">
+                <div class="guide__photo" :class="{ changed: guide.change.photo_url }">
                     <div v-if="guide.photo_url" class="guide__photo-avatar">
                         <img :src="`https://guides-to-go.onrender.com${guide.photo_url}`" alt="User photo" />
                     </div>
@@ -25,7 +25,7 @@
                         <img src="@/assets/images/icons/delete.svg" alt="delete">
                     </button>
 
-                    <button v-if="guide.video_url" class="guide__video" @click="showVideo(guide.video_url)">
+                    <button v-if="guide.video_url" class="guide__video" :class="{ changed: guide.change.video_url }" @click="showVideo(guide.video_url)">
                         <img src="@/assets/images/icons/play.svg" alt="play">
                     </button>
 
@@ -36,11 +36,11 @@
             </div>
 
             <div class="guide__info">
-                <h3 class="guide__name" v-text="guide.name ?? 'Имя не указано'"/>
+                <h3 class="guide__name" :class="{ changed: guide.change.name }" v-text="guide.name ?? 'Имя не указано'"/>
                 <p class="guide__detail guide__status">Статус: <span :class="{ 'on': guide.is_active, 'off': !guide.is_active }"/></p>
                 <p class="guide__detail" v-text="`Страна: ${guide_country}`"/>
                 <p class="guide__detail" v-text="`Города: ${cleanCities.map(city => city).join(', ')}`"/>
-                <p class="guide__detail" v-text="`Телефон: ${guide.phone ?? ''}`"/>
+                <p class="guide__detail" :class="{ changed: guide.change.phone }" v-text="`Телефон: ${guide.phone ?? ''}`"/>
                 <p class="guide__detail" v-text="`E-mail: ${guide.email ?? ''}`"/>
                 <p class="guide__detail" v-text="`Дата регистрации: ${formatDate(guide.date_registered)}`"/>
                 <p class="guide__detail" v-text="`Дата последних изменений: ${formatDate(guide.last_modified)}`"/>
@@ -60,7 +60,13 @@
             <div class="guide__services" v-if="guide.services && guide.services.length">
                 <p class="guide__detail">Услуги:</p>
 
-                <div v-for="(service, index) in guide.services" :key="index" class="guide__service" :class="{ filled: service.service_video_url }" @click="showVideo(service.service_video_url)">
+                <div
+                    v-for="(service, index) in guide.services"
+                    :key="index"
+                    class="guide__service"
+                    :class="{ filled: service.service_video_url, changed: isServiceChanged(service.service_name) }"
+                    @click="showVideo(service.service_video_url)">
+
                     <img v-if="service.service_video_url" src="@/assets/images/icons/play.svg" alt="play">
                     {{ service.service_name }}
                 </div>
@@ -68,6 +74,11 @@
 
             <p v-else class="guide__details-empty">Нет услуг</p>
         </div>
+
+        <button v-if="hasChanged" class="confirm-changes" @click="acceptGuideChanges">
+            <img src="@/assets/images/icons/check.svg" alt="check">
+            Подтвердить изменения
+        </button>
     </div>
 
     <video-modal 
@@ -80,7 +91,7 @@
 
 <script setup>
     import { ref, computed } from 'vue';
-    import { approveGuide, deleteGuide } from '@/api';
+    import { approveGuide, deleteGuide, acceptChanges } from '@/api';
     import { useAppStore } from '@/stores/app';
     import { useI18n } from 'vue-i18n';
     import { useToast } from 'vue-toastification';
@@ -139,6 +150,23 @@
         }
     }
 
+    const isServiceChanged = (serviceName) => {
+        return props.guide.change.services.some(
+            changedService => changedService.service_name === serviceName
+        );
+    }
+
+    const hasChanged = computed(() => {
+        const hasTrueChange = Object.keys(props.guide.change).some(
+            key => props.guide.change[key] === true
+        );
+
+        const hasServices = Array.isArray(props.guide.change.services) && props.guide.change.services.length > 0;
+
+        return hasTrueChange || hasServices;
+    });
+
+
     const approve = async () => {
         const params = { 
             data: [
@@ -173,6 +201,11 @@
             toast.success('Успешно');
             emit('update');
         }
+    }
+
+    const acceptGuideChanges = async () => {
+        await acceptChanges(props.guide.user_id);
+        emit('update');
     }
 
     const deleteUser = async () => {
@@ -212,7 +245,7 @@
             &-row {
                 margin-right: 1.5rem;
                 @media screen and (max-width: 480px) {
-                    margin-right: 1.25rem;
+                    margin-right: 0.875rem;
                 }
             }
         }
@@ -236,6 +269,10 @@
                 min-width: 4rem;
                 width: 4rem;
                 height: 4rem;
+            }
+            &.changed {
+                border-width: 5px;
+                border-color: rgba($color: #ff1515, $alpha: 0.75);
             }
             &-avatar {
                 width: 100%;
@@ -274,6 +311,12 @@
             font-weight: bold;
             margin: 0 0 0.75rem 0;
             line-height: 1;
+            border-radius: 0.25rem;
+            width: fit-content;
+            &.changed {
+                padding: 0.5rem;
+                background-color: rgba($color: #ff1515, $alpha: 0.75);
+            }
             @media screen and (max-width: 480px) {
                 font-size: 1.325rem;
                 margin-bottom: 0.75rem;
@@ -302,8 +345,14 @@
             font-weight: bold;
         }
         &__detail {
+            width: fit-content;
             color: $white;
             margin: 0;
+            border-radius: 0.25rem;
+            &.changed {
+                padding: 0.25rem;
+                background-color: rgba($color: #ff1515, $alpha: 0.75);
+            }
             &:not(:last-child) {
                 margin-bottom: 0.75rem;
             }
@@ -372,6 +421,13 @@
                     filter: invert(1);
                 }
             }
+            &.changed {
+                background-color: rgba($color: #ff1515, $alpha: 0.75);
+                color: $white;
+                img {
+                    filter: invert(0);
+                }
+            }
             img {
                 width: 1.25rem;
                 margin-right: 0.5rem;
@@ -392,12 +448,48 @@
         }
         &__video {
             border: 2px solid $white;
+            &.changed {
+                background-color: rgba($color: #ff1515, $alpha: 0.75);
+            }
         }
         &__email {
             background-color: $white;
             img {
                 filter: invert(1);
             }
+        }
+        .confirm-changes {
+            @include flex-center;
+            width: 100%;
+            padding: 1.25rem;
+            border-radius: 0.5rem;
+            background-color: #09f015;
+            cursor: pointer;
+            font-size: 1.125rem;
+            color: $white;
+            font-weight: 500;
+            img {
+                width: 1.5rem;
+                margin-right: 0.5rem;
+            }
+            @media screen and (max-width: 480px) {
+                font-size: 1rem;
+                padding: 1rem;
+                img {
+                    width: 1.25rem;
+                }
+            }
+        }
+    }
+
+    @keyframes warn {
+        0% {
+            border-color: transparent;
+            border-width: 2px;
+        }
+        100% {
+            border-color: rgba($color: #ff1515, $alpha: 0.75);
+            border-width: 8px;
         }
     }
 </style>

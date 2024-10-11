@@ -26,6 +26,8 @@
                 @update="handleGuidesUpdate"/>
         </div>
 
+        <div v-if="show_preloader" class="preloader"><span></span></div>
+
         <p v-else class="admin-message">Пусто</p>
     </div>
 </template>
@@ -40,11 +42,14 @@
     const users = ref([]);
     const languages = ref([]);
     const show_filters = ref(false);
+    const show_preloader = ref(false);
     const filters = ref({});
     const { t } = useI18n();
 
     onMounted(async () => {
+        show_preloader.value = true;
         users.value = await getGuides(t);
+        show_preloader.value = false;
         languages.value = await getAdminLanguages(t);
 
         users.value.forEach(user => {
