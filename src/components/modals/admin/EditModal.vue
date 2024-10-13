@@ -21,7 +21,7 @@
                         </div>
                     </div>
 
-                    <div v-else-if="type === 'countries' || (type === 'backgrounds' && initialData?.country_code !== 'default')">
+                    <div v-else-if="type === 'countries'">
                         <div class="admin-modal__field">
                             <p>Двухзначный код страны:</p>
                             <input
@@ -29,35 +29,15 @@
                                 v-model="form_data.country_code"
                                 placeholder="Например: ru, us"
                                 maxlength="2"
-                                :class="{ error: (type === 'countries' || type === 'backgrounds') && v$.country_code.$errors.length }" />
+                                :class="{ error: type === 'countries' && v$.country_code.$errors.length }" />
                         </div>
                     </div>
 
-                    <div v-if="type === 'backgrounds'">
-                        <div class="admin-modal__field" v-if="initialData?.country_code !== 'default'">
-                            <p>Название локации на Русском:</p>
-                            <input type="text" v-model="form_data.ru"
-                                placeholder="Введите текст"
-                                :class="{ error: v$.ru.$errors.length }" />
-                        </div>
-
-                        <div class="admin-modal__field">
-                            <p>Фон:</p>
-                            <span v-if="v$.background_image.$errors.length" class="form-error" style="margin-bottom: 0.5rem;">Загрузите изображение</span>
-                            <admin-background-upload
-                                :photo_url="initialData?.photo_url"
-                                :only_jpg="initialData?.country_code === 'default'"
-                                @upload="file => form_data.background_image = file"/>
-                        </div>
-                    </div>
-
-                    <div v-else>
-                        <div v-for="lang in appStore.interface_languages" :key="lang.lang_code" class="admin-modal__field">
-                            <p>Перевод на {{ lang.name }}:</p>
-                            <input type="text" v-model="form_data[lang.lang_code]"
-                                placeholder="Введите текст"
-                                :class="{ error: lang.lang_code === 'en' && v$.en.$errors.length }" />
-                        </div>
+                    <div v-for="lang in appStore.interface_languages" :key="lang.lang_code" class="admin-modal__field">
+                        <p>Перевод на {{ lang.name }}:</p>
+                        <input type="text" v-model="form_data[lang.lang_code]"
+                            placeholder="Введите текст"
+                            :class="{ error: lang.lang_code === 'en' && v$.en.$errors.length }" />
                     </div>
 
                     <submit-button blue text="save" icon="check" class="full-column" />
@@ -74,7 +54,7 @@
     import { useAppStore } from '@/stores/app';
     import { useToast } from 'vue-toastification';
     import { onClickOutside } from '@vueuse/core';
-    import { updateAdminLanguage, updateAdminService, updateCity, updateCountry, updateBackground } from '@/api';
+    import { updateAdminLanguage, updateAdminService, updateCity, updateCountry } from '@/api';
     import SubmitButton from '@/components/SubmitButton.vue';
     import AdminBackgroundUpload from '@/components/admin/AdminBackgroundUpload.vue';
 
@@ -92,17 +72,13 @@
 
     const rules = computed(() => {
         const rules = {};
-        if (props.type === 'backgrounds') {
-            rules.country_code = { required };
-            rules.ru = { required };
-            rules.background_image = { required };
-        } else {
-            appStore.interface_languages.forEach((lang) => {
-                if (lang.lang_code === 'en') rules[lang.lang_code] = { required };
-                if (props.type === 'languages') rules.lang_code = { required };
-                if (props.type === 'countries') rules.country_code = { required };
-            });
-        }
+
+        appStore.interface_languages.forEach((lang) => {
+            if (lang.lang_code === 'en') rules[lang.lang_code] = { required };
+            if (props.type === 'languages') rules.lang_code = { required };
+            if (props.type === 'countries') rules.country_code = { required };
+        });
+
         return rules;
     });
 
@@ -118,10 +94,6 @@
                 form_data[lang.lang_code] = props.initialData?.country_names?.[lang.lang_code] || '';
             } else if(props.type === 'cities') {
                 form_data[lang.lang_code] = props.initialData?.city_names?.[lang.lang_code] || '';
-            } else if (props.type === 'backgrounds') {
-                form_data.ru = props.initialData?.name || '';
-                form_data.country_code = props.initialData?.country_code || '';
-                form_data.background_image = props.initialData?.photo_url || '';
             }
         });
 
@@ -189,25 +161,6 @@
                 };
 
                 await updateCity(cities_formatted_data);
-                break;
-            case 'backgrounds':
-                const backgrounds_formatted_data = {
-                    country_code_old: props.initialData.country_code,
-                    country_code: form_data.country_code,
-                    photo_url_old: props.initialData.photo_url,
-                    name: form_data.ru
-                };
-
-                let fd;
-
-                if(form_data.background_image !== props.initialData.photo_url) {
-                    fd = new FormData();
-                    fd.append('new_file', form_data.background_image, form_data.background_image.name);
-
-                    await updateBackground(backgrounds_formatted_data, fd);
-                } else {
-                    await updateBackground(backgrounds_formatted_data);
-                }
                 break;
             default:
                 break;

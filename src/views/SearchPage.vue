@@ -105,6 +105,12 @@
         </div>
     </section>
 
+    <teleport to="#site-header">
+        <button v-if="showOpenGalleryButton" class="open-gallery" @click="openGallery">
+            <img src="@/assets/images/icons/minus.svg" alt="minus">
+        </button>
+    </teleport>
+
     <video-modal 
         v-if="is_video_shown" 
         close_disabled
@@ -116,6 +122,14 @@
         @ended="showNextVideo"
         @switch="switchVideo"
         @back="is_video_shown = false; resetSearch()"/>
+
+    <gallery
+        v-if="is_gallery_open && backgrounds"
+        :backgrounds="backgrounds"
+        :first_city_id="form_data.cities ? form_data.cities[0] : 131"
+        :cities="cities"
+        :country_name="countries.find(country => country.id === form_data.country_id).name || ''"
+        @close="is_gallery_open = false"/>
 </template>
 
 <script setup>
@@ -131,10 +145,12 @@
     import SubmitButton from '@/components/SubmitButton.vue';
     import Guide from '@/components/Guide.vue';
     import VideoModal from '@/components/modals/VideoModal.vue';
+    import Gallery from '@/components/Gallery.vue';
     import axios from 'axios';
 
     const { t } = useI18n();
     const is_country_valid = ref(false);
+    const is_gallery_open = ref(false);
     const response_loading = ref(false);
     const toast = useToast();
 
@@ -155,6 +171,7 @@
     const services = ref([]);
     const results = ref(null);
     const split_by = ref(null);
+    const backgrounds = ref(null);
 
     onMounted(async () => {
         countries.value = await getCountries(t);
@@ -261,9 +278,9 @@
         if (isValidCountry) {
             form_data.value.country_id = country_found.id;
             is_country_valid.value = true;
-            const photo_url = await getBackgroundPhoto(country_found.country_code.toLowerCase(), t);
-            if (photo_url) {
-                document.body.style.backgroundImage = `url('https://guides-to-go.onrender.com${photo_url}')`;
+            backgrounds.value = await getBackgroundPhoto(country_found.country_code.toLowerCase(), t);
+            if (backgrounds.value && backgrounds.value.country_photo) {
+                document.body.style.backgroundImage = `url('https://guides-to-go.onrender.com${backgrounds.value.country_photo}')`;
             } else {
                 document.body.style.backgroundImage = sessionStorage.getItem("background_image");
             }
@@ -272,6 +289,7 @@
             form_data.value.country_id = null;
             form_data.value.cities = null;
             is_country_valid.value = false;
+            backgrounds.value = null;
             cities.value = [];
         }
     }
@@ -291,6 +309,13 @@
 
         if (isValidCity) {
             form_data.value.cities = [city_found.id];
+            const city_background = backgrounds.value?.cities_photos.find(city => city.city_id === city_found.id);
+            if (backgrounds.value && city_background) {
+                document.body.style.backgroundImage = `url('https://guides-to-go.onrender.com${city_background.photo_url}')`;
+            } else if(backgrounds.value && backgrounds.value.country_photo && !city_background) {
+                document.body.style.backgroundImage = `url('https://guides-to-go.onrender.com${backgrounds.value.country_photo}')`;
+            }
+            
         } else {
             form_data.value.cities = null;
         }
@@ -317,6 +342,7 @@
 
     const resetSearch = () => {
         results.value = null;
+        backgrounds.value = null;
         currentPage.value = 0;
         callsMade.value = [];
     }
@@ -353,6 +379,14 @@
 
     const randomSort = (array) => {
         return array.sort(() => Math.random() - 0.5);
+    }
+
+    const showOpenGalleryButton = computed(() => {
+        return !is_gallery_open.value && backgrounds.value && backgrounds.value.country_photo;
+    });
+
+    const openGallery = () => {
+        is_gallery_open.value = true;
     }
 </script>
 
@@ -480,6 +514,20 @@
                     font-size: 0.875rem;
                 }
             }
+        }
+    }
+
+    .open-gallery {
+        @include flex-center;
+        width: 3rem;
+        height: 3rem;
+        background-color: $white;
+        color: $black;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        margin-left: 2rem;
+        img {
+            width: 1.5rem;
         }
     }
 </style>

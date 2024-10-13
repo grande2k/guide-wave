@@ -1,36 +1,63 @@
 <template>
     <div class="admin-background-upload">
-        <label for="photo" class="photo-upload">
+        <label v-if="(!photo_url && !previewImage) || showUploadButton" for="photo" class="photo-upload">
             Выберите изображение
         </label>
 
         <div class="image">
-            <img v-if="photo_url && !previewImage" :src="`https://guides-to-go.onrender.com${photo_url}`" alt="User photo" />
+            <img v-if="photo_url && !previewImage && !showUploadButton"
+                :src="`https://guides-to-go.onrender.com${photo_url}`" alt="User photo" />
             <img v-if="previewImage" :src="previewImage" alt="Photo Preview" />
         </div>
 
-        <input type="file" :accept="only_jpg ? 'image/jpeg' : 'image/*'" id="photo" @change="onFileChange">
+        <div v-if="!showUploadButton && photo_url && !previewImage" class="grid-half">
+            <button class="change-background" @click="changeBackground">
+                <img src="@/assets/images/icons/edit.svg" alt="edit">
+                Изменить
+            </button>
+
+            <button class="delete-background" @click="deleteBackground">
+                <img src="@/assets/images/icons/delete.svg" alt="delete">
+                Удалить
+            </button>
+        </div>
+
+        <div v-if="selected_image && previewImage" class="grid-half">
+            <button class="change-background" @click="changeBackground">
+                <img src="@/assets/images/icons/edit.svg" alt="edit">
+                Изменить
+            </button>
+
+            <button class="delete-background" @click="deleteBackground">
+                <img src="@/assets/images/icons/delete.svg" alt="delete">
+                Удалить
+            </button>
+        </div>
+
+        <button v-if="selected_image && previewImage" class="save-background" @click="updateImage">
+            <img src="@/assets/images/icons/check.svg" alt="save">
+            Сохранить
+        </button>
+
+        <input type="file" accept="image/jpeg" id="photo" @change="onFileChange">
     </div>
 </template>
 
 <script setup>
-    import { ref } from 'vue';
+    import { ref, watch } from 'vue';
 
     const props = defineProps({
         photo_url: {
             type: String,
             default: ''
-        },
-        only_jpg: {
-            type: Boolean,
-            default: false
         }
     });
 
-    const emit = defineEmits(['upload']);
+    const emit = defineEmits(['update']);
 
     const selected_image = ref(null);
     const previewImage = ref(null);
+    const showUploadButton = ref(false);
 
     const onFileChange = (event) => {
         const file = event.target.files[0];
@@ -41,16 +68,42 @@
             };
             reader.readAsDataURL(file);
             selected_image.value = file;
-            uploadImage();
-        } else {
-            previewImage.value = null;
+            showUploadButton.value = false;
         }
     }
 
-    const uploadImage = async () => {
-        emit('upload', selected_image.value);
+    const changeBackground = () => {
+        previewImage.value = null;
+        selected_image.value = null;
+        showUploadButton.value = true;
     }
+
+    const deleteBackground = () => {
+        if (previewImage.value) {
+            previewImage.value = null;
+            selected_image.value = null;
+        } else if (props.photo_url) {
+            emit('update', null);
+        }
+
+        showUploadButton.value = true;
+        selected_image.value = null;
+        previewImage.value = null;
+    }
+
+    const updateImage = () => {
+        emit('update', selected_image.value);
+    }
+
+    watch(() => props.photo_url, (newValue) => {
+        if (!newValue) {
+            previewImage.value = null;
+            selected_image.value = null;
+            showUploadButton.value = true;
+        }
+    });
 </script>
+
 
 <style lang="scss" scoped>
     .admin-background-upload {
@@ -74,6 +127,34 @@
         }
         .image {
             margin-top: 1rem;
+        }
+        .grid-half {
+            margin-top: 1rem;
+            @include grid(2, 0.75rem);
+        }
+        button {
+            @include flex-center;
+            width: 100%;
+            padding: 1.25rem;
+            border-radius: 1rem;
+            color: $white;
+            font-weight: 500;
+            font-size: 1rem;
+            cursor: pointer;
+            &.change-background {
+                background-color: $primary;
+            }
+            &.delete-background {
+                background-color: $error;
+            }
+            &.save-background {
+                background-color: #48cc3c;
+                margin-top: 1rem;
+            }
+            img {
+                width: 1.5rem;
+                margin-right: 0.5rem;
+            }
         }
     }
 </style>

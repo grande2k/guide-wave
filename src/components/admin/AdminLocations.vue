@@ -11,13 +11,25 @@
 
         <div v-if="locations.length" class="admin-locations__list">
             <div v-for="country in locations" :key="country.country_id">
-                <div class="admin-list-item" @click="handleCountryClick(country)">
-                    <strong v-text="country.country_names.ru || country.country_names.en"/>
+                <div class="admin-list-item">
+                    <strong v-text="country.country_names.ru || country.country_names.en" @click="handleCountryClick(country)"/>
+
+                    <div class="location-background" @click="handleCountryBackgroundClick(country)">
+                        <img v-if="country.country_photo_url" :src="`https://guides-to-go.onrender.com${country.country_photo_url}`" alt="background">
+                        <div v-else class="location-background-empty"/>
+                    </div>
                 </div>
 
                 <div class="cities">
                     <ul v-if="country.cities && country.cities.length" class="admin-locations__cities">
-                        <li v-for="city in country.cities" :key="city.city_id" class="admin-list-item" v-text="city.city_names.ru || city.city_names.en" @click="handleCityClick(city)"/>
+                        <li v-for="city in country.cities" :key="city.city_id" class="admin-list-item">
+                            <strong v-text="city.city_names.ru || city.city_names.en" @click="handleCityClick(city)"/>
+                            
+                            <div class="location-background" @click="handleCityBackgroundClick(city)">
+                                <img v-if="city.city_photo_url" :src="`https://guides-to-go.onrender.com${city.city_photo_url}`" alt="background">
+                                <div v-else class="location-background-empty"/>
+                            </div>
+                        </li>
                     </ul>
 
                     <p v-else class="admin-message">Нет городов</p>
@@ -38,7 +50,14 @@
         </button>
     </div>
 
-
+    <background-modal
+        v-if="is_background_modal_open"
+        :title="modal_params.title"
+        :type="modal_params.type"
+        :initial-data="modal_params.type === 'countries' ? selectedCountry : selectedCity"
+        :photo_url="modal_params.type === 'countries' ? selectedCountry.country_photo_url ?? '' : selectedCity.city_photo_url ?? ''"
+        @close="closeModal"
+        @update="getLocationsFunction" />
 
     <edit-or-delete-modal
         v-if="is_dialog_modal_open"
@@ -69,8 +88,10 @@
     import EditOrDeleteModal from '@/components/modals/admin/EditOrDeleteModal.vue';
     import CreateModal from '@/components/modals/admin/CreateModal.vue';
     import EditModal from '@/components/modals/admin/EditModal.vue';
+    import BackgroundModal from '../modals/admin/BackgroundModal.vue';
 
     const locations = ref([]);
+    const is_background_modal_open = ref(false);
     const is_dialog_modal_open = ref(false);
     const is_create_modal_open = ref(false);
     const is_edit_modal_open = ref(false);
@@ -91,8 +112,23 @@
         selectedCountry.value = country;
     }
 
+    const handleCountryBackgroundClick = (country) => {
+        modal_params.value.type = "countries";
+        modal_params.value.title = country.country_names.ru || country.country_names.en;
+        is_background_modal_open.value = true;
+        selectedCountry.value = country;
+    }
+
+
     const handleCityClick = (city) => {
         is_dialog_modal_open.value = true;
+        selectedCity.value = city;
+    }
+
+    const handleCityBackgroundClick = (city) => {
+        modal_params.value.type = "cities";
+        modal_params.value.title = city.city_names.ru || city.city_names.en;
+        is_background_modal_open.value = true;
         selectedCity.value = city;
     }
 
@@ -139,6 +175,7 @@
     }
 
     const closeModal = () => {
+        is_background_modal_open.value = false;
         is_dialog_modal_open.value = false;
         is_create_modal_open.value = false;
         is_edit_modal_open.value = false;
@@ -158,6 +195,40 @@
             }
         }
         &__list {
+            .admin-list-item {
+                display: flex;
+                padding: 0;
+                background-color: transparent;
+                cursor: default;
+                strong {
+                    @include flex-center-vert;
+                    padding: 0.75rem 1rem;
+                    flex: auto;
+                    background-color: $white;
+                    border-radius: inherit;
+                    cursor: pointer;
+                    height: 3.5rem;
+                }
+                .location-background {
+                    width: 3.5rem;
+                    height: 3.5rem;
+                    padding: 0.375rem;
+                    background-color: $white;
+                    border-radius: inherit;
+                    margin-left: 0.5rem;
+                    cursor: pointer;
+                    &-empty {
+                        width: 100%;
+                        height: 100%;
+                        background-color: #c5c5c5;
+                    }
+                    img {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                    }
+                }
+            }
             .cities {
                 padding: 0 0 0 1.5rem;
                 button {

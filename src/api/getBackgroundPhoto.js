@@ -6,7 +6,7 @@ const toast = useToast();
 export const getBackgroundPhoto = async (code, t) => {
     try {
         const response = await axios.post('https://guides-to-go.onrender.com/admin/background_photo', { country_code: code });
-        return response.data.photo_url;
+        return response.data;
     } catch (err) {
         switch (err.response.status) {
             case 422:
