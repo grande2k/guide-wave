@@ -39,6 +39,10 @@
                     <span v-if="guide_index === index + 1" v-text="formatTime(countdown)"/>
                     <span v-else v-text="index + 1"/>
                 </div>
+
+                <div class="circle skip" @click="emit('close')">
+                    <img src="@/assets/images/icons/arrow-left.svg" alt="skip">
+                </div>
             </div>
         </div>
     </teleport>
@@ -318,6 +322,12 @@
             &.active {
                 background-color: $primary;
                 color: $white;
+            }
+            &.skip {
+                img {
+                    width: 1rem;
+                    transform: rotate(180deg);
+                }
             }
         }
     }

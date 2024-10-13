@@ -309,7 +309,10 @@
 
         if (isValidCity) {
             form_data.value.cities = [city_found.id];
-            const city_background = backgrounds.value?.cities_photos.find(city => city.city_id === city_found.id);
+            let city_background;
+            if(backgrounds.value.cities_photos) {
+                city_background = backgrounds.value?.cities_photos.find(city => city?.city_id === city_found?.id);
+            }
             if (backgrounds.value && city_background) {
                 document.body.style.backgroundImage = `url('https://guides-to-go.onrender.com${city_background.photo_url}')`;
             } else if(backgrounds.value && backgrounds.value.country_photo && !city_background) {
