@@ -281,6 +281,7 @@
             backgrounds.value = await getBackgroundPhoto(country_found.country_code.toLowerCase(), t);
             if (backgrounds.value && backgrounds.value.country_photo) {
                 document.body.style.backgroundImage = `url('https://guides-to-go.onrender.com${backgrounds.value.country_photo}')`;
+                sessionStorage.setItem("background_image", `url('https://guides-to-go.onrender.com${backgrounds.value.country_photo}')`);
             } else {
                 document.body.style.backgroundImage = sessionStorage.getItem("background_image");
             }
@@ -315,6 +316,7 @@
             }
             if (backgrounds.value && city_background) {
                 document.body.style.backgroundImage = `url('https://guides-to-go.onrender.com${city_background.photo_url}')`;
+                sessionStorage.setItem("background_image", `url('https://guides-to-go.onrender.com${city_background.photo_url}')`);
             } else if(backgrounds.value && backgrounds.value.country_photo && !city_background) {
                 document.body.style.backgroundImage = `url('https://guides-to-go.onrender.com${backgrounds.value.country_photo}')`;
             }
