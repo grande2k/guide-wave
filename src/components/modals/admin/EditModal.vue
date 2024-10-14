@@ -141,25 +141,27 @@
                 await updateAdminService(services_formatted_data);
                 break;
             case 'countries':
-                const countries_formatted_data = {
-                    old_country_code: props.initialData.country_code,
-                    new_country_code: form_data.country_code.toLowerCase(),
-                    country_names: {}
-                };
+                let country_names = {};
 
                 appStore.interface_languages.forEach((lang) => {
-                    countries_formatted_data.country_names[lang.lang_code] = form_data[lang.lang_code];
+                    country_names[lang.lang_code] = form_data[lang.lang_code];
                 });
 
-                await updateCountry(countries_formatted_data);
+                const countries_fd = new FormData();
+
+                countries_fd.append('old_country_code', props.initialData.country_code);
+                countries_fd.append('new_country_code', form_data.country_code.toLowerCase());
+                countries_fd.append('country_names', JSON.stringify(country_names));
+
+                await updateCountry(countries_fd);
             break;
             case 'cities':
-                const cities_formatted_data = {
-                    old_city_names: props.initialData.city_names,
-                    new_city_names: form_data
-                };
+                const cities_fd = new FormData();
 
-                await updateCity(cities_formatted_data);
+                cities_fd.append('old_city_names', JSON.stringify(props.initialData.city_names));
+                cities_fd.append('new_city_names', JSON.stringify(form_data));
+
+                await updateCity(cities_fd);
                 break;
             default:
                 break;
