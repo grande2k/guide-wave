@@ -110,7 +110,7 @@
         switch (source) {
             case 'languages':
                 const langs_formatted_data = {
-                    lang_code: form_data.lang_code,
+                    lang_code: form_data.lang_code.toLowerCase(),
                     languages_names: {}
                 };
 
@@ -133,7 +133,7 @@
                 break;
             case 'countries':
                 const countries_formatted_data = {
-                    country_code: form_data.country_code,
+                    country_code: form_data.country_code.toLowerCase(),
                     country_names: {}
                 };
 

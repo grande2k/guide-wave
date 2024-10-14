@@ -56,7 +56,6 @@
     import { onClickOutside } from '@vueuse/core';
     import { updateAdminLanguage, updateAdminService, updateCity, updateCountry } from '@/api';
     import SubmitButton from '@/components/SubmitButton.vue';
-    import AdminBackgroundUpload from '@/components/admin/AdminBackgroundUpload.vue';
 
     const toast = useToast();
     const target = ref(null);
@@ -123,7 +122,7 @@
             case 'languages':
                 const languages_formatted_data = {
                     old_lang_code: props.oldLangCode,
-                    update_lang_code: form_data.lang_code,
+                    update_lang_code: form_data.lang_code.toLowerCase(),
                     languages_names: {}
                 };
 
@@ -144,7 +143,7 @@
             case 'countries':
                 const countries_formatted_data = {
                     old_country_code: props.initialData.country_code,
-                    new_country_code: form_data.country_code,
+                    new_country_code: form_data.country_code.toLowerCase(),
                     country_names: {}
                 };
 
