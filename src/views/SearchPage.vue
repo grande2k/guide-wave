@@ -387,7 +387,7 @@
     }
 
     const showOpenGalleryButton = computed(() => {
-        return !is_gallery_open.value && backgrounds.value && backgrounds.value.country_photo;
+        return !is_gallery_open.value && !results.value && backgrounds.value && backgrounds.value.country_photo;
     });
 
     const openGallery = () => {

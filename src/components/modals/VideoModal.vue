@@ -33,14 +33,14 @@
                 <div 
                     v-for="(circle, index) in guides_count" 
                     :key="index" 
-                    :class="['circle', { active: guide_index === index + 1 }]"
+                    :class="['circle', { active: guide_index === index + 1, last: index + 1 === guides_count } ]"
                     :ref="el => circleRefs[index] = el"
                     @click="emit('switch', index)">
                     <span v-if="guide_index === index + 1" v-text="formatTime(countdown)"/>
                     <span v-else v-text="index + 1"/>
                 </div>
 
-                <div class="circle skip" @click="emit('close')">
+                <div class="circle skip" @click="emit('ended')">
                     <img src="@/assets/images/icons/arrow-left.svg" alt="skip">
                 </div>
             </div>
@@ -302,6 +302,8 @@
         width: 100%;
         overflow-x: auto;
         justify-content: center;
+        max-width: calc(100% - 4rem);
+        align-items: center;
         &.flex-start {
             justify-content: flex-start;
         }
@@ -319,13 +321,30 @@
             line-height: 1;
             cursor: pointer;
             user-select: none;
+            @media screen and (max-width: 480px) {
+                &.last {
+                    margin-right: 1rem;
+                }
+            }
             &.active {
                 background-color: $primary;
                 color: $white;
             }
             &.skip {
+                width: 4.5rem;
+                height: 4.5rem;
+                min-width: 4.5rem;
+                position: static;
+                background-color: $primary;
+                border: 4px solid $white;
+                @media screen and (max-width: 480px) {
+                    position: fixed;
+                    right: 0.5rem;
+                    bottom: 1.5rem;
+                    z-index: 4;
+                }
                 img {
-                    width: 1rem;
+                    width: 1.5rem;
                     transform: rotate(180deg);
                 }
             }
