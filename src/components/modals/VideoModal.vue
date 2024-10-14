@@ -40,9 +40,13 @@
                     <span v-else v-text="index + 1"/>
                 </div>
 
-                <div class="circle skip" @click="emit('ended')">
+                <div v-if="!isMobile()" class="circle skip" @click="emit('ended')">
                     <img src="@/assets/images/icons/arrow-left.svg" alt="skip">
                 </div>
+            </div>
+
+            <div v-if="isMobile()" class="circle skip mobile" @click="emit('ended')">
+                <img src="@/assets/images/icons/arrow-left.svg" alt="skip">
             </div>
         </div>
     </teleport>
@@ -198,6 +202,14 @@
         const seconds = Math.floor(time % 60);
         return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
     }
+
+    const isMobile = () => {
+        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 </script>
 
 <style lang="scss" scoped>
@@ -310,43 +322,43 @@
         @media screen and (max-width: 480px) {
             bottom: 2rem;
         }
-        .circle {
-            @include flex-center;
-            width: 3.5rem;
-            height: 3.5rem;
-            min-width: 3.5rem;
-            border-radius: 50%;
-            background-color: rgba($color: $white, $alpha: 0.25);
-            color: rgba($color: $white, $alpha: 0.5);
-            line-height: 1;
-            cursor: pointer;
-            user-select: none;
+    }
+    .circle {
+        @include flex-center;
+        width: 3.5rem;
+        height: 3.5rem;
+        min-width: 3.5rem;
+        border-radius: 50%;
+        background-color: rgba($color: $white, $alpha: 0.25);
+        color: rgba($color: $white, $alpha: 0.5);
+        line-height: 1;
+        cursor: pointer;
+        user-select: none;
+        @media screen and (max-width: 480px) {
+            &.last {
+                margin-right: 1rem;
+            }
+        }
+        &.active {
+            background-color: $primary;
+            color: $white;
+        }
+        &.skip {
+            width: 4.5rem;
+            height: 4.5rem;
+            min-width: 4.5rem;
+            position: static;
+            background-color: $primary;
+            border: 4px solid $white;
             @media screen and (max-width: 480px) {
-                &.last {
-                    margin-right: 1rem;
-                }
+                position: fixed;
+                right: 0.5rem;
+                bottom: 1.5rem;
+                z-index: 10;
             }
-            &.active {
-                background-color: $primary;
-                color: $white;
-            }
-            &.skip {
-                width: 4.5rem;
-                height: 4.5rem;
-                min-width: 4.5rem;
-                position: static;
-                background-color: $primary;
-                border: 4px solid $white;
-                @media screen and (max-width: 480px) {
-                    position: fixed;
-                    right: 0.5rem;
-                    bottom: 1.5rem;
-                    z-index: 4;
-                }
-                img {
-                    width: 1.5rem;
-                    transform: rotate(180deg);
-                }
+            img {
+                width: 1.5rem;
+                transform: rotate(180deg);
             }
         }
     }
