@@ -54,6 +54,12 @@
     });
 
     const filteredOptions = computed(() => {
+        const userLang = localStorage.getItem("language");
+        const userLangIndex = props.options.findIndex(lang => lang.lang_code === userLang);
+        if(userLangIndex !== -1) {
+            const userLanguage = props.options.splice(userLangIndex, 1)[0];
+            props.options.unshift(userLanguage);
+        }
         return props.options.filter(option => !props.allSelectedLanguages.includes(option.lang_code));
     });
 
