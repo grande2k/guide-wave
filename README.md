@@ -1,4 +1,4 @@
-# guides-to-go
+# guide-wave
 
 This template should help get you started developing with Vue 3 in Vite.
 
