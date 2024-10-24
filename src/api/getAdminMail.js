@@ -5,7 +5,7 @@ const toast = useToast();
 
 export const getAdminMail = async (t) => {
     try {
-        const response = await axios.get('https://guides-to-go.onrender.com/admin/email');
+        const response = await axios.get('https://api.theguidewave.com/admin/email');
         return response.data.email_admin;
     } catch (err) {
         switch (err.response.status) {

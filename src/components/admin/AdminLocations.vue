@@ -15,7 +15,7 @@
                     <strong v-text="country.country_names.ru || country.country_names.en" @click="handleCountryClick(country)"/>
 
                     <div class="location-background" @click="handleCountryBackgroundClick(country)">
-                        <img v-if="country.country_photo_url" :src="`https://guides-to-go.onrender.com${country.country_photo_url}`" alt="background">
+                        <img v-if="country.country_photo_url" :src="`https://api.theguidewave.com${country.country_photo_url}`" alt="background">
                         <div v-else class="location-background-empty"/>
                     </div>
                 </div>
@@ -26,7 +26,7 @@
                             <strong v-text="city.city_names.ru || city.city_names.en" @click="handleCityClick(city)"/>
                             
                             <div class="location-background" @click="handleCityBackgroundClick(city)">
-                                <img v-if="city.city_photo_url" :src="`https://guides-to-go.onrender.com${city.city_photo_url}`" alt="background">
+                                <img v-if="city.city_photo_url" :src="`https://api.theguidewave.com${city.city_photo_url}`" alt="background">
                                 <div v-else class="location-background-empty"/>
                             </div>
                         </li>

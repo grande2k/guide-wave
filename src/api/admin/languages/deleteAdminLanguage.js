@@ -10,7 +10,7 @@ export const deleteAdminLanguage = async (params) => {
             data: params 
         };
 
-        await axios.delete('https://guides-to-go.onrender.com/admin/delete_languages', request_headers);
+        await axios.delete('https://api.theguidewave.com/admin/delete_languages', request_headers);
 
         toast.success('Язык был успешно удален')
     } catch (err) {

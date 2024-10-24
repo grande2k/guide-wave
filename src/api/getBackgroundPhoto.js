@@ -5,7 +5,7 @@ const toast = useToast();
 
 export const getBackgroundPhoto = async (code, t) => {
     try {
-        const response = await axios.post('https://guides-to-go.onrender.com/admin/background_photo', { country_code: code });
+        const response = await axios.post('https://api.theguidewave.com/admin/background_photo', { country_code: code });
         return response.data;
     } catch (err) {
         switch (err.response.status) {

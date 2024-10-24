@@ -20,7 +20,7 @@
                     <video
                         class="video"
                         ref="videoRef"
-                        :src="`https://guides-to-go.onrender.com${video_url}`"
+                        :src="`https://api.theguidewave.com${video_url}`"
                         autoplay
                         playsinline
                         @timeupdate="updateProgress"

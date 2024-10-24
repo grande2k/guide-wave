@@ -10,7 +10,7 @@ export const deleteCity = async (params) => {
             data: { city_names: params } 
         };
 
-        await axios.delete('https://guides-to-go.onrender.com/admin/city_delete', request_headers);
+        await axios.delete('https://api.theguidewave.com/admin/city_delete', request_headers);
 
         toast.success('Город был успешно удален')
     } catch (err) {

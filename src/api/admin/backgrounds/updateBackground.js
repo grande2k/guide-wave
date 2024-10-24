@@ -20,9 +20,9 @@ export const updateBackground = async (data, photo) => {
         };
 
         if(photo) {
-            await axios.put('https://guides-to-go.onrender.com/admin/background_photo_update', photo, request_params);
+            await axios.put('https://api.theguidewave.com/admin/background_photo_update', photo, request_params);
         } else {
-            await axios.put('https://guides-to-go.onrender.com/admin/background_photo_update', {}, request_params);
+            await axios.put('https://api.theguidewave.com/admin/background_photo_update', {}, request_params);
         }
 
         toast.success('Фон был успешно обновлен');

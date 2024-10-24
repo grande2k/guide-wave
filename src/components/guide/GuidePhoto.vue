@@ -1,7 +1,7 @@
 <template>
     <label for="guide-photo" class="guide-profile__photo">
         <div v-if="photo_url" class="guide-profile__photo-avatar">
-            <img :src="`https://guides-to-go.onrender.com${photo_url}`" alt="User photo" />
+            <img :src="`https://api.theguidewave.com${photo_url}`" alt="User photo" />
         </div>
         <div v-if="previewImage" class="guide-profile__photo-preview">
             <img :src="previewImage" alt="Photo Preview" />

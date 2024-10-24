@@ -5,7 +5,7 @@ const toast = useToast();
 
 export const register = async (params, router, t) => {
     try {
-        await axios.post('https://guides-to-go.onrender.com/auth/register', params);
+        await axios.post('https://api.theguidewave.com/auth/register', params);
         router.push('/login');
         toast.success(t('message_register_success'));
     } catch (err) {

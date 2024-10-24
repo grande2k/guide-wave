@@ -4,7 +4,7 @@
             <div class="guide__flex-row">
                 <div class="guide__photo" :class="{ changed: guide.change.photo_url }">
                     <div v-if="guide.photo_url" class="guide__photo-avatar">
-                        <img :src="`https://guides-to-go.onrender.com${guide.photo_url}`" alt="User photo" />
+                        <img :src="`https://api.theguidewave.com${guide.photo_url}`" alt="User photo" />
                     </div>
 
                     <div v-else class="guide__photo-empty">

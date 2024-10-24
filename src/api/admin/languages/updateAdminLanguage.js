@@ -21,7 +21,7 @@ export const updateAdminLanguage = async (data) => {
             languages_names: data.languages_names
         };
 
-        await axios.put('https://guides-to-go.onrender.com/admin/update_languages', params, request_headers);
+        await axios.put('https://api.theguidewave.com/admin/update_languages', params, request_headers);
         toast.success('Язык был успешно обновлен');
     } catch (err) {
         if (err.response?.status === 422) {

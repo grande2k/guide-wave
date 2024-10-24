@@ -9,7 +9,7 @@ export const deleteAdminService = async (params) => {
             headers: { 'Authorization': `Bearer ${$cookies.get("access_token")}` },
             data: params 
         };
-        await axios.delete('https://guides-to-go.onrender.com/admin/delete_service', request_params);
+        await axios.delete('https://api.theguidewave.com/admin/delete_service', request_params);
         toast.success('Услуга была успешно удалена');
     } catch (err) {
         switch (err.response.status) {

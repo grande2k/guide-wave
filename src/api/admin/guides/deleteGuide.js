@@ -6,7 +6,7 @@ const toast = useToast();
 export const deleteGuide = async (params) => {
     try {
         const request_params = { data: params, headers: { 'Authorization': `Bearer ${$cookies.get("access_token")}` } };
-        const response = await axios.delete('https://guides-to-go.onrender.com/admin/delete_guide', request_params);
+        const response = await axios.delete('https://api.theguidewave.com/admin/delete_guide', request_params);
 
         console.log(response.data);
         toast.success('Исполнитель был успешно удален');

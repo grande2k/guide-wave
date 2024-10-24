@@ -7,7 +7,7 @@ export const getCities = async (country_id, t, lang) => {
     try {
         const locale = localStorage.getItem('language') || 'en';
         const params = { language: lang ?? locale, country_id: country_id };
-        const response = await axios.post('https://guides-to-go.onrender.com/search/get_city', params);
+        const response = await axios.post('https://api.theguidewave.com/search/get_city', params);
         
         return response.data.cities;
     } catch (err) {

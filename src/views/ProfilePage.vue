@@ -287,8 +287,8 @@
 
             response_loading.value = true;
 
-            await axios.post('https://guides-to-go.onrender.com/user_info/', params, request_headers);
-            await axios.post('https://guides-to-go.onrender.com/service/update_services', services_params, request_headers);
+            await axios.post('https://api.theguidewave.com/user_info/', params, request_headers);
+            await axios.post('https://api.theguidewave.com/service/update_services', services_params, request_headers);
 
             let photoUploadPromise = null;
 
@@ -298,7 +298,7 @@
                         try {
                             const fd = new FormData();
                             fd.append('file', uploading_photo.value, uploading_photo.value.name);
-                            const response = await axios.post('https://guides-to-go.onrender.com/user_info/add_photo', fd, request_headers);
+                            const response = await axios.post('https://api.theguidewave.com/user_info/add_photo', fd, request_headers);
                             resolve(response);
                         } catch (error) {
                             reject(error);
@@ -315,7 +315,7 @@
                         try {
                             const fd = new FormData();
                             fd.append('file', uploading_video.value, uploading_video.value.name);
-                            const response = await axios.post('https://guides-to-go.onrender.com/user_info/add_video', fd, request_headers);
+                            const response = await axios.post('https://api.theguidewave.com/user_info/add_video', fd, request_headers);
                             resolve(response);
                         } catch (error) {
                             reject(error);
@@ -329,7 +329,7 @@
                             const fd = new FormData();
                             const request_params = { params: { old_video_url: guide_profile.value.video_url }, headers: { 'Authorization': `Bearer ${$cookies.get("access_token")}` } };
                             fd.append('new_file', updating_video.value, updating_video.value.name);
-                            const response = await axios.put('https://guides-to-go.onrender.com/user_info/update_video', fd, request_params);
+                            const response = await axios.put('https://api.theguidewave.com/user_info/update_video', fd, request_params);
                             resolve(response);
                         } catch (error) {
                             reject(error);
@@ -358,7 +358,7 @@
                                     headers: request_headers.headers
                                 };
 
-                                response = await axios.put('https://guides-to-go.onrender.com/service/update_video_service', fd, request_params);
+                                response = await axios.put('https://api.theguidewave.com/service/update_video_service', fd, request_params);
                             } else {
                                 fd.append('file', service.uploading_video, service.uploading_video.name);
 
@@ -369,7 +369,7 @@
                                     headers: request_headers.headers
                                 };
 
-                                response = await axios.post('https://guides-to-go.onrender.com/service/add_video_service', fd, request_params);
+                                response = await axios.post('https://api.theguidewave.com/service/add_video_service', fd, request_params);
                             }
                             resolve(response);
                         } catch (error) {

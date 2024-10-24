@@ -162,7 +162,7 @@
                 headers: { 'Authorization': `Bearer ${$cookies.get("access_token")}` }
             };
 
-            const response = await axios.delete('https://guides-to-go.onrender.com/service/delete_video_service', request_options);
+            const response = await axios.delete('https://api.theguidewave.com/service/delete_video_service', request_options);
             console.log(response);
             emit('delete_video');
             toast.success(t('message_video_delete_success'));

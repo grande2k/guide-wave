@@ -6,7 +6,7 @@ const toast = useToast();
 export const approveGuide = async (params, t) => {
     try {
         const request_headers = { headers: { 'Authorization': `Bearer ${$cookies.get("access_token")}` } };
-        const response = await axios.post('https://guides-to-go.onrender.com/admin/approve_guide', params, request_headers);
+        const response = await axios.post('https://api.theguidewave.com/admin/approve_guide', params, request_headers);
 
         console.log(response.data);
 

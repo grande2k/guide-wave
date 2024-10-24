@@ -10,7 +10,7 @@ export const deleteCountry = async (country_id) => {
             data: { id: country_id } 
         };
 
-        await axios.delete('https://guides-to-go.onrender.com/admin/country_delete', request_headers);
+        await axios.delete('https://api.theguidewave.com/admin/country_delete', request_headers);
 
         toast.success('Страна была успешно удалена')
     } catch (err) {

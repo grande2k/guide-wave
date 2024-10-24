@@ -7,7 +7,7 @@ export const getLanguages = async (t) => {
     try {
         const locale = localStorage.getItem('language') || 'en';
         const params = { language: locale };
-        const response = await axios.post('https://guides-to-go.onrender.com/search/language', params);
+        const response = await axios.post('https://api.theguidewave.com/search/language', params);
 
         return response.data.language;
     } catch (err) {

@@ -5,7 +5,7 @@ const toast = useToast();
 
 export const recoverPassword = async (params, t) => {
     try {
-        const response = await axios.post('https://guides-to-go.onrender.com/auth/accept_answer', params);
+        const response = await axios.post('https://api.theguidewave.com/auth/accept_answer', params);
         return response.data.new_password;
     } catch (err) {
         switch (err.response.status) {

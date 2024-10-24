@@ -18,12 +18,14 @@
 </template>
 
 <script setup>
-    import { onMounted } from 'vue';
+    import { onMounted, watch } from 'vue';
     import { getUserLocation, getBackgroundPhoto, getAdminMail, getCountries, getInterfaceLanguages, getDuration } from '@/api';
     import { useAppStore } from '@/stores/app';
     import { useI18n } from 'vue-i18n';
+    import { useRoute } from 'vue-router';
 
     const appStore = useAppStore();
+    const route = useRoute();
     const { t } = useI18n();
 
     onMounted(async () => {
@@ -32,8 +34,9 @@
         if(user_country_code) {
             const user_location_background = await getBackgroundPhoto(user_country_code, t);
             if(user_location_background.country_photo) {
-                document.body.style.backgroundImage = `url('https://guides-to-go.onrender.com${user_location_background.country_photo}')`;
-                sessionStorage.setItem("background_image", `url('https://guides-to-go.onrender.com${user_location_background.country_photo}')`);
+                document.body.style.backgroundImage = `url('https://api.theguidewave.com${user_location_background.country_photo}')`;
+                sessionStorage.setItem("background_image", `url('https://api.theguidewave.com${user_location_background.country_photo}')`);
+                sessionStorage.setItem("user_bg", `url('https://api.theguidewave.com${user_location_background.country_photo}')`);
             }
         }
         
@@ -41,6 +44,12 @@
         appStore.setCountries(await getCountries(t));
         appStore.setInterfaceLanguages(await getInterfaceLanguages(t));
         appStore.setMaxVideoDuration(await getDuration(t));
+    });
+
+    watch(route, (newRoute) => {
+        if(newRoute.name !== 'search') {
+            document.body.style.backgroundImage = sessionStorage.getItem("user_bg");
+        }
     });
 </script>
 

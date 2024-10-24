@@ -20,7 +20,7 @@ export const addAdminLanguage = async (data) => {
             languages_names: data.languages_names
         };
 
-        await axios.post('https://guides-to-go.onrender.com/admin/add_languages', params, request_headers);
+        await axios.post('https://api.theguidewave.com/admin/add_languages', params, request_headers);
         toast.success('Язык был успешно добавлен');
     } catch (err) {
         if (err.response?.status === 422) {

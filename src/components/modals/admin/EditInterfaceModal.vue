@@ -28,7 +28,7 @@
 
                         <div class="image">
                             <img v-if="previewImage" :src="previewImage" alt="Flag Preview" />
-                            <img v-else :src="`https://guides-to-go.onrender.com/flags/${data.lang_code}.svg`" alt="Flag" />
+                            <img v-else :src="`https://api.theguidewave.com/flags/${data.lang_code}.svg`" alt="Flag" />
                         </div>
 
                         <input type="file" accept="image/svg+xml" id="photo" @change="onFileChange">

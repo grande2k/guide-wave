@@ -6,7 +6,7 @@ const toast = useToast();
 export const updatePassword = async (params, t) => {
     try {
         const request_headers = { headers: { 'Authorization': `Bearer ${$cookies.get("access_token")}` } };
-        await axios.put('https://guides-to-go.onrender.com/auth/update_password', params, request_headers);
+        await axios.put('https://api.theguidewave.com/auth/update_password', params, request_headers);
         toast.success(t('message_password_updated_success'));
     } catch(err) {
         switch (err.response.status) {

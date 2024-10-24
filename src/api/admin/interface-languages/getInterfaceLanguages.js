@@ -5,7 +5,7 @@ const toast = useToast();
 
 export const getInterfaceLanguages = async (t) => {
     try {
-        const response = await axios.get('https://guides-to-go.onrender.com/admin/language_interface');
+        const response = await axios.get('https://api.theguidewave.com/admin/language_interface');
 
         return response.data.languages;
     } catch (err) {

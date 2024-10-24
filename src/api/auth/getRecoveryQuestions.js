@@ -7,7 +7,7 @@ export const getRecoveryQuestions = async (t) => {
     try {
         const locale = localStorage.getItem('language') || 'en';
         const params = { language_code: locale };
-        const response = await axios.post('https://guides-to-go.onrender.com/auth/list_questions', params);
+        const response = await axios.post('https://api.theguidewave.com/auth/list_questions', params);
         return response.data.questions;
     } catch (err) {
         switch (err.response.status) {

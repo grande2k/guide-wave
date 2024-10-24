@@ -9,7 +9,7 @@ export const deleteInterfaceLanguages = async (lang) => {
             data: { lang_code: lang },
             headers: { 'Authorization': `Bearer ${$cookies.get("access_token")}` } 
         };
-        await axios.delete('https://guides-to-go.onrender.com/admin/language_interface_delete', request_params);
+        await axios.delete('https://api.theguidewave.com/admin/language_interface_delete', request_params);
         toast.success('Интерфейс был успешно удален');
     } catch (err) {
         switch (err.response.status) {

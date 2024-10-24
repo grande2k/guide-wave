@@ -6,7 +6,7 @@ const toast = useToast();
 export const getAdminServices = async () => {
     try {
         const request_headers = { headers: { 'Authorization': `Bearer ${$cookies.get("access_token")}` } };
-        const response = await axios.get('https://guides-to-go.onrender.com/admin/all_services', request_headers);
+        const response = await axios.get('https://api.theguidewave.com/admin/all_services', request_headers);
 
         console.log(response.data);
 

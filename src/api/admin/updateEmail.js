@@ -6,7 +6,7 @@ const toast = useToast();
 export const updateEmail = async (params, t) => {
     try {
         const request_headers = { headers: { 'Authorization': `Bearer ${$cookies.get("access_token")}` } };
-        const response = await axios.put('https://guides-to-go.onrender.com/admin/email', params, request_headers);
+        const response = await axios.put('https://api.theguidewave.com/admin/email', params, request_headers);
 
         console.log(response.data);
 

@@ -204,7 +204,7 @@
                     };
                     const request_headers = { headers: { 'Authorization': `Bearer ${$cookies.get("access_token")}` } };
 
-                    const response = await axios.post('https://guides-to-go.onrender.com/search/price_list', params, request_headers);
+                    const response = await axios.post('https://api.theguidewave.com/search/price_list', params, request_headers);
 
                     prices.value = response.data.price_list.map((price, index) => ({
                         title: price.title,
@@ -280,8 +280,8 @@
             is_country_valid.value = true;
             backgrounds.value = await getBackgroundPhoto(country_found.country_code.toLowerCase(), t);
             if (backgrounds.value && backgrounds.value.country_photo) {
-                document.body.style.backgroundImage = `url('https://guides-to-go.onrender.com${backgrounds.value.country_photo}')`;
-                sessionStorage.setItem("background_image", `url('https://guides-to-go.onrender.com${backgrounds.value.country_photo}')`);
+                document.body.style.backgroundImage = `url('https://api.theguidewave.com${backgrounds.value.country_photo}')`;
+                sessionStorage.setItem("background_image", `url('https://api.theguidewave.com${backgrounds.value.country_photo}')`);
             } else {
                 document.body.style.backgroundImage = sessionStorage.getItem("background_image");
             }
@@ -315,10 +315,10 @@
                 city_background = backgrounds.value?.cities_photos.find(city => city?.city_id === city_found?.id);
             }
             if (backgrounds.value && city_background) {
-                document.body.style.backgroundImage = `url('https://guides-to-go.onrender.com${city_background.photo_url}')`;
-                sessionStorage.setItem("background_image", `url('https://guides-to-go.onrender.com${city_background.photo_url}')`);
+                document.body.style.backgroundImage = `url('https://api.theguidewave.com${city_background.photo_url}')`;
+                sessionStorage.setItem("background_image", `url('https://api.theguidewave.com${city_background.photo_url}')`);
             } else if(backgrounds.value && backgrounds.value.country_photo && !city_background) {
-                document.body.style.backgroundImage = `url('https://guides-to-go.onrender.com${backgrounds.value.country_photo}')`;
+                document.body.style.backgroundImage = `url('https://api.theguidewave.com${backgrounds.value.country_photo}')`;
             }
             
         } else {

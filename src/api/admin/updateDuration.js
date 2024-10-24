@@ -6,7 +6,7 @@ const toast = useToast();
 export const updateDuration = async (params, t) => {
     try {
         const request_headers = { headers: { 'Authorization': `Bearer ${$cookies.get("access_token")}` } };
-        const response = await axios.post('https://guides-to-go.onrender.com/admin/time_video', params, request_headers);
+        const response = await axios.post('https://api.theguidewave.com/admin/time_video', params, request_headers);
 
         console.log(response.data);
 

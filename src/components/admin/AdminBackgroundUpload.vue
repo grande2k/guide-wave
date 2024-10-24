@@ -6,7 +6,7 @@
 
         <div class="image">
             <img v-if="photo_url && !previewImage && !showUploadButton"
-                :src="`https://guides-to-go.onrender.com${photo_url}`" alt="User photo" />
+                :src="`https://api.theguidewave.com${photo_url}`" alt="User photo" />
             <img v-if="previewImage" :src="previewImage" alt="Photo Preview" />
         </div>
 

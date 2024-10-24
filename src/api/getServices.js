@@ -8,7 +8,7 @@ export const getServices = async (source, t) => {
         try {
             const locale = localStorage.getItem('language') || 'en';
             const params = { language: locale };
-            const response = await axios.post('https://guides-to-go.onrender.com/search/services', params);
+            const response = await axios.post('https://api.theguidewave.com/search/services', params);
 
             console.log(response.data.services);
 
@@ -25,7 +25,7 @@ export const getServices = async (source, t) => {
     } else if(source === 'guide') {
         try {
             const request_headers = { headers: { 'Authorization': `Bearer ${$cookies.get("access_token")}` } };
-            const response = await axios.get('https://guides-to-go.onrender.com/service/get_service', request_headers);
+            const response = await axios.get('https://api.theguidewave.com/service/get_service', request_headers);
             
             console.log(response.data.services);
 

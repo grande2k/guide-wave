@@ -6,7 +6,7 @@ const toast = useToast();
 export const updateInterface = async (params) => {
     try {
         const request_headers = { headers: { 'Authorization': `Bearer ${$cookies.get("access_token")}` } };
-        await axios.put('https://guides-to-go.onrender.com/admin/update_interface', params, request_headers);
+        await axios.put('https://api.theguidewave.com/admin/update_interface', params, request_headers);
         toast.success('Успешно');
     } catch (err) {
         switch (err.response.status) {

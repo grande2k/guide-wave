@@ -2,7 +2,7 @@
     <teleport to="body">
         <Carousel class="gallery" :items-to-show="1" :wrap-around="slides.length > 1 ? true : false" :autoplay="10000" v-model="currentSlide">
             <Slide v-for="(slide, index) in slides" :key="index">
-                <img :src="`https://guides-to-go.onrender.com${slide.photo_url}`" alt="slide.name" class="gallery__item">
+                <img :src="`https://api.theguidewave.com${slide.photo_url}`" alt="slide.name" class="gallery__item">
             </Slide>
         </Carousel>
     </teleport>
@@ -11,7 +11,7 @@
         <div v-if="slides.length > 1" class="gallery__navigation" :class="{ 'start': isScrollable }">
             <div class="gallery__navigation-item" v-for="(slide, index) in slides" :key="index" :class="{ active: currentSlide === index }" :ref="el => circleRefs[index] = el" @click="slideTo(index)">
                 <div class="gallery__navigation-item-image">
-                    <img :src="`https://guides-to-go.onrender.com${slide.photo_url}`" :alt="slide.name" class="gallery__item">
+                    <img :src="`https://api.theguidewave.com${slide.photo_url}`" :alt="slide.name" class="gallery__item">
                     <div class="progress-bar"></div>
                 </div>
                 

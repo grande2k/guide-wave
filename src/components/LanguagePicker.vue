@@ -2,7 +2,7 @@
     <div v-if="languages" class="language-picker" :class="{ 'language-picker--active': isPickerActive }">
         <div class="language-picker__language language-picker__language--current" @click="isPickerActive = !isPickerActive">
             <div class="language-picker__flag">
-                <img :src="`https://guides-to-go.onrender.com/flags/${currentLanguage.lang_code}.svg`" alt="flag">
+                <img :src="`https://api.theguidewave.com/flags/${currentLanguage.lang_code}.svg`" alt="flag">
             </div>
             <span class="language-picker__langName" v-text="currentLanguage.lang_code" />
         </div>
@@ -11,7 +11,7 @@
             <li v-for="lang in filteredLanguages" :key="lang.id" class="language-picker__language"
                 @click="switchLanguage(lang.lang_code)">
                 <div class="language-picker__flag">
-                    <img :src="`https://guides-to-go.onrender.com/flags/${lang.lang_code}.svg`" alt="flag">
+                    <img :src="`https://api.theguidewave.com/flags/${lang.lang_code}.svg`" alt="flag">
                 </div>
 
                 <span class="language-picker__langName" v-text="lang.lang_code" />

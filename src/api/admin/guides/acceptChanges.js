@@ -11,7 +11,7 @@ export const acceptChanges = async (id) => {
             user_id: id
         };
 
-        const response = await axios.post('https://guides-to-go.onrender.com/admin/accept_changes', params, request_headers);
+        const response = await axios.post('https://api.theguidewave.com/admin/accept_changes', params, request_headers);
 
         console.log(response.data);
 

@@ -14,7 +14,7 @@ export const addBackground = async (data, photo) => {
             params: { country_code : data.country_code , name: data.name }
         };
         
-        await axios.post('https://guides-to-go.onrender.com/admin/background_photo_add', photo, request_params);
+        await axios.post('https://api.theguidewave.com/admin/background_photo_add', photo, request_params);
         toast.success('Фон был успешно добавлен');
     } catch (err) {
         switch (err.response.status) {
