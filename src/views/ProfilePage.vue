@@ -41,6 +41,14 @@
 
                 <div class="guide-profile__line"/>
 
+                <div v-if="guide_profile.email" class="guide-profile__form-field full-column">
+                    <p class="form-label" v-text="$t('email')" />
+
+                    <div class="guide-profile__email" v-text="guide_profile.email"/>
+                </div>
+
+                <div class="guide-profile__line"/>
+
                 <div class="guide-profile__form-field full-column">
                     <p class="form-label" v-text="$t('location')" />
 
@@ -554,6 +562,22 @@
             grid-column: 1 / 3;
             @media screen and (max-width: 480px) {
                 margin: 0.5rem 0;
+            }
+        }
+        &__email {
+            display: block;
+            width: 100%;
+            background-color: $white;
+            border-radius: 0.5rem;
+            padding: 1rem 0.75rem;
+            border: 2px solid $white;
+            color: $black;
+            outline: none;
+            transition: all 0.3s ease;
+            line-height: 1.25;
+            @media screen and (max-width: 480px) {
+                font-size: 16px;
+                padding: 0.75rem 0.5rem;
             }
         }
         &__label {
