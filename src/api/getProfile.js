@@ -6,7 +6,7 @@ const toast = useToast();
 export const getProfile = async (router, t) => {
     try {
         const request_headers = { headers: { 'Authorization': `Bearer ${$cookies.get("access_token")}` } };
-        const response = await axios.get('https://api.theguidewave.com/user_info', request_headers);
+        const response = await axios.get('https://api.theguidewave.com/user_info/', request_headers);
 
         console.log(response.data.info_about_user);
 
